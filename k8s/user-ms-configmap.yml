@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: kareer
+  name: ms-user
+  labels:
+    app: ms-user
+data:
+  application.yml: |-
+    spring:
+      datasource:
+        url: jdbc:postgresql://ms-user-db:5432/kareer
+        username: 'admin'
+        password: 'admin'
+      liquibase:
+        drop-first: false

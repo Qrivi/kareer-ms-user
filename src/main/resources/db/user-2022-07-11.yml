@@ -1,0 +1,93 @@
+databaseChangeLog:
+  - changeSet:
+      id: user-2022-07-11
+      author: Kristof Dewilde
+      changes:
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: user_pkey
+                    nullable: false
+                    unique: true
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: email
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: alias
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: company_uuid
+                  type: UUID
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: role
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: false
+        - createTable:
+            tableName: ticket
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: user_pkey
+                    nullable: false
+                    unique: true
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: token
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: used
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                    unique: false
