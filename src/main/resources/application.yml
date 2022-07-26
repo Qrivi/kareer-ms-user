@@ -1,5 +1,5 @@
 kareer:
-  salt: 0VKvg9UVp1WDcUKLPH7o2Vp9RSeLXIVQ
+  salt: $2a$12$s2o5YgwkqXj90ArJV7SYbe
   admin-email: kristof@kommaboard.be
   admin-password: admin
   confirm-email-ttl: 7 # days
@@ -22,7 +22,7 @@ management:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/kareer_local
+    url: jdbc:postgresql://localhost:5432/kareer
     username: 'admin'
     password: 'admin'
   jpa:
@@ -39,7 +39,7 @@ spring:
     open-in-view: false
   liquibase:
     enabled: true
-    drop-first: true
+    drop-first: false
     change-log: classpath:/db/changelog.yml
   mvc:
     throw-exception-if-no-handler-found: true
@@ -62,3 +62,5 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    org.springframework.cloud.kubernetes.client.KubernetesClientUtils: ERROR
+    io.kubernetes.client.spring.extended.controller.config.KubernetesInformerAutoConfiguration: ERROR

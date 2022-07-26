@@ -70,7 +70,7 @@ databaseChangeLog:
                   type: UUID
                   constraints:
                     primaryKey: true
-                    primaryKeyName: user_pkey
+                    primaryKeyName: ticket_pkey
                     nullable: false
                     unique: true
               - column:

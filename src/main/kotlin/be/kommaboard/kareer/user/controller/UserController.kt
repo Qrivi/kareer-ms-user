@@ -19,7 +19,7 @@ import java.util.UUID
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 class UserController(
     private val userService: UserService,
 ) {

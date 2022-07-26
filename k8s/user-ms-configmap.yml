@@ -8,9 +8,11 @@ metadata:
 data:
   application.yml: |-
     spring:
+      cloud:
+        kubernetes:
+          discovery:
+            enabled: true
       datasource:
         url: jdbc:postgresql://ms-user-db:5432/kareer
         username: 'admin'
         password: 'admin'
-      liquibase:
-        drop-first: false

@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties(prefix = "kareer")
-class UserConfig {
+data class UserConfig (
 
-    val salt = "0VKvg9UVp1WDcUKLPH7o2Vp9RSeLXIVQ"
+    var salt: String = "\$2a\$12\$s2o5YgwkqXj90ArJV7SYbe",
 
-    val adminEmail = "kommaboard@kristofdewil.de"
-    val adminPassword = "admin"
+    var adminEmail: String = "kommaboard@kristofdewil.de",
+    var adminPassword: String = "admin",
 
-    val confirmEmailTTL = 7L
-    val resetPasswordTTL = 1L
-}
+    var confirmEmailTTL: Long = 7L,
+    var resetPasswordTTL: Long = 1L,
+)
