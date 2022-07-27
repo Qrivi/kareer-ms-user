@@ -1,5 +1,6 @@
 package be.kommaboard.kareer.user.service
 
+import be.kommaboard.kareer.common.hashedWithSalt
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
@@ -56,7 +57,7 @@ class UserService(
         val user = User(
             creationDate = now,
             email = email.trim(),
-            password = password.hashedWithSalt(),
+            password = password.hashedWithSalt(userConfig.salt),
             name = name.trim(),
             alias = if (!alias.isNullOrBlank()) alias.trim() else name.trim().substringBefore(" "),
             companyUuid = companyUuid,
@@ -70,7 +71,7 @@ class UserService(
             val ticket = Ticket(
                 user = user,
                 creationDate = now,
-                token = UUID.randomUUID().toString().hashedWithSalt(),
+                token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt),
                 kind = Ticket.Kind.CONFIRM_EMAIL,
             )
             ticketRepository.save(ticket)
