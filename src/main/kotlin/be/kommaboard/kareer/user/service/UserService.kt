@@ -104,6 +104,4 @@ class UserService(
 
         return user
     }
-
-    private fun String.hashedWithSalt() = BCrypt.hashpw(this, userConfig.salt)
 }

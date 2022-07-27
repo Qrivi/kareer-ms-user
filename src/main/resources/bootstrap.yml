@@ -3,13 +3,13 @@ spring:
     name: ms-user
   cloud:
     kubernetes:
-      reload:
-        enabled: true
-        mode: polling
-        period: 1000
       config:
         sources:
           - name: ${spring.application.name}
       discovery:
         enabled: false
         all-namespaces: true
+      reload:
+        enabled: true
+        mode: polling
+        period: 10000

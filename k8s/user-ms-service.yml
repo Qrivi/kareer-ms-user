@@ -6,9 +6,8 @@ metadata:
   labels:
     app: ms-user
 spec:
-  type: NodePort # ClusterIP
+  type: ClusterIP
   selector:
     app: ms-user
   ports:
-    - port: 32001
-      nodePort: 32001
+    - port: 32002

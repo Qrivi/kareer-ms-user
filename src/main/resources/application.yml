@@ -6,7 +6,7 @@ kareer:
   reset-password-ttl: 1 # days
 
 server:
-  port: 32001
+  port: 32002
   error:
     whitelabel:
       enabled: false

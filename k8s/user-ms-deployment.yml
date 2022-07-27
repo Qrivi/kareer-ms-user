@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: ms-user
-          image: kareer/ms-user
+          image: kareer/ms-user:0.0.1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 32001
+            - containerPort: 32002
