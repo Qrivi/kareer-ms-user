@@ -1,5 +1,6 @@
 package be.kommaboard.kareer.user.repository.entity
 
+import be.kommaboard.kareer.common.security.Role
 import org.hibernate.annotations.GenericGenerator
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -49,12 +50,6 @@ class User(
     var status: Status,
 
 ) {
-
-    enum class Role {
-        USER,
-        MANAGER,
-        ADMIN,
-    }
 
     enum class Status {
         REGISTERED,

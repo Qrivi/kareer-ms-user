@@ -1,6 +1,7 @@
 package be.kommaboard.kareer.user.service
 
 import be.kommaboard.kareer.common.hashedWithSalt
+import be.kommaboard.kareer.common.security.Role
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
@@ -38,7 +39,7 @@ class UserService(
                 email = userConfig.adminEmail,
                 password = userConfig.adminPassword,
                 name = "Admin",
-                role = User.Role.ADMIN,
+                role = Role.ADMIN,
                 activate = true,
             )
         }
@@ -50,7 +51,7 @@ class UserService(
 
     fun getUserByEmail(email: String) = userRepository.findByEmail(email)
 
-    fun createUser(email: String, password: String, name: String, alias: String? = null, companyUuid: UUID? = null, role: User.Role, activate: Boolean = false): User {
+    fun createUser(email: String, password: String, name: String, alias: String? = null, companyUuid: UUID? = null, role: Role, activate: Boolean = false): User {
         val now = ZonedDateTime.now()
 
         // Create the new user
