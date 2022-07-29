@@ -1,0 +1,9 @@
+.git/
+build/
+k8s/
+log/
+
+.editorconfig
+.gitignore
+.gitmodules
+skaffold.yml
