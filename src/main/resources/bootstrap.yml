@@ -9,6 +9,9 @@ spring:
       discovery:
         enabled: false
         all-namespaces: true
+      loadbalancer:
+        enabled: false
+        mode: service
       reload:
         enabled: true
         mode: polling

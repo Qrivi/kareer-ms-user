@@ -12,6 +12,8 @@ data:
         kubernetes:
           discovery:
             enabled: true
+          loadbalancer:
+            enabled: true
       datasource:
         url: jdbc:postgresql://ms-user-db:5432/kareer
         username: 'admin'
