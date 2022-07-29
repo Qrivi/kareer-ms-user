@@ -1,7 +1,7 @@
 package be.kommaboard.kareer.user.controller
 
-import be.kommaboard.kareer.common.dto.ErrorDTO
-import be.kommaboard.kareer.common.dto.ResponseDTO
+import be.kommaboard.kareer.common.response.dto.ErrorDTO
+import be.kommaboard.kareer.common.response.dto.ResponseDTO
 import be.kommaboard.kareer.common.security.InternalHttpHeaders
 import be.kommaboard.kareer.common.security.Role
 import be.kommaboard.kareer.user.controller.dto.request.CreateUserDTO

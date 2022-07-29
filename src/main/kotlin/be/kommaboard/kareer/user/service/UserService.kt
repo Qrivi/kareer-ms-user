@@ -54,6 +54,8 @@ class UserService(
     fun createUser(email: String, password: String, name: String, alias: String? = null, companyUuid: UUID? = null, role: Role, activate: Boolean = false): User {
         val now = ZonedDateTime.now()
 
+        // TODO check if email is already registered
+
         // Create the new user
         val user = User(
             creationDate = now,
