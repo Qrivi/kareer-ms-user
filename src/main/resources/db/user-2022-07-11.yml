@@ -74,6 +74,12 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: user_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
                   name: creation_date
                   type: TIMESTAMP
                   constraints:
@@ -82,6 +88,12 @@ databaseChangeLog:
               - column:
                   name: token
                   type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: kind
+                  type: VARCHAR(20)
                   constraints:
                     nullable: false
                     unique: false
