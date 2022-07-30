@@ -21,7 +21,7 @@ class User(
         strategy = "org.hibernate.id.UUIDGenerator",
     )
     @Column(name = "uuid")
-    val uuid: UUID = UUID.randomUUID(),
+    val uuid: UUID? = null,
 
     @Column(name = "creation_date")
     val creationDate: ZonedDateTime,

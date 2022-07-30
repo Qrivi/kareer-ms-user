@@ -1,6 +1,6 @@
 package be.kommaboard.kareer.user.controller.dto.response
 
-import be.kommaboard.kareer.common.response.dto.ResponseDTO
+import be.kommaboard.kareer.common.dto.ResponseDTO
 import be.kommaboard.kareer.user.repository.entity.User
 import java.time.ZonedDateTime
 

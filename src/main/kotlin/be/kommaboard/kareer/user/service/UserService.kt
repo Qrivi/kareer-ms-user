@@ -11,12 +11,12 @@ import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
 import be.kommaboard.kareer.user.service.exception.TicketExpiredException
 import be.kommaboard.kareer.user.service.exception.TicketInvalidException
 import be.kommaboard.kareer.user.service.exception.TicketNotFoundException
+import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserNotFoundException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
-import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
@@ -45,39 +45,52 @@ class UserService(
         }
     }
 
-    fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserNotFoundException(uuid)
+    fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserNotFoundException()
 
-    fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketNotFoundException(uuid)
+    fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketNotFoundException()
 
     fun getUserByEmail(email: String) = userRepository.findByEmail(email)
 
-    fun createUser(email: String, password: String, name: String, alias: String? = null, companyUuid: UUID? = null, role: Role, activate: Boolean = false): User {
+    fun createUser(
+        email: String,
+        password: String,
+        name: String,
+        alias: String? = null,
+        companyUuid: UUID? = null,
+        role: Role,
+        activate: Boolean = false,
+    ): User {
+        val formattedEmail = email.trim().lowercase()
+
+        if (userRepository.existsByEmailIgnoreCase(formattedEmail))
+            throw UserAlreadyExistsException(formattedEmail)
+
         val now = ZonedDateTime.now()
 
-        // TODO check if email is already registered
-
         // Create the new user
-        val user = User(
-            creationDate = now,
-            email = email.trim(),
-            password = password.hashedWithSalt(userConfig.salt),
-            name = name.trim(),
-            alias = if (!alias.isNullOrBlank()) alias.trim() else name.trim().substringBefore(" "),
-            companyUuid = companyUuid,
-            role = role,
-            status = if (activate) User.Status.ACTIVATED else User.Status.REGISTERED,
+        val user = userRepository.saveAndFlush(
+            User(
+                creationDate = now,
+                email = formattedEmail,
+                password = password.hashedWithSalt(userConfig.salt),
+                name = name.trim(),
+                alias = if (!alias.isNullOrBlank()) alias.trim() else name.trim().substringBefore(" "),
+                companyUuid = companyUuid,
+                role = role,
+                status = if (activate) User.Status.ACTIVATED else User.Status.REGISTERED,
+            )
         )
-        userRepository.saveAndFlush(user)
 
         // Create a ticket to activate the user later
         if (!activate) {
-            val ticket = Ticket(
-                user = user,
-                creationDate = now,
-                token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt),
-                kind = Ticket.Kind.CONFIRM_EMAIL,
+            ticketRepository.save(
+                Ticket(
+                    user = user,
+                    creationDate = now,
+                    token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt),
+                    kind = Ticket.Kind.CONFIRM_EMAIL,
+                )
             )
-            ticketRepository.save(ticket)
         }
 
         // TODO Add message to the queue to send out activation e-mail
@@ -85,7 +98,11 @@ class UserService(
         return user
     }
 
-    fun activateUser(userUuid: UUID, ticketUuid: UUID, token: String): User {
+    fun confirmEmail(
+        userUuid: UUID,
+        ticketUuid: UUID,
+        token: String,
+    ): User {
         val user = getUserByUuid(userUuid)
         val ticket = getTicketByUuid(ticketUuid)
 
@@ -93,6 +110,8 @@ class UserService(
         if (token != ticket.token) throw TicketInvalidException(ticketUuid)
         // Verify that passed user UUID matches with user linked to ticket in the database
         if (userUuid != ticket.user.uuid) throw TicketInvalidException(ticketUuid)
+        // Verify that ticket was meant to confirm e-mail
+        if (Ticket.Kind.CONFIRM_EMAIL != ticket.kind) throw TicketInvalidException(ticketUuid)
         // Verify that the ticket was not expired
         if (ZonedDateTime.now().isBefore(ticket.creationDate.plusDays(userConfig.confirmEmailTTL))) throw TicketExpiredException(ticketUuid)
         // Verify that the ticket was not used before

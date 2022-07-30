@@ -21,7 +21,7 @@ class Ticket(
         strategy = "org.hibernate.id.UUIDGenerator",
     )
     @Column(name = "uuid")
-    val uuid: UUID = UUID.randomUUID(),
+    val uuid: UUID? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_uuid")

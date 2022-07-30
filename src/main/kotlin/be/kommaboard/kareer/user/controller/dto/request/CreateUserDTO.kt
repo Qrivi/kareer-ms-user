@@ -11,7 +11,7 @@ data class CreateUserDTO(
 
     @JsonProperty("email")
     @get:NotBlank(message = "{CreateUserDTO.email.NotBlank}")
-    @get:Email(message = "{CreateUserDTO.email.Email")
+    @get:Email(message = "{CreateUserDTO.email.Email}")
     val email: String?,
 
     @JsonProperty("password")

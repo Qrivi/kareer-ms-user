@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties(prefix = "kareer")
-data class UserConfig (
+data class UserConfig(
 
     var salt: String = "\$2a\$12\$s2o5YgwkqXj90ArJV7SYbe",
 
