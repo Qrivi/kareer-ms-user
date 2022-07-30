@@ -4,6 +4,7 @@ import be.kommaboard.kareer.common.dto.ResponseDTO
 import be.kommaboard.kareer.common.dto.response.ErrorDTO
 import be.kommaboard.kareer.common.security.InternalHttpHeaders
 import be.kommaboard.kareer.common.security.Role
+import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.controller.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.controller.dto.response.UserDTO
 import be.kommaboard.kareer.user.service.UserService
@@ -24,6 +25,7 @@ import javax.validation.Valid
 @RequestMapping("/users/v1")
 class UserController(
     private val userService: UserService,
+    private val userConfig: UserConfig,
 ) {
 
     @GetMapping("/{uuid}")
@@ -33,7 +35,7 @@ class UserController(
         @PathVariable uuid: String,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
-        if (!Role.SYSTEM.matches(consumerRole))
+        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
             return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
 
         val user = userService.getUserByUuid(UUID.fromString(uuid))
@@ -47,7 +49,11 @@ class UserController(
         @RequestHeader(value = InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @Valid @RequestBody dto: CreateUserDTO,
         validation: BindingResult,
+        request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
+        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
+            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+
         if (validation.hasErrors())
             return ErrorDTO.BadRequest(validation).buildEntity()
 

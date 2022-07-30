@@ -18,3 +18,10 @@ data:
         url: jdbc:postgresql://ms-user-db:5432/kareer
         username: 'admin'
         password: 'admin'
+    kareer:
+        consumer-id: cluster
+        salt: $2a$12$d4cOXB.py0DYQh8ICeKdaejHycVpag.Mn1ZBR1SFwU5Agi2QP2O5O
+        admin-email: kristof@kommaboard.be
+        admin-password: KareerAdmin69
+        confirm-email-ttl: 168 # hours aka 7 days
+        reset-password-ttl: 24 # hours aka 1 day

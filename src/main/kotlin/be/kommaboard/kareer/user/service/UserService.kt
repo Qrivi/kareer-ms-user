@@ -36,8 +36,8 @@ class UserService(
         if (userRepository.count() == 0L) {
             logger.warn("No admins found in database. Creating admin with default credentials...")
             createUser(
-                email = userConfig.adminEmail,
-                password = userConfig.adminPassword,
+                email = userConfig.adminEmail!!,
+                password = userConfig.adminPassword!!,
                 name = "Admin",
                 role = Role.ADMIN,
                 activate = true,
@@ -72,7 +72,7 @@ class UserService(
             User(
                 creationDate = now,
                 email = formattedEmail,
-                password = password.hashedWithSalt(userConfig.salt),
+                password = password.hashedWithSalt(userConfig.salt!!),
                 name = name.trim(),
                 alias = if (!alias.isNullOrBlank()) alias.trim() else name.trim().substringBefore(" "),
                 companyUuid = companyUuid,
@@ -87,7 +87,7 @@ class UserService(
                 Ticket(
                     user = user,
                     creationDate = now,
-                    token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt),
+                    token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt!!),
                     kind = Ticket.Kind.CONFIRM_EMAIL,
                 )
             )
@@ -113,7 +113,7 @@ class UserService(
         // Verify that ticket was meant to confirm e-mail
         if (Ticket.Kind.CONFIRM_EMAIL != ticket.kind) throw TicketInvalidException(ticketUuid)
         // Verify that the ticket was not expired
-        if (ZonedDateTime.now().isBefore(ticket.creationDate.plusDays(userConfig.confirmEmailTTL))) throw TicketExpiredException(ticketUuid)
+        if (ZonedDateTime.now().isBefore(ticket.creationDate.plusHours(userConfig.confirmEmailTtl!!))) throw TicketExpiredException(ticketUuid)
         // Verify that the ticket was not used before
         if (ticket.used) throw TicketAlreadyUsedException(ticketUuid)
 

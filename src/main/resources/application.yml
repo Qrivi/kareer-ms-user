@@ -1,16 +1,16 @@
 kareer:
-  salt: $2a$12$s2o5YgwkqXj90ArJV7SYbe
+  consumer-id: localhost
+  salt: $2a$12$d4cOXB.py0DYQh8ICeKdaejHycVpag.Mn1ZBR1SFwU5Agi2QP2O5O
   admin-email: kristof@kommaboard.be
-  admin-password: admin
-  confirm-email-ttl: 7 # days
-  reset-password-ttl: 1 # days
+  admin-password: KareerAdmin69
+  confirm-email-ttl: 168 # hours aka 7 days
+  reset-password-ttl: 24 # hours aka 1 day
 
 server:
   port: 32002
   error:
     whitelabel:
       enabled: false
-
 
 management:
   endpoints:
