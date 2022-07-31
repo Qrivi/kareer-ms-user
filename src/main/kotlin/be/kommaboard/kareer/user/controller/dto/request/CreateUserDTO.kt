@@ -12,6 +12,7 @@ data class CreateUserDTO(
     @JsonProperty("email")
     @get:NotBlank(message = "{CreateUserDTO.email.NotBlank}")
     @get:Email(message = "{CreateUserDTO.email.Email}")
+    @get:Size(message = "{CreateUserDTO.email.Size}", max = 100)
     val email: String?,
 
     @JsonProperty("password")
@@ -23,8 +24,10 @@ data class CreateUserDTO(
 
     @JsonProperty("name")
     @get:NotBlank(message = "{CreateUserDTO.name.NotBlank}")
+    @get:Size(message = "{CreateUserDTO.name.Size}", max = 100)
     val name: String?,
 
     @JsonProperty("alias")
+    @get:Size(message = "{CreateUserDTO.alias.Size}", max = 100)
     val alias: String?,
 )
