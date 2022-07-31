@@ -47,6 +47,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     // Liquibase
     implementation("org.liquibase:liquibase-core:4.11.0")
+    // OpenAPI
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

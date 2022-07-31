@@ -18,6 +18,12 @@ management:
       exposure:
         include: '*'
 
+springdoc:
+  api-docs:
+    path: /openapi
+  swagger-ui:
+    path: /swagger
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/kareer
