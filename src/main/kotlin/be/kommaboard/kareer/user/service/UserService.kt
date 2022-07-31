@@ -49,7 +49,7 @@ class UserService(
         }
     }
 
-    fun getAllUsers() = userRepository.findAll()
+    fun getAllUsers(): List<User> = userRepository.findAll()
 
     fun getPagedUsers(
         pageRequest: PageRequest,
