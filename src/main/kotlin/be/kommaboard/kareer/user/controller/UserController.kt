@@ -1,13 +1,23 @@
 package be.kommaboard.kareer.user.controller
 
 import be.kommaboard.kareer.common.dto.ResponseDTO
+import be.kommaboard.kareer.common.dto.buildEntity
 import be.kommaboard.kareer.common.dto.response.ErrorDTO
+import be.kommaboard.kareer.common.exception.OutOfPagesException
 import be.kommaboard.kareer.common.security.InternalHttpHeaders
 import be.kommaboard.kareer.common.security.Role
+import be.kommaboard.kareer.common.toRole
+import be.kommaboard.kareer.common.toUuid
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.controller.dto.request.CreateUserDTO
+import be.kommaboard.kareer.user.controller.dto.request.VerifyCredentialsDTO
 import be.kommaboard.kareer.user.controller.dto.response.UserDTO
+import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.data.mapping.PropertyReferenceException
+import org.springframework.data.util.ClassTypeInformation
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,37 +26,82 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users/v1")
 class UserController(
-    private val userService: UserService,
     private val userConfig: UserConfig,
+    private val userService: UserService,
 ) {
+
+    @GetMapping("/all")
+    fun getAllUsers(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<*> {
+        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
+            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+
+        val users = userService.getAllUsers()
+
+        return users.map { user -> UserDTO(user) }.buildEntity()
+    }
+
+    @GetMapping
+    fun getUsers(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @RequestParam email: String?,
+        @RequestParam company: String?,
+        @RequestParam role: String?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam sort: String?,
+        request: HttpServletRequest,
+    ): ResponseEntity<*> {
+        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
+            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+
+        if (sort.equals("password")) // Disable sorting on password
+            throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
+
+        val results = userService.getPagedUsers(
+            pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
+            email = if (email.isNullOrBlank()) null else email.trim(),
+            companyUuid = if (company.isNullOrBlank()) null else company.toUuid(),
+            role = if (role.isNullOrBlank()) null else role.toRole(),
+        )
+
+        if (results.totalPages <= page)
+            throw OutOfPagesException()
+
+        return results.content.map { user -> UserDTO(user) }.buildEntity(request, results)
+    }
 
     @GetMapping("/{uuid}")
     fun getUser(
-        @RequestHeader(value = InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
-        @RequestHeader(value = InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
         if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
             return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
 
-        val user = userService.getUserByUuid(UUID.fromString(uuid))
+        val user = userService.getUserByUuid(uuid.toUuid())
 
         return UserDTO(user).buildEntity()
     }
 
     @PostMapping
     fun createUser(
-        @RequestHeader(value = InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
-        @RequestHeader(value = InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @Valid @RequestBody dto: CreateUserDTO,
         validation: BindingResult,
         request: HttpServletRequest,
@@ -64,6 +119,28 @@ class UserController(
             alias = dto.alias,
             // TODO companyUuid: retrieve using authorization, copy from manager
             role = Role.USER,
+        )
+
+        return UserDTO(user).buildEntity()
+    }
+
+    @PostMapping("/verify")
+    fun verifyUserCredentials(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @Valid @RequestBody dto: VerifyCredentialsDTO,
+        validation: BindingResult,
+        request: HttpServletRequest,
+    ): ResponseEntity<ResponseDTO> {
+        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
+            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+
+        if (validation.hasErrors())
+            return ErrorDTO.BadRequest(validation).buildEntity()
+
+        val user = userService.getUserByEmailAndPassword(
+            email = dto.email!!,
+            password = dto.password!!
         )
 
         return UserDTO(user).buildEntity()

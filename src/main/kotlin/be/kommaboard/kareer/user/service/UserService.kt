@@ -7,16 +7,20 @@ import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
 import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
+import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
+import be.kommaboard.kareer.user.service.exception.TicketDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketExpiredException
 import be.kommaboard.kareer.user.service.exception.TicketInvalidException
-import be.kommaboard.kareer.user.service.exception.TicketNotFoundException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
-import be.kommaboard.kareer.user.service.exception.UserNotFoundException
+import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
@@ -45,11 +49,42 @@ class UserService(
         }
     }
 
-    fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserNotFoundException()
+    fun getAllUsers() = userRepository.findAll()
 
-    fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketNotFoundException()
+    fun getPagedUsers(
+        pageRequest: PageRequest,
+        email: String?,
+        companyUuid: UUID?,
+        role: Role?,
+    ): Page<User> {
+        if (email != null && companyUuid != null && role != null)
+            return userRepository.findAllByCompanyUuidAndRoleAndEmailLikeIgnoreCase(companyUuid, role, email, pageRequest)
+        else if (email != null && companyUuid != null)
+            return userRepository.findAllByCompanyUuidAndEmailLikeIgnoreCase(companyUuid, email, pageRequest)
+        else if (email != null && role != null)
+            return userRepository.findAllByRoleAndEmailLikeIgnoreCase(role, email, pageRequest)
+        else if (companyUuid != null && role != null)
+            return userRepository.findAllByCompanyUuidAndRole(companyUuid, role, pageRequest)
+        else if (email != null)
+            return userRepository.findAllByEmailLikeIgnoreCase(email, pageRequest)
+        else if (companyUuid != null)
+            return userRepository.findAllByCompanyUuid(companyUuid, pageRequest)
+        else if (role != null)
+            return userRepository.findAllByRole(role, pageRequest)
+        return userRepository.findAll(pageRequest)
+    }
+
+    fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserDoesNotExistException()
+
+    fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketDoesNotExistException()
 
     fun getUserByEmail(email: String) = userRepository.findByEmail(email)
+
+    fun getUserByEmailAndPassword(email: String, password: String): User {
+        val user = getUserByEmail(email) ?: throw IncorrectCredentialsException()
+        if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
+        return user
+    }
 
     fun createUser(
         email: String,
