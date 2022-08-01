@@ -58,20 +58,21 @@ class UserService(
         role: Role?,
     ): Page<User> {
         if (email != null && companyUuid != null && role != null)
-            return userRepository.findAllByCompanyUuidAndRoleAndEmailLikeIgnoreCase(companyUuid, role, email, pageRequest)
+            return userRepository.findAllByCompanyUuidAndRoleAndEmailContainsIgnoreCase(companyUuid, role, email, pageRequest)
         else if (email != null && companyUuid != null)
-            return userRepository.findAllByCompanyUuidAndEmailLikeIgnoreCase(companyUuid, email, pageRequest)
+            return userRepository.findAllByCompanyUuidAndEmailContainsIgnoreCase(companyUuid, email, pageRequest)
         else if (email != null && role != null)
-            return userRepository.findAllByRoleAndEmailLikeIgnoreCase(role, email, pageRequest)
+            return userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, email, pageRequest)
         else if (companyUuid != null && role != null)
             return userRepository.findAllByCompanyUuidAndRole(companyUuid, role, pageRequest)
         else if (email != null)
-            return userRepository.findAllByEmailLikeIgnoreCase(email, pageRequest)
+            return userRepository.findAllByEmailContainsIgnoreCase(email, pageRequest)
         else if (companyUuid != null)
             return userRepository.findAllByCompanyUuid(companyUuid, pageRequest)
         else if (role != null)
             return userRepository.findAllByRole(role, pageRequest)
-        return userRepository.findAll(pageRequest)
+        else
+            return userRepository.findAll(pageRequest)
     }
 
     fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserDoesNotExistException()
@@ -80,7 +81,10 @@ class UserService(
 
     fun getUserByEmail(email: String) = userRepository.findByEmail(email)
 
-    fun getUserByEmailAndPassword(email: String, password: String): User {
+    fun getUserByEmailAndPassword(
+        email: String,
+        password: String,
+    ): User {
         val user = getUserByEmail(email) ?: throw IncorrectCredentialsException()
         if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
         return user

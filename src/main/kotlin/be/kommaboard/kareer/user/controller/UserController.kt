@@ -49,7 +49,7 @@ class UserController(
 
         val users = userService.getAllUsers()
 
-        return users.map { user -> UserDTO(user) }.buildEntity()
+        return users.map(::UserDTO).buildEntity()
     }
 
     @GetMapping
@@ -80,7 +80,7 @@ class UserController(
         if (results.totalPages <= page)
             throw OutOfPagesException()
 
-        return results.content.map { user -> UserDTO(user) }.buildEntity(request, results)
+        return results.content.map(::UserDTO).buildEntity(request, results)
     }
 
     @GetMapping("/{uuid}")

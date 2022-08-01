@@ -41,13 +41,12 @@ dependencies {
     // Spring Cloud
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     // Spring Data
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
     // Liquibase
     implementation("org.liquibase:liquibase-core:4.11.0")
-    // OpenAPI
+    // OpenAPI + Swagger UI
     implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")

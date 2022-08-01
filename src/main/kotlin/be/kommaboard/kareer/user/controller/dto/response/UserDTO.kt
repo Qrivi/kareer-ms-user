@@ -10,6 +10,7 @@ data class UserDTO(
     val email: String,
     val name: String,
     val alias: String,
+    val companyUuid: String?,
     val role: String,
     val status: String,
 ) : ResponseDTO() {
@@ -20,6 +21,7 @@ data class UserDTO(
         email = user.email,
         name = user.name,
         alias = user.alias,
+        companyUuid = user.companyUuid?.toString(),
         role = user.role.name,
         status = user.status.name,
     )

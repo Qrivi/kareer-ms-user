@@ -11,19 +11,19 @@ import java.util.UUID
 @Repository
 interface UserRepository : JpaRepository<User, UUID> {
 
-    fun findAllByEmailLikeIgnoreCase(email: String, pageable: Pageable): Page<User>
+    fun findAllByRole(role: Role, pageable: Pageable): Page<User>
 
     fun findAllByCompanyUuid(companyUUID: UUID, pageable: Pageable): Page<User>
 
-    fun findAllByRole(role: Role, pageable: Pageable): Page<User>
+    fun findAllByEmailContainsIgnoreCase(email: String, pageable: Pageable): Page<User>
 
     fun findAllByCompanyUuidAndRole(companyUUID: UUID, role: Role, pageable: Pageable): Page<User>
 
-    fun findAllByRoleAndEmailLikeIgnoreCase(role: Role, email: String, pageable: Pageable): Page<User>
+    fun findAllByRoleAndEmailContainsIgnoreCase(role: Role, email: String, pageable: Pageable): Page<User>
 
-    fun findAllByCompanyUuidAndEmailLikeIgnoreCase(companyUUID: UUID, email: String, pageable: Pageable): Page<User>
+    fun findAllByCompanyUuidAndEmailContainsIgnoreCase(companyUUID: UUID, email: String, pageable: Pageable): Page<User>
 
-    fun findAllByCompanyUuidAndRoleAndEmailLikeIgnoreCase(companyUUID: UUID, role: Role, email: String, pageable: Pageable): Page<User>
+    fun findAllByCompanyUuidAndRoleAndEmailContainsIgnoreCase(companyUUID: UUID, role: Role, email: String, pageable: Pageable): Page<User>
 
     fun findByUuid(uuid: UUID): User?
 
