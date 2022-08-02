@@ -1,5 +1,12 @@
 .git/
+
+.idea/
+
+.gradle/
+gradle/
 build/
+out/
+
 k8s/
 log/
 
