@@ -2,12 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: kareer
-  name: ms-user-db
+  name: ms-user
   labels:
-    app: ms-user-db
+    app: ms-user
 spec:
   type: ClusterIP
   selector:
-    app: ms-user-db
+    app: ms-user
   ports:
-    - port: 5432
+    - port: 32002
+      targetPort: 32002
