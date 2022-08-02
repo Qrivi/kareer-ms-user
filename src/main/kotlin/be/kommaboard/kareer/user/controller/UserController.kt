@@ -2,7 +2,6 @@ package be.kommaboard.kareer.user.controller
 
 import be.kommaboard.kareer.common.dto.ResponseDTO
 import be.kommaboard.kareer.common.dto.buildEntity
-import be.kommaboard.kareer.common.dto.response.ErrorDTO
 import be.kommaboard.kareer.common.exception.InvalidCredentialsException
 import be.kommaboard.kareer.common.exception.OutOfPagesException
 import be.kommaboard.kareer.common.exception.RequestValidationException
