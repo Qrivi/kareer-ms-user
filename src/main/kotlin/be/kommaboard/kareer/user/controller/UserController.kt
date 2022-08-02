@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/users/v1")
+@RequestMapping("/v1")
 class UserController(
     private val userConfig: UserConfig,
     private val userService: UserService,
@@ -64,11 +64,13 @@ class UserController(
         @RequestParam sort: String?,
         request: HttpServletRequest,
     ): ResponseEntity<*> {
-        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+        if (!Role.SYSTEM.matches(consumerRole) && !Role.ADMIN.matches(consumerRole))
+            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity() // TODO throw generic exception instead, and map in globalexceptionresolver
 
         if (sort.equals("password")) // Disable sorting on password
             throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
+
+        // TODO allow MANAGER too but overwrite companyuuid with user.companyuuid
 
         val results = userService.getPagedUsers(
             pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
