@@ -3,7 +3,9 @@ package be.kommaboard.kareer.user.controller
 import be.kommaboard.kareer.common.dto.ResponseDTO
 import be.kommaboard.kareer.common.dto.buildEntity
 import be.kommaboard.kareer.common.dto.response.ErrorDTO
+import be.kommaboard.kareer.common.exception.InvalidCredentialsException
 import be.kommaboard.kareer.common.exception.OutOfPagesException
+import be.kommaboard.kareer.common.exception.RequestValidationException
 import be.kommaboard.kareer.common.security.InternalHttpHeaders
 import be.kommaboard.kareer.common.security.Role
 import be.kommaboard.kareer.common.toRole
@@ -45,7 +47,7 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<*> {
         if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+            throw InvalidCredentialsException()
 
         val users = userService.getAllUsers()
 
@@ -63,9 +65,9 @@ class UserController(
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam sort: String?,
         request: HttpServletRequest,
-    ): ResponseEntity<*> {
+    ): ResponseEntity<List<ResponseDTO>> {
         if (!Role.SYSTEM.matches(consumerRole) && !Role.ADMIN.matches(consumerRole))
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity() // TODO throw generic exception instead, and map in globalexceptionresolver
+            throw InvalidCredentialsException()
 
         if (sort.equals("password")) // Disable sorting on password
             throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
@@ -93,7 +95,7 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
         if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+            throw InvalidCredentialsException()
 
         val user = userService.getUserByUuid(uuid.toUuid())
 
@@ -109,10 +111,10 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
         if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+            throw InvalidCredentialsException()
 
         if (validation.hasErrors())
-            return ErrorDTO.BadRequest(validation).buildEntity()
+            throw RequestValidationException(validation)
 
         val user = userService.createUser(
             email = dto.email!!,
@@ -135,10 +137,10 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
         if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            return ErrorDTO.Unauthorized(ErrorDTO.Unauthorized.Reason.INVALID_CREDENTIALS, request).buildEntity()
+            throw InvalidCredentialsException()
 
         if (validation.hasErrors())
-            return ErrorDTO.BadRequest(validation).buildEntity()
+            throw RequestValidationException(validation)
 
         val user = userService.getUserByEmailAndPassword(
             email = dto.email!!,
