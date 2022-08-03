@@ -65,7 +65,7 @@ class UserController(
         @RequestParam sort: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<ResponseDTO>> {
-        if (!Role.SYSTEM.matches(consumerRole) && !Role.ADMIN.matches(consumerRole))
+        if ((!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId) && !Role.ADMIN.matches(consumerRole))
             throw InvalidCredentialsException()
 
         if (sort.equals("password")) // Disable sorting on password
@@ -93,7 +93,7 @@ class UserController(
         @PathVariable uuid: String,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
-        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
+        if ((!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId) && !Role.ADMIN.matches(consumerRole))
             throw InvalidCredentialsException()
 
         val user = userService.getUserByUuid(uuid.toUuid())
