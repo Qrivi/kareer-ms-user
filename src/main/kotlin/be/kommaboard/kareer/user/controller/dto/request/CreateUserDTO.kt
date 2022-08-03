@@ -21,8 +21,8 @@ data class CreateUserDTO(
 
     @get:NotBlank(message = "{CreateUserDTO.name.NotBlank}")
     @get:Size(message = "{CreateUserDTO.name.Size}", max = 100)
-    val name: String?,
+    val fullName: String?,
 
     @get:Size(message = "{CreateUserDTO.alias.Size}", max = 100)
-    val alias: String?,
+    val shortName: String?,
 )

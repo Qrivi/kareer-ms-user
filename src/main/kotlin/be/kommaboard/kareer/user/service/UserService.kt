@@ -14,6 +14,7 @@ import be.kommaboard.kareer.user.service.exception.TicketExpiredException
 import be.kommaboard.kareer.user.service.exception.TicketInvalidException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
+import org.bouncycastle.asn1.x500.style.RFC4519Style.name
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
@@ -23,6 +24,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Clock
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -32,6 +34,7 @@ class UserService(
     private val userConfig: UserConfig,
     private val userRepository: UserRepository,
     private val ticketRepository: TicketRepository,
+    private val clock: Clock,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -42,7 +45,7 @@ class UserService(
             createUser(
                 email = userConfig.adminEmail!!,
                 password = userConfig.adminPassword!!,
-                name = "Admin",
+                fullName = "Admin",
                 role = Role.ADMIN,
                 activate = true,
             )
@@ -93,8 +96,8 @@ class UserService(
     fun createUser(
         email: String,
         password: String,
-        name: String,
-        alias: String? = null,
+        fullName: String,
+        shortName: String? = null,
         companyUuid: UUID? = null,
         role: Role,
         activate: Boolean = false,
@@ -104,7 +107,7 @@ class UserService(
         if (userRepository.existsByEmailIgnoreCase(formattedEmail))
             throw UserAlreadyExistsException(formattedEmail)
 
-        val now = ZonedDateTime.now()
+        val now = ZonedDateTime.now(clock)
 
         // Create the new user
         val user = userRepository.saveAndFlush(
@@ -112,8 +115,8 @@ class UserService(
                 creationDate = now,
                 email = formattedEmail,
                 password = password.hashedWithSalt(userConfig.salt!!),
-                name = name.trim(),
-                alias = if (!alias.isNullOrBlank()) alias.trim() else name.trim().substringBefore(" "),
+                fullName = fullName.trim(),
+                shortName = if (!shortName.isNullOrBlank()) shortName.trim() else fullName.trim().substringBefore(" "),
                 companyUuid = companyUuid,
                 role = role,
                 status = if (activate) User.Status.ACTIVATED else User.Status.REGISTERED,
@@ -152,7 +155,7 @@ class UserService(
         // Verify that ticket was meant to confirm e-mail
         if (Ticket.Kind.CONFIRM_EMAIL != ticket.kind) throw TicketInvalidException(ticketUuid)
         // Verify that the ticket was not expired
-        if (ZonedDateTime.now().isBefore(ticket.creationDate.plusHours(userConfig.confirmEmailTtl!!))) throw TicketExpiredException(ticketUuid)
+        if (ZonedDateTime.now(clock).isBefore(ticket.creationDate.plusHours(userConfig.confirmEmailTtl!!))) throw TicketExpiredException(ticketUuid)
         // Verify that the ticket was not used before
         if (ticket.used) throw TicketAlreadyUsedException(ticketUuid)
 

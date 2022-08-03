@@ -118,8 +118,8 @@ class UserController(
         val user = userService.createUser(
             email = dto.email!!,
             password = dto.password!!,
-            name = dto.name!!,
-            alias = dto.alias,
+            fullName = dto.fullName!!,
+            shortName = dto.shortName,
             // TODO companyUuid: retrieve using authorization, copy from manager
             role = Role.USER,
         )

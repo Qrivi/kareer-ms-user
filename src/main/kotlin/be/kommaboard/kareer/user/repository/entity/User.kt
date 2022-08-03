@@ -32,11 +32,11 @@ class User(
     @Column(name = "password")
     val password: String,
 
-    @Column(name = "name")
-    val name: String,
+    @Column(name = "full_name")
+    val fullName: String,
 
-    @Column(name = "alias")
-    val alias: String,
+    @Column(name = "short_name")
+    val shortName: String,
 
     @Column(name = "company_uuid")
     val companyUuid: UUID?,
