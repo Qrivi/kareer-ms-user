@@ -19,5 +19,5 @@ RUN groupadd -r kareer && useradd -g kareer kareer
 USER kareer:kareer
 
 # Get the app and mark it as entrypoint
-COPY --from=build ./build/libs/*.jar ./app.jar
+COPY --from=build /opt/build/libs/*.jar ./app.jar
 ENTRYPOINT ["java","-jar","app.jar"]
