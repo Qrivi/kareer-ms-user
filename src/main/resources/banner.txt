@@ -5,7 +5,7 @@
     @@        @@      | ' / | | | |\/| | |\/| | / _ \   |  _ \| | | |/ _ \ | |_) | | | |
     @@@@@@@   @@      | . \ |_| | |  | | |  | |/ ___ \  | |_) | |_| / ___ \|  _ <| |_| |
          @@   @@      |_|\_\___/|_|  |_|_|  |_/_/   \_\ |____/ \___/_/   \_\_| \_\____/
-        @@    @@      ${AnsiBackground.BLUE}                    ${AnsiBackground.DEFAULT} IT & FINANCE CONSULTANCY ${AnsiBackground.RED}                    ${AnsiBackground.DEFAULT}
-    @@@@    @@@       ${AnsiBackground.BLUE}                                 ${AnsiBackground.RED}                                 ${AnsiBackground.DEFAULT}
+        @@    @@
+    @@@@    @@@       ${AnsiBackground.BLUE}                    ${AnsiBackground.DEFAULT} IT & FINANCE CONSULTANCY ${AnsiBackground.RED}                    ${AnsiBackground.DEFAULT}
     @@   @@@@
     @@@@@             KAREER / ms-user

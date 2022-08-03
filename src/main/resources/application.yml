@@ -1,5 +1,5 @@
 kareer:
-  consumer-id: localhost
+  consumer-id: kareer.local
   salt: $2a$12$d4cOXB.py0DYQh8ICeKdaejHycVpag.Mn1ZBR1SFwU5Agi2QP2O5O
   admin-email: kristof@kommaboard.be
   admin-password: KareerAdmin69
@@ -26,7 +26,7 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/kareer
+    url: jdbc:postgresql://kareer.local:5432/kareer
     username: 'admin'
     password: 'admin'
   jpa:
