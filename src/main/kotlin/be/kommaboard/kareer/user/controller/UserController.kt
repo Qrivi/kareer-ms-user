@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/users/v1")
 class UserController(
     private val userConfig: UserConfig,
     private val userService: UserService,
