@@ -10,5 +10,5 @@ build:
 deploy:
   kubectl:
     manifests:
-      - ../kareer-kubernetes/config/*.yml
-      - k8s/*.yml
+      - ../kareer-deploy/k8s/*.yml
+      - ./k8s/*.yml
