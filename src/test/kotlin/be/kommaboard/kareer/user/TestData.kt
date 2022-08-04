@@ -13,7 +13,7 @@ import java.util.UUID
 
 class TestData {
 
-    val companyUuid:UUID="88888888-8888-8888-8888-888888888888".toUuid()
+    val organizationUuid:UUID="88888888-8888-8888-8888-888888888888".toUuid()
 
     val salt: String = BCrypt.gensalt(12)
 
@@ -29,7 +29,7 @@ class TestData {
             password = "AnnChovey1234".hashedWithSalt(salt),
             fullName = "Ann Chovey",
             shortName = "Ann",
-            companyUuid = null,
+            organizationUuid = null,
             role = Role.ADMIN,
             status = User.Status.ACTIVATED,
         ),
@@ -39,7 +39,7 @@ class TestData {
             password = "BarryCuda1234".hashedWithSalt(salt),
             fullName = "Barry Cuda",
             shortName = "Barry",
-            companyUuid = companyUuid,
+            organizationUuid = organizationUuid,
             role = Role.MANAGER,
             status = User.Status.ACTIVATED,
         ),
@@ -49,7 +49,7 @@ class TestData {
             password = "ClaudeStrophobia1234".hashedWithSalt(salt),
             fullName = "Claude Strophobia",
             shortName = "Claude",
-            companyUuid = companyUuid,
+            organizationUuid = organizationUuid,
             role = Role.USER,
             status = User.Status.ACTIVATED,
         ),

@@ -38,8 +38,8 @@ class User(
     @Column(name = "short_name")
     val shortName: String,
 
-    @Column(name = "company_uuid")
-    val companyUuid: UUID?,
+    @Column(name = "organization_uuid")
+    val organizationUuid: UUID?,
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)

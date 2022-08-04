@@ -57,21 +57,21 @@ class UserService(
     fun getPagedUsers(
         pageRequest: PageRequest,
         email: String?,
-        companyUuid: UUID?,
+        organizationUuid: UUID?,
         role: Role?,
     ): Page<User> {
-        if (email != null && companyUuid != null && role != null)
-            return userRepository.findAllByCompanyUuidAndRoleAndEmailContainsIgnoreCase(companyUuid, role, email, pageRequest)
-        else if (email != null && companyUuid != null)
-            return userRepository.findAllByCompanyUuidAndEmailContainsIgnoreCase(companyUuid, email, pageRequest)
+        if (email != null && organizationUuid != null && role != null)
+            return userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, email, pageRequest)
+        else if (email != null && organizationUuid != null)
+            return userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, email, pageRequest)
         else if (email != null && role != null)
             return userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, email, pageRequest)
-        else if (companyUuid != null && role != null)
-            return userRepository.findAllByCompanyUuidAndRole(companyUuid, role, pageRequest)
+        else if (organizationUuid != null && role != null)
+            return userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
         else if (email != null)
             return userRepository.findAllByEmailContainsIgnoreCase(email, pageRequest)
-        else if (companyUuid != null)
-            return userRepository.findAllByCompanyUuid(companyUuid, pageRequest)
+        else if (organizationUuid != null)
+            return userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
         else if (role != null)
             return userRepository.findAllByRole(role, pageRequest)
         else
@@ -98,7 +98,7 @@ class UserService(
         password: String,
         fullName: String,
         shortName: String? = null,
-        companyUuid: UUID? = null,
+        organizationUuid: UUID? = null,
         role: Role,
         activate: Boolean = false,
     ): User {
@@ -117,7 +117,7 @@ class UserService(
                 password = password.hashedWithSalt(userConfig.salt!!),
                 fullName = fullName.trim(),
                 shortName = if (!shortName.isNullOrBlank()) shortName.trim() else fullName.trim().substringBefore(" "),
-                companyUuid = companyUuid,
+                organizationUuid = organizationUuid,
                 role = role,
                 status = if (activate) User.Status.ACTIVATED else User.Status.REGISTERED,
             )

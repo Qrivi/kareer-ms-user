@@ -45,7 +45,7 @@ databaseChangeLog:
                     nullable: false
                     unique: false
               - column:
-                  name: company_uuid
+                  name: organization_uuid
                   type: UUID
                   constraints:
                     nullable: true

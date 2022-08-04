@@ -1,10 +1,12 @@
 package be.kommaboard.kareer.user.controller
 
+import be.kommaboard.kareer.common.authorizationCheck
 import be.kommaboard.kareer.common.dto.ResponseDTO
 import be.kommaboard.kareer.common.dto.buildEntity
 import be.kommaboard.kareer.common.exception.InvalidCredentialsException
 import be.kommaboard.kareer.common.exception.OutOfPagesException
 import be.kommaboard.kareer.common.exception.RequestValidationException
+import be.kommaboard.kareer.common.orNullIfBlank
 import be.kommaboard.kareer.common.security.InternalHttpHeaders
 import be.kommaboard.kareer.common.security.Role
 import be.kommaboard.kareer.common.toRole
@@ -45,8 +47,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         request: HttpServletRequest,
     ): ResponseEntity<*> {
-        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            throw InvalidCredentialsException()
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         val users = userService.getAllUsers()
 
@@ -58,26 +59,23 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @RequestParam email: String?,
-        @RequestParam company: String?,
+        @RequestParam organization: String?,
         @RequestParam role: String?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam sort: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<ResponseDTO>> {
-        if ((!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId) && !Role.ADMIN.matches(consumerRole))
-            throw InvalidCredentialsException()
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
 
         if (sort.equals("password")) // Disable sorting on password
             throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
 
-        // TODO allow MANAGER too but overwrite companyuuid with user.companyuuid
-
         val results = userService.getPagedUsers(
-            pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
-            email = if (email.isNullOrBlank()) null else email.trim(),
-            companyUuid = if (company.isNullOrBlank()) null else company.toUuid(),
-            role = if (role.isNullOrBlank()) null else role.toRole(),
+            pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
+            email = email.orNullIfBlank()?.trim(),
+            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organization.orNullIfBlank()?.toUuid(),
+            role = role.orNullIfBlank()?.toRole(),
         )
 
         if (results.totalPages <= page)
@@ -93,10 +91,19 @@ class UserController(
         @PathVariable uuid: String,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
-        if ((!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId) && !Role.ADMIN.matches(consumerRole))
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        if (Role.USER.matches(consumerRole) && uuid != consumerId)
             throw InvalidCredentialsException()
 
         val user = userService.getUserByUuid(uuid.toUuid())
+
+        if(Role.MANAGER.matches(consumerRole)){
+            val manager = userService.getUserByUuid(consumerId.toUuid())
+
+            if(manager.organizationUuid == null || user.organizationUuid == null || manager.organizationUuid != user.organizationUuid)
+                throw InvalidCredentialsException()
+        }
 
         return UserDTO(user).buildEntity()
     }
@@ -109,8 +116,7 @@ class UserController(
         validation: BindingResult,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
-        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            throw InvalidCredentialsException()
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
@@ -120,7 +126,7 @@ class UserController(
             password = dto.password!!,
             fullName = dto.fullName!!,
             shortName = dto.shortName,
-            // TODO companyUuid: retrieve using authorization, copy from manager
+            // TODO organizationUuid: retrieve using authorization, copy from manager?
             role = Role.USER,
         )
 
@@ -135,8 +141,7 @@ class UserController(
         validation: BindingResult,
         request: HttpServletRequest,
     ): ResponseEntity<ResponseDTO> {
-        if (!Role.SYSTEM.matches(consumerRole) || userConfig.consumerId != consumerId)
-            throw InvalidCredentialsException()
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
