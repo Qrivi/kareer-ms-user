@@ -46,7 +46,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         request: HttpServletRequest,
-    ): ResponseEntity<*> {
+    ): ResponseEntity<List<ResponseDTO>> {
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         val users = userService.getAllUsers()
