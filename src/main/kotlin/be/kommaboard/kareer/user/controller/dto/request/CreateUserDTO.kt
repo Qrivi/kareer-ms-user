@@ -9,14 +9,14 @@ import javax.validation.constraints.Size
 data class CreateUserDTO(
 
     @get:NotBlank(message = "{CreateUserDTO.email.NotBlank}")
-    @get:Email(message = "{CreateUserDTO.email.Email}")
     @get:Size(message = "{CreateUserDTO.email.Size}", max = 100)
+    @get:Email(message = "{CreateUserDTO.email.Email}")
     val email: String?,
 
     @get:NotBlank(message = "{CreateUserDTO.password.NotBlank}")
+    @get:Size(message = "{CreateUserDTO.password.size}", min = 8)
     @get:NotCommon(message = "{CreateUserDTO.password.NotCommon}")
     @get:NotSimple(message = "{CreateUserDTO.password.NotSimple}")
-    @get:Size(message = "{CreateUserDTO.password.size}", min = 8)
     val password: String?,
 
     @get:NotBlank(message = "{CreateUserDTO.name.NotBlank}")
