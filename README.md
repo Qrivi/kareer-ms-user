@@ -13,7 +13,6 @@ restart, but in Kubernetes the application detects changes to the ConfigMap and 
 |----------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `consumer-id`        | String | Value used for identification when communicating between services. Must be the same value across all microservices for authorization to be successful. |
 | `salt`               | String | Salt used when hashing passwords before sending them to the database. Must be a valid BCrypt salt. See below.                                          |
-| `salt`               | String | Salt used when hashing passwords before sending them to the database. Must be a valid BCrypt salt. See below.                                          |
 | `admin-email`        | String | E-mail address for the default admin user that is created when no users exist in the database.                                                         |
 | `admin-password`     | String | Password for the default admin user that is created when no users exist in the database.                                                               |
 | `confirm-email-ttl`  | Int    | Time To Live for tickets of the `CONFIRM_EMAIL` type. Basically how long the link to confirm your e-mail address remains valid.                        |
