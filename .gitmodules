@@ -1,3 +1,0 @@
-[submodule "common"]
-	path = common
-	url = git@bitbucket.org:komma-board/kareer-common.git
