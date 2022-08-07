@@ -1,4 +1,4 @@
-# kareer-user
+# kareer-ms-user
 
 Microservice for user management. Spins up a web server exposing REST endpoints on port 32002. API docs are available on `/swagger` generated from the OpenAPI 3 spec yaml available on `/openapi`.
 
