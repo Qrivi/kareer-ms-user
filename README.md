@@ -29,7 +29,7 @@ echo $(htpasswd -bnBC 12 "" password | tr -d ':\n' | sed 's/$2y/$2a/')
 
 ### Run locally
 
-Requires `http://kareer.local` to point to your local host. Expects a Postgres database `kareer` running on port 5432 and a user `admin` with password `admin` with full permissions on this database. Requires Java 17 to build the project. Gradle is not required as a wrapper is included.
+Requires `http://kareer.local` to point to your local host. Expects a Postgres database `kareer` running on port 5432 and a user `admin` with password `admin` with full permissions on this database. Requires JDK 17 to build the project. Gradle is not required as a wrapper is included.
 
 ```shell
 cd ms-user
