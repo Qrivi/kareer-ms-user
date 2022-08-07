@@ -50,9 +50,9 @@ cd ms-user
 # Perhaps first remove old containers (eg Postgres is shared, might give conflicts)
 docker container prune -f
 # Perhaps first remove old images (to make sure new images are build using latest code)
-docker rmi $(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'kareer')
+docker rmi $(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'kareer/')
 # Let's get this bread
-docker compose run -d -p 5432:5432 kareer-postgres
+docker compose up
 ```
 
 ### Run with Skaffold
