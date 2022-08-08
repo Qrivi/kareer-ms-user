@@ -61,8 +61,8 @@ class UserController(
     fun getUsers(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-        @RequestParam email: String?,
-        @RequestParam organization: String?,
+        @RequestParam emailPart: String?,
+        @RequestParam organizationUuid: String?,
         @RequestParam role: String?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
@@ -76,8 +76,8 @@ class UserController(
 
         val results = userService.getPagedUsers(
             pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
-            email = email.orNullIfBlank()?.trim(),
-            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organization.orNullIfBlank()?.toUuid(),
+            emailPart = emailPart.orNullIfBlank()?.trim(),
+            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.orNullIfBlank()?.toUuid(),
             role = role.orNullIfBlank()?.toRole(),
         )
 

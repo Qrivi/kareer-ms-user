@@ -55,20 +55,20 @@ class UserService(
 
     fun getPagedUsers(
         pageRequest: PageRequest,
-        email: String?,
+        emailPart: String?,
         organizationUuid: UUID?,
         role: Role?,
     ): Page<User> {
-        if (email != null && organizationUuid != null && role != null)
-            return userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, email, pageRequest)
-        else if (email != null && organizationUuid != null)
-            return userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, email, pageRequest)
-        else if (email != null && role != null)
-            return userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, email, pageRequest)
+        if (emailPart != null && organizationUuid != null && role != null)
+            return userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, emailPart, pageRequest)
+        else if (emailPart != null && organizationUuid != null)
+            return userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, emailPart, pageRequest)
+        else if (emailPart != null && role != null)
+            return userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, emailPart, pageRequest)
         else if (organizationUuid != null && role != null)
             return userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
-        else if (email != null)
-            return userRepository.findAllByEmailContainsIgnoreCase(email, pageRequest)
+        else if (emailPart != null)
+            return userRepository.findAllByEmailContainsIgnoreCase(emailPart, pageRequest)
         else if (organizationUuid != null)
             return userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
         else if (role != null)
