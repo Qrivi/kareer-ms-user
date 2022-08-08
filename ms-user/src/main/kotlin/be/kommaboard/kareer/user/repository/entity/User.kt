@@ -1,6 +1,7 @@
 package be.kommaboard.kareer.user.repository.entity
 
 import be.kommaboard.kareer.authorization.Role
+import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import org.hibernate.annotations.GenericGenerator
 import java.time.ZonedDateTime
@@ -50,12 +51,6 @@ class User(
     @Enumerated(EnumType.STRING)
     var status: Status,
 ) {
-
-    enum class Status {
-        REGISTERED,
-        ACTIVATED,
-        DEACTIVATED,
-    }
 
     fun toDTO() = UserDTO(
         uuid = uuid.toString(),

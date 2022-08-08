@@ -1,6 +1,7 @@
 package be.kommaboard.kareer.user.service
 
 import be.kommaboard.kareer.authorization.Role
+import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.TicketRepository
@@ -30,10 +31,10 @@ import java.util.UUID
 @Service
 @Transactional
 class UserService(
-    private val userConfig: UserConfig,
-    private val userRepository: UserRepository,
-    private val ticketRepository: TicketRepository,
     private val clock: Clock,
+    private val userConfig: UserConfig,
+    private val ticketRepository: TicketRepository,
+    private val userRepository: UserRepository,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -118,7 +119,7 @@ class UserService(
                 shortName = if (!shortName.isNullOrBlank()) shortName.trim() else fullName.trim().substringBefore(" "),
                 organizationUuid = organizationUuid,
                 role = role,
-                status = if (activate) User.Status.ACTIVATED else User.Status.REGISTERED,
+                status = if (activate) Status.ACTIVATED else Status.REGISTERED,
             )
         )
 
@@ -159,7 +160,7 @@ class UserService(
         if (ticket.used) throw TicketAlreadyUsedException(ticketUuid)
 
         // Mark user as activated
-        user.status = User.Status.ACTIVATED
+        user.status = Status.ACTIVATED
         userRepository.save(user)
 
         // Mark ticket as used

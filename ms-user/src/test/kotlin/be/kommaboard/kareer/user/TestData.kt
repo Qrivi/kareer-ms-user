@@ -1,6 +1,7 @@
 package be.kommaboard.kareer.user
 
 import be.kommaboard.kareer.authorization.Role
+import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
 import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.user.repository.entity.User
@@ -31,7 +32,7 @@ class TestData {
             shortName = "Ann",
             organizationUuid = null,
             role = Role.ADMIN,
-            status = User.Status.ACTIVATED,
+            status = Status.ACTIVATED,
         ),
         User(
             creationDate = ZonedDateTime.now(clock),
@@ -41,7 +42,7 @@ class TestData {
             shortName = "Barry",
             organizationUuid = organizationUuid,
             role = Role.MANAGER,
-            status = User.Status.ACTIVATED,
+            status = Status.ACTIVATED,
         ),
         User(
             creationDate = ZonedDateTime.now(clock),
@@ -51,7 +52,7 @@ class TestData {
             shortName = "Claude",
             organizationUuid = organizationUuid,
             role = Role.USER,
-            status = User.Status.ACTIVATED,
+            status = Status.ACTIVATED,
         ),
     )
 }
