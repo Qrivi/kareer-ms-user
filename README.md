@@ -47,7 +47,7 @@ Included in the `ms-user` subdirectory is a `docker-compose.yml` file which will
 ```shell
 cd ms-user
 # Perhaps first remove old containers (eg Postgres is shared, might give conflicts)
-docker container prune -f
+docker compose rm -sf
 # Perhaps first remove old images (to make sure new images are build using latest code)
 docker rmi $(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'kareer/')
 # Let's get this bread

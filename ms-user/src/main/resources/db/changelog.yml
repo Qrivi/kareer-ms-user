@@ -1,3 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/user-2022-07-11.yml

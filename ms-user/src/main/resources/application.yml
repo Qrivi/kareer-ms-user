@@ -45,7 +45,7 @@ spring:
   liquibase:
     enabled: true
     drop-first: false
-    change-log: classpath:/db/changelog.yml
+    change-log: classpath:/liquibase/changelog.yml
   mvc:
     throw-exception-if-no-handler-found: true
   web:
