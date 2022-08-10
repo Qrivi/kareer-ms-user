@@ -6,7 +6,8 @@ import be.kommaboard.kareer.authorization.authorizationCheck
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
 import be.kommaboard.kareer.authorization.toRole
 import be.kommaboard.kareer.authorization.toUuid
-import be.kommaboard.kareer.common.exception.OutOfPagesException
+import be.kommaboard.kareer.common.dto.ListDTO
+import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
 import be.kommaboard.kareer.common.orNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
@@ -46,7 +47,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         request: HttpServletRequest,
-    ): ResponseEntity<List<UserDTO>> {
+    ): ResponseEntity<ListDTO<UserDTO>> {
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         val users = userService.getAllUsers()
@@ -54,7 +55,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(users.map(User::toDTO))
+            .body(ListDTO(users.map(User::toDTO)))
     }
 
     @GetMapping
@@ -68,31 +69,31 @@ class UserController(
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam sort: String?,
         request: HttpServletRequest,
-    ): ResponseEntity<List<UserDTO>> {
+    ): ResponseEntity<ListDTO<UserDTO>> {
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
+
+        if (page < 0 || size < 1)
+            throw InvalidPageOrSizeException()
 
         if (!sort.isNullOrBlank() && sort.contains("password")) // Disable sorting on password
             throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
 
-        val results = userService.getPagedUsers(
+        val usersPage = userService.getPagedUsers(
             pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
             emailPart = emailPart.orNullIfBlank()?.trim(),
             organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.orNullIfBlank()?.toUuid(),
             role = role.orNullIfBlank()?.toRole(),
         )
 
-        if (results.totalPages <= page)
-            throw OutOfPagesException()
-
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(
                 HttpHeadersBuilder()
                     .contentLanguage()
-                    .link(request, results)
+                    .link(request, usersPage)
                     .build()
             )
-            .body(results.content.map(User::toDTO))
+            .body(ListDTO(usersPage.content.map(User::toDTO), usersPage))
     }
 
     @GetMapping("/{uuid}")
