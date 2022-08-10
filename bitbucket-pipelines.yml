@@ -1,0 +1,13 @@
+image: atlassian/default-image:3
+
+pipelines:
+  branches:
+    development:
+      - step:
+          name: 'Perform code analysis'
+          script:
+            - ./gradlew ktlintCheck
+      - step:
+          name: 'Build and test'
+          script:
+            - ./gradlew build # includes test
