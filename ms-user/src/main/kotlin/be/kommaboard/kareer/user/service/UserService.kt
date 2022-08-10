@@ -3,9 +3,13 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
+import be.kommaboard.kareer.common.capitalizeWords
+import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.user.UserConfig
+import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
+import be.kommaboard.kareer.user.repository.entity.Invite
 import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
@@ -33,6 +37,7 @@ import java.util.UUID
 class UserService(
     private val clock: Clock,
     private val userConfig: UserConfig,
+    private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
 ) {
@@ -138,6 +143,29 @@ class UserService(
         // TODO Add message to the queue to send out activation e-mail
 
         return user
+    }
+
+    fun createInvite(
+        inviterUuid: UUID,
+        inviteeEmail: String,
+        inviteeName: String?,
+    ): Invite {
+        val formattedInviteeEmail = inviteeEmail.trim().lowercase()
+        val formattedInviteeName = (inviteeName.trimOrNullIfBlank() ?: formattedInviteeEmail.replace('.', ' ')).capitalizeWords()
+
+        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
+            throw UserAlreadyExistsException(formattedInviteeEmail)
+
+        val invite = Invite(
+            inviter = getUserByUuid(inviterUuid),
+            creationDate = ZonedDateTime.now(clock),
+            inviteeEmail = formattedInviteeEmail,
+            inviteeName = formattedInviteeName,
+        )
+
+        // TODO send mail
+
+        return inviteRepository.save(invite)
     }
 
     fun confirmEmail(

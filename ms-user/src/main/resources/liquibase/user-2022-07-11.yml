@@ -63,6 +63,47 @@ databaseChangeLog:
                     nullable: false
                     unique: false
         - createTable:
+            tableName: invite
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: invite_pkey
+                    nullable: false
+                    unique: true
+              - column:
+                  name: inviter_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: invitee_email
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: invitee_name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: used
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                    unique: false
+        - createTable:
             tableName: ticket
             columns:
               - column:

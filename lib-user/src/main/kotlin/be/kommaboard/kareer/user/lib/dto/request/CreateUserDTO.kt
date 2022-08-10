@@ -19,10 +19,12 @@ data class CreateUserDTO(
     @get:NotSimple(message = "{CreateUserDTO.password.NotSimple}")
     val password: String?,
 
-    @get:NotBlank(message = "{CreateUserDTO.name.NotBlank}")
-    @get:Size(message = "{CreateUserDTO.name.Size}", max = 100)
+    @get:NotBlank(message = "{CreateUserDTO.fullName.NotBlank}")
+    @get:Size(message = "{CreateUserDTO.fullName.Size}", max = 100)
     val fullName: String?,
 
     @get:Size(message = "{CreateUserDTO.alias.Size}", max = 100)
     val shortName: String?,
+
+    val role: String?,
 )

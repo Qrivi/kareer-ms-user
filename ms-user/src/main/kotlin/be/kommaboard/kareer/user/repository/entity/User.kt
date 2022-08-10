@@ -53,12 +53,12 @@ class User(
 ) {
 
     fun toDTO() = UserDTO(
-        uuid = uuid.toString(),
+        uuid = uuid!!,
         creationDate = creationDate,
         email = email,
         fullName = fullName,
         shortName = shortName,
-        organizationUuid = organizationUuid?.toString(),
+        organizationUuid = organizationUuid,
         role = role.name,
         status = status.name,
     )

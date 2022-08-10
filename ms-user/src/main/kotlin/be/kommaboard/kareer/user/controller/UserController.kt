@@ -9,14 +9,17 @@ import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
-import be.kommaboard.kareer.common.orNullIfBlank
+import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.UserConfig
+import be.kommaboard.kareer.user.lib.dto.request.CreateInviteDTO
 import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
+import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
+import be.kommaboard.kareer.user.service.exception.NoOrganizationException
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.PropertyReferenceException
@@ -80,9 +83,9 @@ class UserController(
 
         val usersPage = userService.getPagedUsers(
             pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
-            emailPart = emailPart.orNullIfBlank()?.trim(),
-            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.orNullIfBlank()?.toUuid(),
-            role = role.orNullIfBlank()?.toRole(),
+            emailPart = emailPart.trimOrNullIfBlank(),
+            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.trimOrNullIfBlank()?.toUuid(),
+            role = role.trimOrNullIfBlank()?.toRole(),
         )
 
         return ResponseEntity
@@ -131,7 +134,7 @@ class UserController(
         validation: BindingResult,
         request: HttpServletRequest,
     ): ResponseEntity<UserDTO> {
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN)
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
@@ -141,14 +144,43 @@ class UserController(
             password = dto.password!!,
             fullName = dto.fullName!!,
             shortName = dto.shortName,
-            // TODO organizationUuid: retrieve using authorization, copy from manager?
-            role = Role.USER,
+            role = dto.role?.toRole() ?: Role.USER,
         )
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(user.toDTO())
+    }
+
+    @PostMapping("/invite")
+    fun inviteUser(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @Valid @RequestBody dto: CreateInviteDTO,
+        validation: BindingResult,
+        request: HttpServletRequest,
+    ): ResponseEntity<InviteDTO> {
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
+
+        val manager = userService.getUserByUuid(consumerId.toUuid())
+
+        if(manager.organizationUuid == null)
+            throw NoOrganizationException()
+
+        if (validation.hasErrors())
+            throw RequestValidationException(validation)
+
+        val invite = userService.createInvite(
+            inviterUuid = manager.uuid!!,
+            inviteeEmail = dto.email!!,
+            inviteeName = dto.name,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(invite.toDTO())
     }
 
     @PostMapping("/verify")
