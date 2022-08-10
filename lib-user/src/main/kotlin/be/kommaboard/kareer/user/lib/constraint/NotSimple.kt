@@ -19,5 +19,10 @@ class NotSimpleValidator : ConstraintValidator<NotSimple, String> {
     override fun initialize(constraintAnnotation: NotSimple) {}
 
     // Regex checks for 1 uppercase, 1 lowercase and 1 number
-    override fun isValid(value: String, context: ConstraintValidatorContext): Boolean = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+\$").matches(value)
+    override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {
+        return if (value == null)
+            true
+        else
+            Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+\$").matches(value)
+    }
 }
