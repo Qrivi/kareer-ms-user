@@ -149,7 +149,7 @@ class UserController(
         )
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.CREATED       )
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(user.toDTO())
     }

@@ -5,16 +5,12 @@ pipelines:
     develop:
       - parallel:
         - step:
-            name: '[lib-user] Verify code quality and run tests'
+            name: '[lib-user]'
             script:
-              - cd lib-user
-              - ./gradlew ktlintCheck
-            after-script:
-              - ./gradlew build # includes test
+              - ./scripts/outputToSlack "lib-user" "Code analysis" "cd lib-user; ./gradlew ktlintCheck"
+              - ./scripts/outputToSlack "lib-user" "Build and test" "cd lib-user; ./gradlew build"
         - step:
-            name: '[ms-user] Verify code quality and run tests'
+            name: '[ms-user]'
             script:
-              - cd ms-user
-              - ./gradlew ktlintCheck
-            after-script:
-              - ./gradlew build # includes test
+              - ./scripts/outputToSlack "ms-user" "Code analysis" "cd ms-user; ./gradlew ktlintCheck"
+              - ./scripts/outputToSlack "ms-user" "Build and test" "cd ms-user; ./gradlew build"
