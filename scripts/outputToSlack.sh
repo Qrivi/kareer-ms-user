@@ -72,11 +72,12 @@ SLACK_MESSAGE_CONTENT="{
 rm "$REPO_ROOT/cicd.log"
 
 if [ -n "$SLACK_WEBHOOK_URL" ]; then
-    # Multiple remotes... so we'll just skip sending to Slack if webhook is not set.
-    exit 0
-else
     # Send it.
     curl -X POST -H 'Content-type: application/json' --data "$SLACK_MESSAGE_CONTENT" "$SLACK_WEBHOOK_URL"
+else
+    # Multiple remotes... so we'll just skip sending to Slack if webhook is not set.
+    echo SLACK_WEBHOOK_URL is not set!
+    exit 0
 fi
 
 # Make the job fail
