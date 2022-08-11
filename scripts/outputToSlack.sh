@@ -21,7 +21,7 @@ REPO_REMOTE_NAME=$(if [ -n "$BITBUCKET_BUILD_NUMBER" ]; then echo Bitbucket; eli
 REPO_REMOTE_URL=$(if [ -n "$BITBUCKET_GIT_HTTP_ORIGIN" ]; then echo "$BITBUCKET_GIT_HTTP_ORIGIN"; elif [ -n "$GITHUB_SERVER_URL" ]; then echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"; else echo ""; fi)
 REPO_REMOTE_FORMATTED=$(if [ -n "$REPO_REMOTE_URL" ]; then echo "<$REPO_REMOTE_URL|$REPO_REMOTE_NAME>"; else echo "$REPO_REMOTE_NAME" ; fi)
 SCRIPT_TRIGGER=$(if [ -n "$BITBUCKET_PR_ID" ]; then echo "refs/pull/$BITBUCKET_PR_ID/merge"; elif [ -n "$BITBUCKET_BRANCH" ]; then echo "refs/heads/$BITBUCKET_BRANCH"; elif [ -n "$BITBUCKET_TAG" ]; then echo "refs/tags/$BITBUCKET_TAG"; elif [ -n "$GITHUB_REF" ]; then echo "$GITHUB_REF"; else echo Unknown; fi)
-LAST_COMMITTER=$(git log -1 --pretty=format:'%an')
+LAST_COMMITTER=$(git log -1 --pretty=format:'%an' | cat)
 
 # Make a cool Slack message
 SLACK_MESSAGE_CONTENT="{
