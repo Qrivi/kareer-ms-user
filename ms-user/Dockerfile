@@ -4,7 +4,7 @@ WORKDIR /opt
 
 # Download and install dependencies
 COPY ./build.gradle.kts ./settings.gradle.kts ./
-RUN gradle clean build --no-daemon > /dev/null 2>&1 || true
+RUN gradle clean build > /dev/null 2>&1 || true
 
 # Build and package the application
 COPY . ./
