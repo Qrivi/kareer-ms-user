@@ -7,10 +7,12 @@ pipelines:
         - step:
             name: '[lib-user]'
             script:
+              - apt-get install -y jq
               - ./scripts/outputToSlack "lib-user" "Code analysis" "cd lib-user; ./gradlew ktlintCheck"
               - ./scripts/outputToSlack "lib-user" "Build and test" "cd lib-user; ./gradlew build"
         - step:
             name: '[ms-user]'
             script:
+              - apt-get install -y jq
               - ./scripts/outputToSlack "ms-user" "Code analysis" "cd ms-user; ./gradlew ktlintCheck"
               - ./scripts/outputToSlack "ms-user" "Build and test" "cd ms-user; ./gradlew build"
