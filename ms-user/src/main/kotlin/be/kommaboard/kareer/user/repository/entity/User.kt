@@ -34,11 +34,14 @@ class User(
     @Column(name = "password")
     val password: String,
 
-    @Column(name = "full_name")
-    val fullName: String,
+    @Column(name = "last_name")
+    val lastName: String,
 
-    @Column(name = "short_name")
-    val shortName: String,
+    @Column(name = "first_name")
+    val firstName: String,
+
+    @Column(name = "nickname")
+    val nickname: String,
 
     @Column(name = "organization_uuid")
     val organizationUuid: UUID?,
@@ -56,8 +59,9 @@ class User(
         uuid = uuid!!,
         creationDate = creationDate,
         email = email,
-        fullName = fullName,
-        shortName = shortName,
+        lastName = lastName,
+        firstName = firstName,
+        nickname = nickname,
         organizationUuid = organizationUuid,
         role = role.name,
         status = status.name,

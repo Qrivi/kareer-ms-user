@@ -142,8 +142,9 @@ class UserController(
         val user = userService.createUser(
             email = dto.email!!,
             password = dto.password!!,
-            fullName = dto.fullName!!,
-            shortName = dto.shortName,
+            lastName = dto.lastName!!,
+            firstName = dto.firstName!!,
+            nickname = dto.nickname,
             role = dto.role?.toRole() ?: Role.USER,
         )
 
@@ -165,7 +166,7 @@ class UserController(
 
         val manager = userService.getUserByUuid(consumerId.toUuid())
 
-        if(manager.organizationUuid == null)
+        if (manager.organizationUuid == null)
             throw NoOrganizationException()
 
         if (validation.hasErrors())
@@ -174,7 +175,8 @@ class UserController(
         val invite = userService.createInvite(
             inviterUuid = manager.uuid!!,
             inviteeEmail = dto.email!!,
-            inviteeName = dto.name,
+            inviteeLastName = dto.lastName!!,
+            inviteeFirstName = dto.firstName!!,
         )
 
         return ResponseEntity

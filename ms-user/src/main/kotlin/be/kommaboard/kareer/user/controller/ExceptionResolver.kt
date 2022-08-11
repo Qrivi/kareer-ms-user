@@ -1,6 +1,5 @@
 package be.kommaboard.kareer.user.controller
 
-import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
 import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.MessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder

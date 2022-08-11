@@ -34,8 +34,11 @@ class Invite(
     @Column(name = "invitee_email")
     val inviteeEmail: String,
 
-    @Column(name = "invitee_name")
-    val inviteeName: String,
+    @Column(name = "invitee_last_name")
+    val inviteeLastName: String,
+
+    @Column(name = "invitee_first_name")
+    val inviteeFirstName: String,
 
     @Column(name = "used")
     var used: Boolean = false,
@@ -46,7 +49,8 @@ class Invite(
         inviterUuid = inviter.uuid!!,
         creationDate = creationDate,
         inviteeEmail = inviteeEmail,
-        inviteeName = inviteeName,
+        inviteeLastName = inviteeLastName,
+        inviteeFirstName = inviteeFirstName,
         used = used,
     )
 }

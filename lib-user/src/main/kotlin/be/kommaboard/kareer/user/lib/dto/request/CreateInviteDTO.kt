@@ -11,6 +11,11 @@ data class CreateInviteDTO(
     @get:Email(message = "{CreateInviteDTO.email.Email}")
     val email: String?,
 
-    @get:Size(message = "{CreateInviteDTO.name.Size}", max = 100)
-    val name: String?,
+    @get:NotBlank(message = "{CreateInviteDTO.lastName.NotBlank}")
+    @get:Size(message = "{CreateInviteDTO.lastName.Size}", max = 100)
+    val lastName: String?,
+
+    @get:NotBlank(message = "{CreateInviteDTO.firstName.NotBlank}")
+    @get:Size(message = "{CreateInviteDTO.firstName.Size}", max = 100)
+    val firstName: String?,
 )

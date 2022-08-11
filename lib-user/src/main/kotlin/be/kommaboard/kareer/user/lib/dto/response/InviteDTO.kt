@@ -8,6 +8,7 @@ data class InviteDTO(
     val inviterUuid: UUID,
     val creationDate: ZonedDateTime,
     val inviteeEmail: String,
-    val inviteeName: String,
+    val inviteeLastName: String,
+    val inviteeFirstName: String,
     val used: Boolean,
 )

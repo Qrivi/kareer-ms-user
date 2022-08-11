@@ -3,7 +3,6 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
-import be.kommaboard.kareer.common.capitalizeWords
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.InviteRepository
@@ -50,7 +49,8 @@ class UserService(
             createUser(
                 email = userConfig.adminEmail!!,
                 password = userConfig.adminPassword!!,
-                fullName = "Admin",
+                lastName = "Admin",
+                firstName = "Admin",
                 role = Role.ADMIN,
                 activate = true,
             )
@@ -101,8 +101,9 @@ class UserService(
     fun createUser(
         email: String,
         password: String,
-        fullName: String,
-        shortName: String? = null,
+        lastName: String,
+        firstName: String,
+        nickname: String? = null,
         organizationUuid: UUID? = null,
         role: Role,
         activate: Boolean = false,
@@ -120,8 +121,9 @@ class UserService(
                 creationDate = now,
                 email = formattedEmail,
                 password = password.hashedWithSalt(userConfig.salt!!),
-                fullName = fullName.trim(),
-                shortName = if (!shortName.isNullOrBlank()) shortName.trim() else fullName.trim().substringBefore(" "),
+                lastName = lastName.trim(),
+                firstName = firstName.trim(),
+                nickname = nickname.trimOrNullIfBlank() ?: firstName,
                 organizationUuid = organizationUuid,
                 role = role,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
@@ -148,10 +150,10 @@ class UserService(
     fun createInvite(
         inviterUuid: UUID,
         inviteeEmail: String,
-        inviteeName: String?,
+        inviteeLastName: String,
+        inviteeFirstName: String,
     ): Invite {
         val formattedInviteeEmail = inviteeEmail.trim().lowercase()
-        val formattedInviteeName = (inviteeName.trimOrNullIfBlank() ?: formattedInviteeEmail.replace('.', ' ')).capitalizeWords()
 
         if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
             throw UserAlreadyExistsException(formattedInviteeEmail)
@@ -160,7 +162,8 @@ class UserService(
             inviter = getUserByUuid(inviterUuid),
             creationDate = ZonedDateTime.now(clock),
             inviteeEmail = formattedInviteeEmail,
-            inviteeName = formattedInviteeName,
+            inviteeLastName = inviteeLastName.trim(),
+            inviteeFirstName = inviteeFirstName.trim(),
         )
 
         // TODO send mail
