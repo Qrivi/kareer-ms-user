@@ -7,14 +7,16 @@ pipelines:
         - step:
             name: '[lib-user]'
             script:
+              - wget https://raw.githubusercontent.com/Qrivi/handy-scripts/develop/outputToSlack.sh && chmod +x outputToSlack.sh # Get handy script
               - apt-get update && apt-get install -y jq git # Install jq and git dependencies
               - ./lib-user/gradlew --version # Suppress version message in subsequent gradle output
-              - ./scripts/outputToSlack.sh "lib-user" "Code analysis" "cd lib-user; ./gradlew ktlintCheck"
-              - ./scripts/outputToSlack.sh "lib-user" "Build and test" "cd lib-user; ./gradlew build"
+              - ./outputToSlack.sh "lib-user" "Code analysis" "cd lib-user; ./gradlew ktlintCheck"
+              - ./outputToSlack.sh "lib-user" "Build and test" "cd lib-user; ./gradlew build"
         - step:
             name: '[ms-user]'
             script:
+              - wget https://raw.githubusercontent.com/Qrivi/handy-scripts/develop/outputToSlack.sh && chmod +x outputToSlack.sh # Get handy script
               - apt-get update && apt-get install -y jq git # Install jq and git dependencies
               - ./ms-user/gradlew --version # Suppress version message in subsequent gradle output
-              - ./scripts/outputToSlack.sh "ms-user" "Code analysis" "cd ms-user; ./gradlew ktlintCheck"
-              - ./scripts/outputToSlack.sh "ms-user" "Build and test" "cd ms-user; ./gradlew build"
+              - ./outputToSlack.sh "ms-user" "Code analysis" "cd ms-user; ./gradlew ktlintCheck"
+              - ./outputToSlack.sh "ms-user" "Build and test" "cd ms-user; ./gradlew build"
