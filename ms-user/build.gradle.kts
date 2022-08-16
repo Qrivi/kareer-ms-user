@@ -35,6 +35,7 @@ dependencies {
     implementation("be.kommaboard.kareer:lib-common:0.0.1")
     implementation("be.kommaboard.kareer:lib-user:$version")
     implementation("be.kommaboard.kareer:lib-mailing:0.0.1")
+    implementation("be.kommaboard.kareer:lib-organization:0.0.1")
     // Kotlin (required by Spring Web)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -46,6 +47,8 @@ dependencies {
     // Spring Cloud
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client")
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-loadbalancer")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     // Spring Data
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")

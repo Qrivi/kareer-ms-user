@@ -6,7 +6,8 @@ import be.kommaboard.kareer.authorization.hashedWithSalt
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
 import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
-import be.kommaboard.kareer.mailing.lib.service.MailingService
+import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
+import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
@@ -43,7 +44,7 @@ class UserService(
     private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
-    private val mailingService: MailingService,
+    private val mailingQueueService: MailingQueueService,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -154,6 +155,7 @@ class UserService(
 
     fun createInvite(
         manager: User,
+        organization: OrganizationDTO,
         inviteeEmail: String,
         inviteeLastName: String,
         inviteeFirstName: String,
@@ -180,10 +182,10 @@ class UserService(
                 recipientName = invite.inviteeFirstName,
             ),
             inviterName = manager.fullName(),
-            companyName = "Oepsie", // TODO get from company ms
+            organizationName = organization.name,
             inviteLink = "https://kommaboard.be/kareerfrontent/?uuid=${invite.uuid}"
         )
-        mailingService.sendToQueue(mailDTO)
+        mailingQueueService.sendToQueue(mailDTO)
 
         return invite
     }

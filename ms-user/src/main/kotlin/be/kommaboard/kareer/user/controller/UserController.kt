@@ -17,6 +17,7 @@ import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
 import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
+import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
 import be.kommaboard.kareer.user.service.exception.NoOrganizationException
@@ -43,6 +44,7 @@ import javax.validation.Valid
 class UserController(
     private val userConfig: UserConfig,
     private val userService: UserService,
+    private val organizationProxy: OrganizationProxy,
 ) {
 
     @GetMapping("/all")
@@ -118,6 +120,7 @@ class UserController(
 
             if (manager.organizationUuid == null || user.organizationUuid == null || manager.organizationUuid != user.organizationUuid)
                 throw InvalidCredentialsException()
+            // TODO fix: still show own profile if organization is null
         }
 
         return ResponseEntity
@@ -149,7 +152,7 @@ class UserController(
         )
 
         return ResponseEntity
-            .status(HttpStatus.CREATED       )
+            .status(HttpStatus.CREATED)
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(user.toDTO())
     }
@@ -166,14 +169,21 @@ class UserController(
 
         val manager = userService.getUserByUuid(consumerId.toUuid())
 
-        // if (manager.organizationUuid == null)
-        //     throw NoOrganizationException()
+        if (manager.organizationUuid == null)
+            throw NoOrganizationException()
+
+        val organization = organizationProxy.getOrganization(
+            consumerRole = Role.SYSTEM.name,
+            consumerId = userConfig.consumerId!!,
+            uuid = manager.organizationUuid.toString(),
+        )
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
 
         val invite = userService.createInvite(
             manager = manager,
+            organization = organization,
             inviteeEmail = dto.email!!,
             inviteeLastName = dto.lastName!!,
             inviteeFirstName = dto.firstName!!,

@@ -16,8 +16,8 @@ data:
             enabled: true
       datasource:
         url: jdbc:postgresql://ms-user-db/kareer
-        username: 'admin'
-        password: 'admin'
+        username: admin
+        password: admin
     kareer:
         consumer-id: cluster
         salt: $2a$12$d4cOXB.py0DYQh8ICeKdaejHycVpag.Mn1ZBR1SFwU5Agi2QP2O5O

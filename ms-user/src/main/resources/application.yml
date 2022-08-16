@@ -16,7 +16,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: "*"
 
 springdoc:
   api-docs:
@@ -27,8 +27,8 @@ springdoc:
 spring:
   datasource:
     url: jdbc:postgresql://kareer.local:5432/kareer
-    username: 'admin'
-    password: 'admin'
+    username: admin
+    password: admin
     hikari:
       initialization-fail-timeout: 30000
   jpa:
