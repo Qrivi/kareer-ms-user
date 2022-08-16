@@ -60,7 +60,7 @@ logging:
     console: UTF-8
     file: UTF-8
   file:
-    name: log/ms-user.log
+    name: data/log/ms-user.log
   level:
     root: INFO
     org.springframework: INFO

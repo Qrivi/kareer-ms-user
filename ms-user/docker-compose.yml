@@ -19,7 +19,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/data:/var/lib/postgresql/data
+      - ./data/postgres/data:/var/lib/postgresql/data
     restart: unless-stopped
 
   kareer-ms-user:

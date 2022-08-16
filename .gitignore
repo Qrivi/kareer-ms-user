@@ -1,5 +1,4 @@
-db/
-log/
+/data/
 
 # Gradle
 build/
