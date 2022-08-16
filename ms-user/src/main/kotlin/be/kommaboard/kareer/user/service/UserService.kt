@@ -4,6 +4,9 @@ import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
 import be.kommaboard.kareer.common.trimOrNullIfBlank
+import be.kommaboard.kareer.mailing.lib.dto.MailMeta
+import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
+import be.kommaboard.kareer.mailing.lib.service.MailingService
 import be.kommaboard.kareer.user.UserConfig
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
@@ -22,6 +25,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.bcrypt.BCrypt
@@ -39,6 +43,7 @@ class UserService(
     private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
+    private val mailingService: MailingService,
 ) {
     private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -148,7 +153,7 @@ class UserService(
     }
 
     fun createInvite(
-        inviterUuid: UUID,
+        manager: User,
         inviteeEmail: String,
         inviteeLastName: String,
         inviteeFirstName: String,
@@ -158,17 +163,29 @@ class UserService(
         if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
             throw UserAlreadyExistsException(formattedInviteeEmail)
 
-        val invite = Invite(
-            inviter = getUserByUuid(inviterUuid),
-            creationDate = ZonedDateTime.now(clock),
-            inviteeEmail = formattedInviteeEmail,
-            inviteeLastName = inviteeLastName.trim(),
-            inviteeFirstName = inviteeFirstName.trim(),
+        val invite = inviteRepository.saveAndFlush(
+            Invite(
+                inviter = manager,
+                creationDate = ZonedDateTime.now(clock),
+                inviteeEmail = formattedInviteeEmail,
+                inviteeLastName = inviteeLastName.trim(),
+                inviteeFirstName = inviteeFirstName.trim(),
+            )
         )
 
-        // TODO send mail
+        val mailDTO = UserInvitationMailDTO(
+            meta = MailMeta(
+                language = LocaleContextHolder.getLocale().language,
+                recipientEmail = invite.inviteeEmail,
+                recipientName = invite.inviteeFirstName,
+            ),
+            inviterName = manager.fullName(),
+            companyName = "Oepsie", // TODO get from company ms
+            inviteLink = "https://kommaboard.be/kareerfrontent/?uuid=${invite.uuid}"
+        )
+        mailingService.sendToQueue(mailDTO)
 
-        return inviteRepository.save(invite)
+        return invite
     }
 
     fun confirmEmail(

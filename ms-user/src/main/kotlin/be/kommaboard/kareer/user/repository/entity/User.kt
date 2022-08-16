@@ -55,6 +55,8 @@ class User(
     var status: Status,
 ) {
 
+    fun fullName() = "$firstName $lastName"
+
     fun toDTO() = UserDTO(
         uuid = uuid!!,
         creationDate = creationDate,

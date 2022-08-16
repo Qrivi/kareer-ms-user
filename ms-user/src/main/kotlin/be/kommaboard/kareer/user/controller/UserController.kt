@@ -166,14 +166,14 @@ class UserController(
 
         val manager = userService.getUserByUuid(consumerId.toUuid())
 
-        if (manager.organizationUuid == null)
-            throw NoOrganizationException()
+        // if (manager.organizationUuid == null)
+        //     throw NoOrganizationException()
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
 
         val invite = userService.createInvite(
-            inviterUuid = manager.uuid!!,
+            manager = manager,
             inviteeEmail = dto.email!!,
             inviteeLastName = dto.lastName!!,
             inviteeFirstName = dto.firstName!!,
