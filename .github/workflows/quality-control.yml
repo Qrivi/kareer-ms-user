@@ -1,0 +1,69 @@
+name: Quality control
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  lib-user:
+    name: lib-user
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Checkout codebase
+        id: checkout-codebase
+        uses: actions/checkout@v3.0.2
+        with:
+          ref: ${{ github.ref }}
+      - name: Setup environment
+        id: setup-environment
+        uses: actions/setup-java@v3.4.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install dependencies
+        id: install-dependencies
+        run: |
+          wget https://raw.githubusercontent.com/Qrivi/handy-scripts/develop/outputToSlack.sh
+          chmod +x outputToSlack.sh
+      - name: Quality control
+        id: quality-control
+        run: |
+          ./lib-user/gradlew --version
+          ./outputToSlack.sh "lib-user" "Code analysis" "cd lib-user; ./gradlew ktlintCheck"
+          ./outputToSlack.sh "lib-user" "Build and test" "cd lib-user; ./gradlew build"
+
+  ms-user:
+    name: ms-user
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Checkout codebase
+        id: checkout-codebase
+        uses: actions/checkout@v3.0.2
+        with:
+          ref: ${{ github.ref }}
+      - name: Setup environment
+        id: setup-environment
+        uses: actions/setup-java@v3.4.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Install dependencies
+        id: install-dependencies
+        run: |
+          wget https://raw.githubusercontent.com/Qrivi/handy-scripts/develop/outputToSlack.sh
+          chmod +x outputToSlack.sh
+      - name: Quality control
+        id: quality-control
+        run: |
+          ./ms-user/gradlew --version
+          ./outputToSlack.sh "ms-user" "Code analysis" "cd ms-user; ./gradlew ktlintCheck"
+          ./outputToSlack.sh "ms-user" "Build and test" "cd ms-user; ./gradlew build"
