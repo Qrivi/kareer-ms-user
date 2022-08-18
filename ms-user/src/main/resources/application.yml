@@ -25,6 +25,10 @@ springdoc:
     path: /swagger
 
 spring:
+  rabbitmq:
+    host: kareer.local
+    username: admin
+    password: admin
   datasource:
     url: jdbc:postgresql://kareer.local:5432/kareer
     username: admin

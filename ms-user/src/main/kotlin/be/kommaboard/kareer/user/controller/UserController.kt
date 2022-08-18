@@ -20,7 +20,10 @@ import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
-import be.kommaboard.kareer.user.service.exception.NoOrganizationException
+import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistException
+import feign.FeignException
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.PropertyReferenceException
@@ -47,6 +50,7 @@ class UserController(
     private val organizationProxy: OrganizationProxy,
 ) {
 
+    @Operation(hidden = true)
     @GetMapping("/all")
     fun getAllUsers(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
@@ -63,6 +67,15 @@ class UserController(
             .body(ListDTO(users.map(User::toDTO)))
     }
 
+    @Operation(
+        summary = "Get users mathing filter",
+        description = "Returns the users matching the filters passed as request parameters. `page` and `size` function as offset and limit. Requires `ADMIN` or `MANAGER` roles. If a `MANAGER` makes the request, the `organizationUuid` value is overwritten by the manager's organization's UUID.",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+        ],
+    )
     @GetMapping
     fun getUsers(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
@@ -101,6 +114,15 @@ class UserController(
             .body(ListDTO(usersPage.content.map(User::toDTO), usersPage))
     }
 
+    @Operation(
+        summary = "Get a user by their UUID",
+        description = "Gets the user whose UUID matches the path variable. The `MANAGER` role can only request other users that are part of the same organization, whereas the `USER` role can only request their own details.",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+            ),
+        ],
+    )
     @GetMapping("/{uuid}")
     fun getUser(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
@@ -118,9 +140,8 @@ class UserController(
         if (Role.MANAGER.matches(consumerRole)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
-            if (manager.organizationUuid == null || user.organizationUuid == null || manager.organizationUuid != user.organizationUuid)
+            if (manager.organizationUuid != user.organizationUuid)
                 throw InvalidCredentialsException()
-            // TODO fix: still show own profile if organization is null
         }
 
         return ResponseEntity
@@ -129,6 +150,15 @@ class UserController(
             .body(user.toDTO())
     }
 
+    @Operation(
+        summary = "Create a new user",
+        description = "Creates a new user. Requires the `ADMIN` role as this bypasses the invitation system.",
+        responses = [
+            ApiResponse(
+                responseCode = "201",
+            ),
+        ],
+    )
     @PostMapping
     fun createUser(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
@@ -142,7 +172,18 @@ class UserController(
         if (validation.hasErrors())
             throw RequestValidationException(validation)
 
+        val organization = try {
+            organizationProxy.getOrganization(
+                consumerRole = Role.SYSTEM.name,
+                consumerId = userConfig.consumerId!!,
+                uuid = dto.organizationUuid.toString(),
+            )
+        } catch (e: FeignException) {
+            throw OrganizationDoesNotExistException()
+        }
+
         val user = userService.createUser(
+            organizationUuid = organization.uuid,
             email = dto.email!!,
             password = dto.password!!,
             lastName = dto.lastName!!,
@@ -157,6 +198,15 @@ class UserController(
             .body(user.toDTO())
     }
 
+    @Operation(
+        summary = "Create a new invite",
+        description = "Requires the `MANAGER` role. Creates an invite that will be sent by e-mail that recipient can use to register with.",
+        responses = [
+            ApiResponse(
+                responseCode = "201",
+            ),
+        ],
+    )
     @PostMapping("/invite")
     fun inviteUser(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
@@ -168,9 +218,6 @@ class UserController(
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
         val manager = userService.getUserByUuid(consumerId.toUuid())
-
-        if (manager.organizationUuid == null)
-            throw NoOrganizationException()
 
         val organization = organizationProxy.getOrganization(
             consumerRole = Role.SYSTEM.name,
@@ -195,6 +242,7 @@ class UserController(
             .body(invite.toDTO())
     }
 
+    @Operation(hidden = true)
     @PostMapping("/verify")
     fun verifyUserCredentials(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,

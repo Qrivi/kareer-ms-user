@@ -124,13 +124,13 @@ class UserService(
         // Create the new user
         val user = userRepository.saveAndFlush(
             User(
+                organizationUuid = organizationUuid,
                 creationDate = now,
                 email = formattedEmail,
                 password = password.hashedWithSalt(userConfig.salt!!),
                 lastName = lastName.trim(),
                 firstName = firstName.trim(),
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
-                organizationUuid = organizationUuid,
                 role = role,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
             )

@@ -4,7 +4,7 @@ import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.MessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
-import be.kommaboard.kareer.user.service.exception.NoOrganizationException
+import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
 import org.springframework.core.Ordered
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import javax.servlet.http.HttpServletRequest
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -28,15 +27,10 @@ class ExceptionResolver(
         .body(ErrorsDTO(messageService["exception.IncorrectCredentials"]))
 
     @ExceptionHandler
-    fun resolve(e: NoOrganizationException, request: HttpServletRequest) = ResponseEntity
-        .status(HttpStatus.FORBIDDEN)
-        .headers(
-            HttpHeadersBuilder()
-                .contentLanguage()
-                .wwwAuthenticate(request, HttpHeadersBuilder.UnauthorizedReason.INVALID_CREDENTIALS)
-                .build()
-        )
-        .body(ErrorsDTO(messageService["exception.NoOrganization"]))
+    fun resolve(e: OrganizationDoesNotExistException) = ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(messageService["exception.OrganizationDoesNotExist"]))
 
     @ExceptionHandler
     fun resolve(e: UserAlreadyExistsException) = ResponseEntity

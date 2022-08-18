@@ -25,6 +25,9 @@ class User(
     @Column(name = "uuid")
     val uuid: UUID? = null,
 
+    @Column(name = "organization_uuid")
+    val organizationUuid: UUID?,
+
     @Column(name = "creation_date")
     val creationDate: ZonedDateTime,
 
@@ -42,9 +45,6 @@ class User(
 
     @Column(name = "nickname")
     val nickname: String,
-
-    @Column(name = "organization_uuid")
-    val organizationUuid: UUID?,
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)

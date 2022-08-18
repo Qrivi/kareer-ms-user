@@ -55,6 +55,7 @@ dependencies {
     // Liquibase
     implementation("org.liquibase:liquibase-core:4.14.0")
     // OpenAPI + Swagger UI
+    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.9")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
