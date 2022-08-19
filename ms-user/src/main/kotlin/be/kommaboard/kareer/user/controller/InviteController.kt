@@ -17,6 +17,7 @@ import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.entity.Invite
 import be.kommaboard.kareer.user.service.UserService
+import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import be.kommaboard.kareer.user.toInviteStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -38,7 +39,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/users/v1/invite")
+@RequestMapping("/users/v1/invites")
 class InviteController(
     private val userConfig: UserConfig,
     private val userService: UserService,
@@ -167,8 +168,8 @@ class InviteController(
 
     @Operation(
         summary = "Update an invite",
-        description = "Updates the invite which UUID matches the path variable with the values passed in the request body. Requires the `MANAGER` role and only changes to invites belonging to the manager's organization will go through.",
-        responses = [ApiResponse(responseCode = "201")],
+        description = "Updates the invite which UUID matches the path variable with the values passed in the request body. When using the `MANAGER` role, only changes to invites belonging to the manager's organization will go through.",
+        responses = [ApiResponse(responseCode = "200")],
     )
     @PatchMapping("/{uuid}")
     fun updateInvite(
@@ -180,15 +181,25 @@ class InviteController(
     ): ResponseEntity<InviteDTO> {
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
-        val manager = userService.getUserByUuid(consumerId.toUuid())
         val invite = userService.getInviteByUuid(uuid.toUuid())
+        val status = dto.status!!.toInviteStatus()
 
-        if (manager.organizationUuid != invite.inviter.organizationUuid)
-            throw InvalidCredentialsException()
+        // Extra requirements if performed as a manager
+        if (Role.MANAGER.matches(consumerRole)) {
+            val manager = userService.getUserByUuid(consumerId.toUuid())
+
+            // Managers can only update invites sent by themselves or other managers in their organization
+            if (manager.organizationUuid != invite.inviter.organizationUuid)
+                throw InvalidCredentialsException()
+
+            // Managers can not accept or decline invites (only the invitee can), but can retract invites or undo retraction
+            if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED)
+                throw InvalidInviteStatusException(dto.status!!.trim())
+        }
 
         val updatedInvite = userService.updateInvite(
             invite = invite,
-            status = dto.status!!.toInviteStatus(),
+            status = status,
         )
 
         return ResponseEntity

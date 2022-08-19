@@ -141,7 +141,7 @@ class UserController(
 
     @Operation(
         summary = "Create a new user",
-        description = "Creates a new user. Requires the `ADMIN` role as this bypasses the invitation system.",
+        description = "Creates a new user. If using the `ADMIN` role, this bypasses the invitation system. Endpoint is also used internally when registering via auth-ms.",
         responses = [ApiResponse(responseCode = "201")],
     )
     @PostMapping
