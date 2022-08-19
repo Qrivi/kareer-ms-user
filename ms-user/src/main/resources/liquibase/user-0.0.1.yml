@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: user-2022-07-11
+      id: user-0.0.1
       author: Kristof Dewilde
       changes:
         - createTable:
@@ -110,8 +110,8 @@ databaseChangeLog:
                     nullable: false
                     unique: false
               - column:
-                  name: used
-                  type: BOOLEAN
+                  name: status
+                  type: VARCHAR(20)
                   constraints:
                     nullable: false
                     unique: false

@@ -8,6 +8,8 @@ kareer:
 
 server:
   port: 32002
+  servlet:
+    context-path: /api
   error:
     whitelabel:
       enabled: false
