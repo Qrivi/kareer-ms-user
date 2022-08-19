@@ -10,5 +10,5 @@ data class InviteDTO(
     val inviteeEmail: String,
     val inviteeLastName: String,
     val inviteeFirstName: String,
-    val used: Boolean,
+    val status: String,
 )

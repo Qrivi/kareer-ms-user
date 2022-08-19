@@ -6,6 +6,8 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -40,9 +42,17 @@ class Invite(
     @Column(name = "invitee_first_name")
     val inviteeFirstName: String,
 
-    @Column(name = "used")
-    var used: Boolean = false,
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: Status,
 ) {
+
+    enum class Status {
+        PENDING,
+        ACCEPTED,
+        DECLINED,
+        RETRACTED,
+    }
 
     fun toDTO() = InviteDTO(
         uuid = uuid!!,
@@ -51,6 +61,6 @@ class Invite(
         inviteeEmail = inviteeEmail,
         inviteeLastName = inviteeLastName,
         inviteeFirstName = inviteeFirstName,
-        used = used,
+        status = status.name,
     )
 }

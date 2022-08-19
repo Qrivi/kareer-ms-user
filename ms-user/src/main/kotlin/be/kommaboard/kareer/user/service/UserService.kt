@@ -16,6 +16,7 @@ import be.kommaboard.kareer.user.repository.entity.Invite
 import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
+import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
 import be.kommaboard.kareer.user.service.exception.TicketDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketExpiredException
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
@@ -65,31 +65,36 @@ class UserService(
 
     fun getAllUsers(): List<User> = userRepository.findAll()
 
+    fun getAllInvites(): List<Invite> = inviteRepository.findAll()
+
     fun getPagedUsers(
         pageRequest: PageRequest,
         emailPart: String?,
         organizationUuid: UUID?,
         role: Role?,
-    ): Page<User> {
-        if (emailPart != null && organizationUuid != null && role != null)
-            return userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, emailPart, pageRequest)
-        else if (emailPart != null && organizationUuid != null)
-            return userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, emailPart, pageRequest)
-        else if (emailPart != null && role != null)
-            return userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, emailPart, pageRequest)
-        else if (organizationUuid != null && role != null)
-            return userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
-        else if (emailPart != null)
-            return userRepository.findAllByEmailContainsIgnoreCase(emailPart, pageRequest)
-        else if (organizationUuid != null)
-            return userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
-        else if (role != null)
-            return userRepository.findAllByRole(role, pageRequest)
-        else
-            return userRepository.findAll(pageRequest)
+    ) = when {
+        emailPart != null && organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, emailPart, pageRequest)
+        emailPart != null && organizationUuid != null -> userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, emailPart, pageRequest)
+        emailPart != null && role != null -> userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, emailPart, pageRequest)
+        organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
+        organizationUuid != null -> userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
+        emailPart != null -> userRepository.findAllByEmailContainsIgnoreCase(emailPart, pageRequest)
+        role != null -> userRepository.findAllByRole(role, pageRequest)
+        else -> userRepository.findAll(pageRequest)
+    }
+
+    fun getPagedInvites(
+        pageRequest: PageRequest,
+        organizationUuid: UUID,
+        status: Invite.Status?,
+    ) = when {
+        status != null -> inviteRepository.findAllByOrganizationUuidAndStatus(organizationUuid, status, pageRequest)
+        else -> inviteRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
     }
 
     fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserDoesNotExistException()
+
+    fun getInviteByUuid(uuid: UUID) = inviteRepository.findByUuid(uuid) ?: throw InviteDoesNotExistException()
 
     fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketDoesNotExistException()
 
@@ -116,8 +121,7 @@ class UserService(
     ): User {
         val formattedEmail = email.trim().lowercase()
 
-        if (userRepository.existsByEmailIgnoreCase(formattedEmail))
-            throw UserAlreadyExistsException(formattedEmail)
+        if (userRepository.existsByEmailIgnoreCase(formattedEmail)) throw UserAlreadyExistsException(formattedEmail)
 
         val now = ZonedDateTime.now(clock)
 
@@ -162,8 +166,7 @@ class UserService(
     ): Invite {
         val formattedInviteeEmail = inviteeEmail.trim().lowercase()
 
-        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
-            throw UserAlreadyExistsException(formattedInviteeEmail)
+        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail)) throw UserAlreadyExistsException(formattedInviteeEmail)
 
         val invite = inviteRepository.saveAndFlush(
             Invite(
@@ -172,6 +175,7 @@ class UserService(
                 inviteeEmail = formattedInviteeEmail,
                 inviteeLastName = inviteeLastName.trim(),
                 inviteeFirstName = inviteeFirstName.trim(),
+                status = Invite.Status.PENDING,
             )
         )
 
@@ -181,13 +185,20 @@ class UserService(
                 recipientEmail = invite.inviteeEmail,
                 recipientName = invite.inviteeFirstName,
             ),
-            inviterName = manager.fullName(),
-            organizationName = organization.name,
-            inviteLink = "https://kommaboard.be/kareerfrontent/?uuid=${invite.uuid}"
+            inviterName = manager.fullName(), organizationName = organization.name, inviteLink = "https://kommaboard.be/kareerfrontent/?uuid=${invite.uuid}"
         )
         mailingQueueService.sendToQueue(mailDTO)
 
         return invite
+    }
+
+    fun updateInvite(
+        invite: Invite,
+        status: Invite.Status,
+    ): Invite {
+        invite.status = status
+
+        return inviteRepository.save(invite)
     }
 
     fun confirmEmail(

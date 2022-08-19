@@ -4,6 +4,8 @@ import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.MessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
+import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
+import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
@@ -25,6 +27,18 @@ class ExceptionResolver(
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
         .body(ErrorsDTO(messageService["exception.IncorrectCredentials"]))
+
+    @ExceptionHandler
+    fun resolve(e: InvalidInviteStatusException) = ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(messageService["exception.InvalidInviteStatus", e.value]))
+
+    @ExceptionHandler
+    fun resolve(e: InviteDoesNotExistException) = ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(messageService["exception.InviteDoesNotExist"]))
 
     @ExceptionHandler
     fun resolve(e: OrganizationDoesNotExistException) = ResponseEntity
