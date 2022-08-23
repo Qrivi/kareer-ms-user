@@ -16,6 +16,7 @@ data:
             enabled: true
       rabbitmq:
         host: kareer.local
+        port: 5672
         username: admin
         password: admin
       datasource:

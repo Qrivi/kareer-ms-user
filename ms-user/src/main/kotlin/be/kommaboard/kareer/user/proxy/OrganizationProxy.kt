@@ -23,5 +23,5 @@ interface OrganizationProxy {
 interface KubernetesOrganizationProxy : OrganizationProxy
 
 @Profile("!kubernetes")
-@FeignClient("ms-organization", url = "http://kareer.local:32002")
+@FeignClient("ms-organization", url = "http://kareer.local:32002/api")
 interface LocalOrganizationProxy : OrganizationProxy

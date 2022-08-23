@@ -29,14 +29,16 @@ springdoc:
 spring:
   rabbitmq:
     host: kareer.local
+    port: 5672
     username: admin
     password: admin
+    connection-timeout: 60000
   datasource:
     url: jdbc:postgresql://kareer.local:5432/kareer
     username: admin
     password: admin
     hikari:
-      initialization-fail-timeout: 30000
+      initialization-fail-timeout: 60000
   jpa:
     properties:
       hibernate:
