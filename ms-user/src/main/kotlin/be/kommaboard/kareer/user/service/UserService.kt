@@ -23,7 +23,6 @@ import be.kommaboard.kareer.user.service.exception.TicketExpiredException
 import be.kommaboard.kareer.user.service.exception.TicketInvalidException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
@@ -46,7 +45,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val mailingQueueService: MailingQueueService,
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @EventListener
     fun onApplicationEvent(event: ContextRefreshedEvent) {

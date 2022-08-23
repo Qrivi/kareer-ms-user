@@ -22,6 +22,7 @@ import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistExcep
 import feign.FeignException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.PropertyReferenceException
@@ -47,6 +48,7 @@ class UserController(
     private val userService: UserService,
     private val organizationProxy: OrganizationProxy,
 ) {
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @Operation(hidden = true)
     @GetMapping("/all")
@@ -55,6 +57,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
+        logger.info("Handling GET /users/v1/all [getAllUsers] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         val users = userService.getAllUsers()
@@ -82,6 +85,7 @@ class UserController(
         @RequestParam sort: String?,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
+        logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
 
         if (page < 0 || size < 1)
@@ -119,6 +123,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
     ): ResponseEntity<UserDTO> {
+        logger.info("Handling GET /users/v1/{uuid} [getUser] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         if (Role.USER.matches(consumerRole) && uuid != consumerId)
@@ -151,6 +156,7 @@ class UserController(
         @Valid @RequestBody dto: CreateUserDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
+        logger.info("Handling POST /users/v1 [createUser] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN)
 
         if (validation.hasErrors())
@@ -190,6 +196,7 @@ class UserController(
         @Valid @RequestBody dto: VerifyCredentialsDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
+        logger.info("Handling POST /users/v1/verify [verifyUserCredentials] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         if (validation.hasErrors())

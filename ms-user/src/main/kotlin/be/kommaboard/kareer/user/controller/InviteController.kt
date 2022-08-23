@@ -21,6 +21,7 @@ import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import be.kommaboard.kareer.user.toInviteStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -45,6 +46,7 @@ class InviteController(
     private val userService: UserService,
     private val organizationProxy: OrganizationProxy,
 ) {
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @Operation(hidden = true)
     @GetMapping("/all")
@@ -52,6 +54,7 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
     ): ResponseEntity<ListDTO<InviteDTO>> {
+        logger.info("Handling GET /users/v1/invites/all [getAllInvites] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
 
         val invites = userService.getAllInvites()
@@ -77,6 +80,7 @@ class InviteController(
         @RequestParam sort: String?,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<InviteDTO>> {
+        logger.info("Handling GET /users/v1/invites [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
         if (page < 0 || size < 1)
@@ -110,6 +114,7 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
     ): ResponseEntity<InviteDTO> {
+        logger.info("Handling GET /users/v1/invites/{uuid} [getInvite] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
@@ -139,6 +144,7 @@ class InviteController(
         @Valid @RequestBody dto: CreateInviteDTO,
         validation: BindingResult,
     ): ResponseEntity<InviteDTO> {
+        logger.info("Handling POST /users/v1/invites [createInvite] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
         val manager = userService.getUserByUuid(consumerId.toUuid())
@@ -179,6 +185,7 @@ class InviteController(
         @Valid @RequestBody dto: UpdateInviteDTO,
         validation: BindingResult,
     ): ResponseEntity<InviteDTO> {
+        logger.info("Handling PATCH /users/v1/invites/{uuid} [updateInvite] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
