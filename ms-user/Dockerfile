@@ -18,6 +18,9 @@ WORKDIR /kareer/ms-user
 RUN groupadd -r kareer && useradd -g kareer kareer
 USER kareer:kareer
 
-# Get the app and mark it as entrypoint
+# Get all our stuff together
 COPY --from=build /opt/build/libs/*.jar ./app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+
+# Run
+EXPOSE 32002
+ENTRYPOINT ["java", "-jar", "app.jar"]
