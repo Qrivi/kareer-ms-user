@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 
 interface OrganizationProxy {
 
-    @GetMapping("/organizations/v1/{uuid}")
+    @GetMapping("/api/organizations/v1/{uuid}")
     fun getOrganization(
         @RequestHeader(value = InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(value = InternalHttpHeaders.CONSUMER_ID) consumerId: String,
@@ -23,5 +23,5 @@ interface OrganizationProxy {
 interface KubernetesOrganizationProxy : OrganizationProxy
 
 @Profile("!kubernetes")
-@FeignClient("ms-organization", url = "http://kareer.local:32002/api")
+@FeignClient("ms-organization", url = "http://kareer.local:32002")
 interface LocalOrganizationProxy : OrganizationProxy
