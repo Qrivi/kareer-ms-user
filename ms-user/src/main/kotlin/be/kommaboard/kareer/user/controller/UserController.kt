@@ -166,7 +166,7 @@ class UserController(
             organizationProxy.getOrganization(
                 consumerRole = Role.SYSTEM.name,
                 consumerId = userConfig.consumerId!!,
-                uuid = dto.organizationUuid.toString(),
+                uuid = dto.organizationUuid!!,
             )
         } catch (e: FeignException) {
             throw OrganizationDoesNotExistException()
