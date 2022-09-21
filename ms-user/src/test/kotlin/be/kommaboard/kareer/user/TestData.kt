@@ -34,6 +34,7 @@ class TestData {
             nickname = "Ann",
             role = Role.ADMIN,
             status = Status.ACTIVATED,
+            keywords = "",
         ),
         User(
             organizationUuid = organizationUuid,
@@ -45,6 +46,7 @@ class TestData {
             nickname = "Barry",
             role = Role.MANAGER,
             status = Status.ACTIVATED,
+            keywords = "",
         ),
         User(
             organizationUuid = organizationUuid,
@@ -56,6 +58,7 @@ class TestData {
             nickname = "Claude",
             role = Role.USER,
             status = Status.ACTIVATED,
+            keywords = "",
         ),
     )
 }
