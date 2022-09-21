@@ -8,6 +8,7 @@ import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
+import be.kommaboard.kareer.common.toSort
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.UserConfig
@@ -23,7 +24,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
@@ -77,7 +77,7 @@ class InviteController(
         @RequestParam status: String?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam sort: String?,
+        @RequestParam(defaultValue = "creationDate") sort: String,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<InviteDTO>> {
         logger.info("Handling GET /users/v1/invites [getUsers] for {}", consumerId)
@@ -87,7 +87,7 @@ class InviteController(
             throw InvalidPageOrSizeException()
 
         val invitesPage = userService.getPagedInvites(
-            pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
+            pageRequest = PageRequest.of(page, size, sort.toSort()),
             organizationUuid = userService.getUserByUuid(consumerId.toUuid()).organizationUuid!!,
             status = status.trimOrNullIfBlank()?.toInviteStatus(),
         )

@@ -53,6 +53,9 @@ class User(
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: Status,
+
+    @Column(name = "keywords")
+    var keywords: String,
 ) {
 
     fun fullName() = "$firstName $lastName"

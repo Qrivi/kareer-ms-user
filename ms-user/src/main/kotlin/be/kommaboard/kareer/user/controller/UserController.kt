@@ -9,6 +9,7 @@ import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
+import be.kommaboard.kareer.common.toSort
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.UserConfig
@@ -24,7 +25,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.data.mapping.PropertyReferenceException
 import org.springframework.data.util.ClassTypeInformation
 import org.springframework.http.HttpStatus
@@ -77,12 +77,12 @@ class UserController(
     fun getUsers(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-        @RequestParam emailPart: String?,
+        @RequestParam keywords: String?,
         @RequestParam organizationUuid: String?,
         @RequestParam role: String?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam sort: String?,
+        @RequestParam(defaultValue = "creationDate") sort: String,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
@@ -91,12 +91,12 @@ class UserController(
         if (page < 0 || size < 1)
             throw InvalidPageOrSizeException()
 
-        if (!sort.isNullOrBlank() && sort.contains("password")) // Disable sorting on password
+        if (sort.contains("password")) // Disable sorting on password
             throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
 
         val usersPage = userService.getPagedUsers(
-            pageRequest = if (sort.isNullOrBlank()) PageRequest.of(page, size, Sort.unsorted()) else PageRequest.of(page, size, Sort.by(*sort.split(',').toTypedArray())),
-            emailPart = emailPart.trimOrNullIfBlank(),
+            pageRequest = PageRequest.of(page, size, sort.toSort()),
+            keywords = keywords.trimOrNullIfBlank(),
             organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.trimOrNullIfBlank()?.toUuid(),
             role = role.trimOrNullIfBlank()?.toRole(),
         )
@@ -174,6 +174,7 @@ class UserController(
 
         val user = userService.createUser(
             organizationUuid = organization.uuid,
+            organizationName = organization.name,
             email = dto.email!!,
             password = dto.password!!,
             lastName = dto.lastName!!,

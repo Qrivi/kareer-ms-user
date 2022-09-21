@@ -68,16 +68,16 @@ class UserService(
 
     fun getPagedUsers(
         pageRequest: PageRequest,
-        emailPart: String?,
+        keywords: String?,
         organizationUuid: UUID?,
         role: Role?,
     ) = when {
-        emailPart != null && organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRoleAndEmailContainsIgnoreCase(organizationUuid, role, emailPart, pageRequest)
-        emailPart != null && organizationUuid != null -> userRepository.findAllByOrganizationUuidAndEmailContainsIgnoreCase(organizationUuid, emailPart, pageRequest)
-        emailPart != null && role != null -> userRepository.findAllByRoleAndEmailContainsIgnoreCase(role, emailPart, pageRequest)
+        keywords != null && organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUuid, role, keywords, pageRequest)
+        keywords != null && organizationUuid != null -> userRepository.findAllByOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUuid, keywords, pageRequest)
+        keywords != null && role != null -> userRepository.findAllByRoleAndKeywordsContainsIgnoreCase(role, keywords, pageRequest)
         organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
         organizationUuid != null -> userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
-        emailPart != null -> userRepository.findAllByEmailContainsIgnoreCase(emailPart, pageRequest)
+        keywords != null -> userRepository.findAllByKeywordsContainsIgnoreCase(keywords, pageRequest)
         role != null -> userRepository.findAllByRole(role, pageRequest)
         else -> userRepository.findAll(pageRequest)
     }
@@ -115,12 +115,14 @@ class UserService(
         firstName: String,
         nickname: String? = null,
         organizationUuid: UUID? = null,
+        organizationName: String? = null,
         role: Role,
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()
 
-        if (userRepository.existsByEmailIgnoreCase(formattedEmail)) throw UserAlreadyExistsException(formattedEmail)
+        if (userRepository.existsByEmailIgnoreCase(formattedEmail))
+            throw UserAlreadyExistsException(formattedEmail)
 
         val now = ZonedDateTime.now(clock)
 
@@ -136,6 +138,7 @@ class UserService(
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
                 role = role,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
+                keywords = "${firstName.trim()} ${lastName.trim()} ${firstName.trim()} $formattedEmail ${organizationName ?: ""}"
             )
         )
 

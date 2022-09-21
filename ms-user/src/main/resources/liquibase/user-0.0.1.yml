@@ -68,6 +68,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: false
+              - column:
+                  name: keywords
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: false
         - createTable:
             tableName: invite
             columns:
