@@ -5,6 +5,8 @@ extra["springBootVersion"] = "2.7.2"
 extra["springCloudVersion"] = "2021.0.3"
 extra["springCloudKubernetesVersion"] = "2.1.3"
 
+java.sourceCompatibility = JavaVersion.VERSION_17
+
 repositories {
     mavenCentral()
     maven {
@@ -56,7 +58,7 @@ dependencies {
     implementation("org.liquibase:liquibase-core:4.14.0")
     // OpenAPI + Swagger UI
     implementation("org.springdoc:springdoc-openapi-kotlin:1.6.9")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")

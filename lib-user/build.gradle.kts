@@ -3,6 +3,8 @@ version = "0.0.1"
 
 extra["springBootVersion"] = "2.7.2"
 
+java.sourceCompatibility = JavaVersion.VERSION_17
+
 repositories {
     mavenCentral()
 }
