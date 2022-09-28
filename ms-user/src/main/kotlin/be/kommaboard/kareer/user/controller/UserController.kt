@@ -69,7 +69,7 @@ class UserController(
     }
 
     @Operation(
-        summary = "Get users mathing filter",
+        summary = "Get users matching filter",
         description = "Returns the users matching the filters passed as request parameters. `page` and `size` function as offset and limit. Requires `ADMIN` or `MANAGER` roles. If a `MANAGER` makes the request, the `organizationUuid` value is overwritten by the manager's organization's UUID.",
         responses = [ApiResponse(responseCode = "200")],
     )
