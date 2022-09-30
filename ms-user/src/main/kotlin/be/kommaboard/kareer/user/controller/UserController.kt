@@ -12,7 +12,6 @@ import be.kommaboard.kareer.common.exception.RequestValidationException
 import be.kommaboard.kareer.common.toSort
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
-import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
 import be.kommaboard.kareer.storage.lib.dto.request.CreateFileReferenceDTO
 import be.kommaboard.kareer.storage.lib.dto.response.UrlDTO
 import be.kommaboard.kareer.user.UserConfig
