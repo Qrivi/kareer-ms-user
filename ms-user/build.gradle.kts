@@ -38,6 +38,7 @@ dependencies {
     implementation("be.kommaboard.kareer:lib-user:$version")
     implementation("be.kommaboard.kareer:lib-mailing:0.0.1")
     implementation("be.kommaboard.kareer:lib-organization:0.0.1")
+    implementation("be.kommaboard.kareer:lib-storage:0.0.1")
     // Kotlin (required by Spring Web)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

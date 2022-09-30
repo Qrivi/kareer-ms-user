@@ -3,12 +3,14 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
+import be.kommaboard.kareer.common.makeKeywords
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
 import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
 import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
 import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
 import be.kommaboard.kareer.user.UserConfig
+import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
@@ -43,6 +45,7 @@ class UserService(
     private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
+    private val organizationProxy: OrganizationProxy,
     private val mailingQueueService: MailingQueueService,
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -91,19 +94,26 @@ class UserService(
         else -> inviteRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
     }
 
-    fun getUserByUuid(uuid: UUID) = userRepository.findByUuid(uuid) ?: throw UserDoesNotExistException()
+    fun getUserByUuid(
+        uuid: UUID,
+    ) = userRepository.findByUuid(uuid)
+        ?: throw UserDoesNotExistException()
 
-    fun getInviteByUuid(uuid: UUID) = inviteRepository.findByUuid(uuid) ?: throw InviteDoesNotExistException()
+    fun getInviteByUuid(
+        uuid: UUID,
+    ) = inviteRepository.findByUuid(uuid)
+        ?: throw InviteDoesNotExistException()
 
-    fun getTicketByUuid(uuid: UUID) = ticketRepository.findByUuid(uuid) ?: throw TicketDoesNotExistException()
-
-    fun getUserByEmail(email: String) = userRepository.findByEmail(email)
+    fun getTicketByUuid(
+        uuid: UUID,
+    ) = ticketRepository.findByUuid(uuid)
+        ?: throw TicketDoesNotExistException()
 
     fun getUserByEmailAndPassword(
         email: String,
         password: String,
     ): User {
-        val user = getUserByEmail(email) ?: throw IncorrectCredentialsException()
+        val user = userRepository.findByEmail(email) ?: throw IncorrectCredentialsException()
         if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
         return user
     }
@@ -120,7 +130,6 @@ class UserService(
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()
-
         if (userRepository.existsByEmailIgnoreCase(formattedEmail))
             throw UserAlreadyExistsException(formattedEmail)
 
@@ -138,7 +147,9 @@ class UserService(
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
                 role = role,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
-                keywords = "${firstName.trim()} ${lastName.trim()} ${firstName.trim()} $formattedEmail ${organizationName ?: ""}"
+                avatarReference = null,
+                bannerReference = null,
+                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, organizationName)
             )
         )
 
@@ -167,8 +178,8 @@ class UserService(
         inviteeFirstName: String,
     ): Invite {
         val formattedInviteeEmail = inviteeEmail.trim().lowercase()
-
-        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail)) throw UserAlreadyExistsException(formattedInviteeEmail)
+        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
+            throw UserAlreadyExistsException(formattedInviteeEmail)
 
         val invite = inviteRepository.saveAndFlush(
             Invite(
@@ -194,7 +205,38 @@ class UserService(
         return invite
     }
 
-    fun updateInvite(
+    fun updateUser(
+        uuid: UUID,
+        organizationName: String?,
+        email: String? = null,
+        password: String? = null,
+        lastName: String? = null,
+        firstName: String? = null,
+        nickname: String? = null,
+        role: Role? = null,
+        avatarReference: String? = null,
+        bannerReference: String? = null,
+    ): User {
+        val formattedEmail = email.trimOrNullIfBlank()?.lowercase()
+        if (formattedEmail != null && userRepository.existsByEmailIgnoreCase(formattedEmail))
+            throw UserAlreadyExistsException(formattedEmail)
+
+        return userRepository.save(
+            getUserByUuid(uuid).apply {
+                formattedEmail?.let { this.email = formattedEmail }
+                password?.let { this.password = password.hashedWithSalt(userConfig.salt!!) }
+                lastName?.let { this.lastName = it }
+                firstName?.let { this.firstName = it }
+                nickname?.let { this.nickname = it }
+                role?.let { this.role = it }
+                avatarReference?.let { this.avatarReference = it }
+                bannerReference?.let { this.bannerReference = it }
+                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, organizationName)
+            }
+        )
+    }
+
+    fun updateInviteStatus(
         invite: Invite,
         status: Invite.Status,
     ): Invite {

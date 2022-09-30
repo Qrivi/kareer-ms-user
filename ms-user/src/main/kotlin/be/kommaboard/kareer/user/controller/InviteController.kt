@@ -204,7 +204,7 @@ class InviteController(
                 throw InvalidInviteStatusException(dto.status!!.trim())
         }
 
-        val updatedInvite = userService.updateInvite(
+        val updatedInvite = userService.updateInviteStatus(
             invite = invite,
             status = status,
         )

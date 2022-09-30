@@ -13,4 +13,6 @@ data class UserDTO(
     val organizationUuid: UUID?,
     val role: String,
     val status: String,
+    val avatarUrl: String?,
+    val bannerUrl: String?,
 )

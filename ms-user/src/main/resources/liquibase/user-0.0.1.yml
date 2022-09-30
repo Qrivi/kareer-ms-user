@@ -69,6 +69,18 @@ databaseChangeLog:
                     nullable: false
                     unique: false
               - column:
+                  name: avatar_reference
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: true
+              - column:
+                  name: banner_reference
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: true
+              - column:
                   name: keywords
                   type: VARCHAR(255)
                   constraints:

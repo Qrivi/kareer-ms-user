@@ -32,27 +32,33 @@ class User(
     val creationDate: ZonedDateTime,
 
     @Column(name = "email")
-    val email: String,
+    var email: String,
 
     @Column(name = "password")
-    val password: String,
+    var password: String,
 
     @Column(name = "last_name")
-    val lastName: String,
+    var lastName: String,
 
     @Column(name = "first_name")
-    val firstName: String,
+    var firstName: String,
 
     @Column(name = "nickname")
-    val nickname: String,
+    var nickname: String,
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    val role: Role,
+    var role: Role,
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: Status,
+
+    @Column(name = "avatar_reference")
+    var avatarReference: String?,
+
+    @Column(name = "banner_reference")
+    var bannerReference: String?,
 
     @Column(name = "keywords")
     var keywords: String,
@@ -60,7 +66,7 @@ class User(
 
     fun fullName() = "$firstName $lastName"
 
-    fun toDTO() = UserDTO(
+    fun toDTO(avatarUrl: String?, bannerUrl: String?) = UserDTO(
         uuid = uuid!!,
         creationDate = creationDate,
         email = email,
@@ -70,5 +76,7 @@ class User(
         organizationUuid = organizationUuid,
         role = role.name,
         status = status.name,
+        avatarUrl = avatarUrl,
+        bannerUrl = bannerUrl,
     )
 }
