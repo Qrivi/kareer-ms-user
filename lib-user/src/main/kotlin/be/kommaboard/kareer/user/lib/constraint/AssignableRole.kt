@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 import kotlin.reflect.KClass
 
-@Target(AnnotationTarget.PROPERTY_GETTER)
+@Target(AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [AssignableRoleValidator::class])
 annotation class AssignableRole(

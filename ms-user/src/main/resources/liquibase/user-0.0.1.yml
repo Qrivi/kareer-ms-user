@@ -27,6 +27,12 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: phone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
                   name: password
                   type: VARCHAR(60)
                   constraints:

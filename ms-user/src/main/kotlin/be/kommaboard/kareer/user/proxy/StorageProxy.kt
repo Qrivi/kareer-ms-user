@@ -5,6 +5,7 @@ import be.kommaboard.kareer.storage.lib.dto.request.CreateFileReferenceDTO
 import be.kommaboard.kareer.storage.lib.dto.response.FileReferenceDTO
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.context.annotation.Profile
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,7 +33,7 @@ interface StorageProxy {
         @RequestHeader(value = InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(value = InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable id: String,
-    )
+    ): ResponseEntity<Unit>
 }
 
 @Profile("kubernetes")

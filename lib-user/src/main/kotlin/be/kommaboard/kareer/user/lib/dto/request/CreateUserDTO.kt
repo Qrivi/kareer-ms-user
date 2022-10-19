@@ -15,6 +15,10 @@ data class CreateUserDTO(
     @get:Email(message = "{CreateUserDTO.email.Email}")
     val email: String?,
 
+    @get:Size(message = "{CreateUserDTO.phone.Size}", max = 20)
+    @get:Pattern(message = "{CreateUserDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
+    val phone: String?,
+
     @get:NotBlank(message = "{CreateUserDTO.password.NotBlank}")
     @get:Size(message = "{CreateUserDTO.password.size}", min = 8)
     @get:NotCommon(message = "{CreateUserDTO.password.NotCommon}")

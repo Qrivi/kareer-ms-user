@@ -7,6 +7,7 @@ data class UserDTO(
     val uuid: UUID,
     val creationDate: ZonedDateTime,
     val email: String,
+    val phone: String?,
     val lastName: String,
     val firstName: String,
     val nickname: String,

@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.ZonedDateTime
+import java.util.Optional
 import java.util.UUID
 
 @Service
@@ -120,6 +121,7 @@ class UserService(
 
     fun createUser(
         email: String,
+        phone: String? = null,
         password: String,
         lastName: String,
         firstName: String,
@@ -141,6 +143,7 @@ class UserService(
                 organizationUuid = organizationUuid,
                 creationDate = now,
                 email = formattedEmail,
+                phone = phone,
                 password = password.hashedWithSalt(userConfig.salt!!),
                 lastName = lastName.trim(),
                 firstName = firstName.trim(),
@@ -208,33 +211,60 @@ class UserService(
     fun updateUser(
         uuid: UUID,
         organizationName: String?,
-        email: String? = null,
-        password: String? = null,
-        lastName: String? = null,
-        firstName: String? = null,
-        nickname: String? = null,
-        role: Role? = null,
-        avatarReference: String? = null,
-        bannerReference: String? = null,
+        email: Optional<String>? = null,
+        password: Optional<String>? = null,
+        lastName: Optional<String>? = null,
+        firstName: Optional<String>? = null,
+        nickname: Optional<String?>? = null,
+        role: Optional<Role>? = null,
     ): User {
-        val formattedEmail = email.trimOrNullIfBlank()?.lowercase()
+        val formattedEmail = email?.get().trimOrNullIfBlank()?.lowercase()
         if (formattedEmail != null && userRepository.existsByEmailIgnoreCase(formattedEmail))
             throw UserAlreadyExistsException(formattedEmail)
 
         return userRepository.save(
             getUserByUuid(uuid).apply {
-                formattedEmail?.let { this.email = formattedEmail }
-                password?.let { this.password = password.hashedWithSalt(userConfig.salt!!) }
-                lastName?.let { this.lastName = it }
-                firstName?.let { this.firstName = it }
-                nickname?.let { this.nickname = it }
-                role?.let { this.role = it }
-                avatarReference?.let { this.avatarReference = it }
-                bannerReference?.let { this.bannerReference = it }
+                formattedEmail?.let {
+                    this.email = formattedEmail
+                }
+                password?.let {
+                    this.password = password.get().hashedWithSalt(userConfig.salt!!)
+                }
+                lastName?.let {
+                    this.lastName = it.get().trim()
+                }
+                firstName?.let {
+                    this.firstName = it.get().trim()
+                    this.nickname = it.get().trim()
+                }
+                nickname?.let {
+                    this.nickname = it.orElse(this.firstName)!!
+                }
+                role?.let {
+                    this.role = it.get()
+                }
                 keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, organizationName)
             }
         )
     }
+
+    fun updateUserAvatar(
+        uuid: UUID,
+        reference: String?
+    ) = userRepository.save(
+        getUserByUuid(uuid).apply {
+            this.avatarReference = reference
+        }
+    )
+
+    fun updateUserBanner(
+        uuid: UUID,
+        reference: String?
+    ) = userRepository.save(
+        getUserByUuid(uuid).apply {
+            this.bannerReference = reference
+        }
+    )
 
     fun updateInviteStatus(
         invite: Invite,

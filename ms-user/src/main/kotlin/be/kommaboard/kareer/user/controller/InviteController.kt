@@ -189,7 +189,7 @@ class InviteController(
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.MANAGER)
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
-        val status = dto.status!!.toInviteStatus()
+        val status = dto.status!!.toInviteStatus().get()
 
         // Extra requirements if performed as a manager
         if (Role.MANAGER.matches(consumerRole)) {
@@ -201,7 +201,7 @@ class InviteController(
 
             // Managers can not accept or decline invites (only the invitee can), but can retract invites or undo retraction
             if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED)
-                throw InvalidInviteStatusException(dto.status!!.trim())
+                throw InvalidInviteStatusException(dto.status!!.get())
         }
 
         val updatedInvite = userService.updateInviteStatus(

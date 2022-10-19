@@ -34,6 +34,9 @@ class User(
     @Column(name = "email")
     var email: String,
 
+    @Column(name = "phone")
+    var phone: String?,
+
     @Column(name = "password")
     var password: String,
 
@@ -70,6 +73,7 @@ class User(
         uuid = uuid!!,
         creationDate = creationDate,
         email = email,
+        phone = phone,
         lastName = lastName,
         firstName = firstName,
         nickname = nickname,

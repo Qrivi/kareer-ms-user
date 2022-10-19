@@ -1,9 +1,11 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
+import java.util.Optional
 import javax.validation.constraints.NotBlank
 
 data class UpdateInviteDTO(
 
-    @get:NotBlank(message = "{UpdateInviteDTO.status.NotBlank}")
-    val status: String?,
+    val status: Optional<
+        @NotBlank(message = "{UpdateInviteDTO.status.NotBlank}")
+        String>?,
 )

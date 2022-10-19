@@ -9,6 +9,7 @@ import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
+import be.kommaboard.kareer.common.getOrNull
 import be.kommaboard.kareer.common.toSort
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
@@ -27,7 +28,6 @@ import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistExcep
 import feign.FeignException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mapping.PropertyReferenceException
@@ -37,6 +37,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.util.Base64Utils
 import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -215,7 +216,6 @@ class UserController(
         @PathVariable uuid: String,
         @Valid @RequestBody dto: UpdateUserDTO,
         validation: BindingResult,
-        request: HttpServletRequest,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling PATCH /users/v1/{uuid} [updateUser] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
@@ -226,7 +226,7 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole) || !Role.USER.matches(dto.role ?: Role.USER.name))
+            if (Role.USER.matches(consumerRole) || !Role.USER.matches(dto.role.getOrNull() ?: Role.USER.name))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
             if (Role.MANAGER.matches(consumerRole)) {
@@ -237,7 +237,7 @@ class UserController(
         }
 
         // If we are trying to update the role to anything but USER...
-        if (dto.role != null && !Role.USER.matches(dto.role!!)) {
+        if (dto.role != null && !Role.USER.matches(dto.role.getOrNull()!!)) {
             // ... then the requester must be a MANAGER or higher
             if (!Role.MANAGER.matches(consumerRole) && !Role.ADMIN.matches(consumerRole) && !Role.SYSTEM.matches(consumerRole))
                 throw InvalidCredentialsException()
@@ -355,22 +355,10 @@ class UserController(
             )
         }
 
-        // Get the organization's name
-        val organizationName = try {
-            organizationProxy.getOrganization(
-                consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
-                uuid = user.organizationUuid.toString(),
-            ).name
-        } catch (e: FeignException) {
-            null
-        }
-
         // Update the user details
-        userService.updateUser(
+        userService.updateUserAvatar(
             uuid = uuid.toUuid(),
-            organizationName = organizationName,
-            avatarReference = fileReference.id,
+            reference = fileReference.id,
         )
 
         return ResponseEntity
@@ -380,7 +368,49 @@ class UserController(
     }
 
     @Operation(
-        summary = "Update an user's banner",
+        summary = "Delete a user's avatar",
+        description = "Deletes a user's avatar. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @DeleteMapping("/{uuid}/avatar")
+    fun deleteUserAvatar(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+    ): ResponseEntity<Unit> {
+        logger.info("Handling DELETE /users/v1/{uuid}/avatar [deleteUserAvatar] for {}", consumerId)
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        // Get the user details, for later
+        val user = userService.getUserByUuid(uuid.toUuid())
+
+        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
+        if (uuid != consumerId) {
+            // Normal user's can only edit their own details
+            if (Role.USER.matches(consumerRole))
+                throw InvalidCredentialsException()
+            // And managers can only edit their own or their employees' details
+            if (Role.MANAGER.matches(consumerRole)) {
+                val manager = userService.getUserByUuid(consumerId.toUuid())
+                if (manager.organizationUuid != user.organizationUuid)
+                    throw InvalidCredentialsException()
+            }
+        }
+
+        val response = storageProxy.deleteFileReference(
+            consumerRole = Role.SYSTEM.name,
+            consumerId = userConfig.consumerId!!,
+            id = userService.getUserByUuid(uuid.toUuid()).avatarReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
+        )
+        userService.updateUserAvatar(
+            uuid = uuid.toUuid(),
+            reference = null,
+        )
+        return response
+    }
+
+    @Operation(
+        summary = "Update a user's banner",
         description = "Updates an user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
@@ -431,28 +461,58 @@ class UserController(
             )
         }
 
-        // Get the organization's name
-        val organizationName = try {
-            organizationProxy.getOrganization(
-                consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
-                uuid = user.organizationUuid.toString(),
-            ).name
-        } catch (e: FeignException) {
-            null
-        }
-
         // Update the user details
-        userService.updateUser(
+        userService.updateUserBanner(
             uuid = uuid.toUuid(),
-            organizationName = organizationName,
-            bannerReference = fileReference.id,
+            reference = fileReference.id,
         )
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(fileReference.toUrlDTO())
+    }
+
+    @Operation(
+        summary = "Delete a user's banner",
+        description = "Deletes a user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @DeleteMapping("/{uuid}/banner")
+    fun deleteUserBanner(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+    ): ResponseEntity<Unit> {
+        logger.info("Handling DELETE /users/v1/{uuid}/banner [deleteUserBanner] for {}", consumerId)
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        // Get the user details, for later
+        val user = userService.getUserByUuid(uuid.toUuid())
+
+        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
+        if (uuid != consumerId) {
+            // Normal user's can only edit their own details
+            if (Role.USER.matches(consumerRole))
+                throw InvalidCredentialsException()
+            // And managers can only edit their own or their employees' details
+            if (Role.MANAGER.matches(consumerRole)) {
+                val manager = userService.getUserByUuid(consumerId.toUuid())
+                if (manager.organizationUuid != user.organizationUuid)
+                    throw InvalidCredentialsException()
+            }
+        }
+
+        val response = storageProxy.deleteFileReference(
+            consumerRole = Role.SYSTEM.name,
+            consumerId = userConfig.consumerId!!,
+            id = userService.getUserByUuid(uuid.toUuid()).bannerReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
+        )
+        userService.updateUserBanner(
+            uuid = uuid.toUuid(),
+            reference = null,
+        )
+        return response
     }
 
     // endregion
