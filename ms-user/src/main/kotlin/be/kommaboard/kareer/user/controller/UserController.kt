@@ -101,7 +101,7 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
+        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         if (page < 0 || size < 1)
             throw InvalidPageOrSizeException()
@@ -112,7 +112,7 @@ class UserController(
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
-            organizationUuid = if (Role.MANAGER.matches(consumerRole)) userService.getUserByUuid(consumerId.toUuid()).organizationUuid else organizationUuid.trimOrNullIfBlank()?.toUuid(),
+            organizationUuid = if (Role.ADMIN.matches(consumerRole)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).organizationUuid,
             role = role.trimOrNullIfBlank()?.toRole(),
         )
 
