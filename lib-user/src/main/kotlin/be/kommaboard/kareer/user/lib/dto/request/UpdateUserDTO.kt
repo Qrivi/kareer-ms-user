@@ -1,6 +1,5 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.AssignableRole
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
 import java.util.Optional
@@ -44,6 +43,6 @@ data class UpdateUserDTO(
         String?>?,
 
     val role: Optional<
-        @AssignableRole(message = "{UpdateUserDTO.role.AssignableRole}")
+        @Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
         String>?,
 )

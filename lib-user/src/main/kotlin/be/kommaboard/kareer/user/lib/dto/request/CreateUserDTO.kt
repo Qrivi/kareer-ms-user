@@ -1,6 +1,5 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.AssignableRole
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
 import javax.validation.constraints.Email
@@ -40,6 +39,6 @@ data class CreateUserDTO(
     @get:Pattern(message = "{CreateUserDTO.organizationUuid.Pattern}", regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$")
     val organizationUuid: String?,
 
-    @get:AssignableRole(message = "{CreateUserDTO.role.AssignableRole}")
+    @get:Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
     val role: String?,
 )
