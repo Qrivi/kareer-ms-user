@@ -3,6 +3,7 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
+import be.kommaboard.kareer.common.getOrNull
 import be.kommaboard.kareer.common.makeKeywords
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
@@ -61,6 +62,7 @@ class UserService(
                 lastName = "Admin",
                 firstName = "Admin",
                 role = Role.ADMIN,
+                title = "Super Administrator",
                 activate = true,
             )
         }
@@ -100,6 +102,11 @@ class UserService(
     ) = userRepository.findByUuid(uuid)
         ?: throw UserDoesNotExistException()
 
+    fun getUserBySlug(
+        slug: String,
+    ) = userRepository.findBySlug(slug)
+        ?: throw UserDoesNotExistException()
+
     fun getInviteByUuid(
         uuid: UUID,
     ) = inviteRepository.findByUuid(uuid)
@@ -120,12 +127,14 @@ class UserService(
     }
 
     fun createUser(
+        slug: String? = null,
         email: String,
         phone: String? = null,
         password: String,
         lastName: String,
         firstName: String,
         nickname: String? = null,
+        title: String,
         organizationUuid: UUID? = null,
         organizationName: String? = null,
         role: Role,
@@ -142,17 +151,19 @@ class UserService(
             User(
                 organizationUuid = organizationUuid,
                 creationDate = now,
+                slug = slug,
                 email = formattedEmail,
                 phone = phone,
                 password = password.hashedWithSalt(userConfig.salt!!),
                 lastName = lastName.trim(),
                 firstName = firstName.trim(),
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
+                title = title.trim(),
                 role = role,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
                 avatarReference = null,
                 bannerReference = null,
-                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, organizationName)
+                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, phone, organizationName)
             )
         )
 
@@ -211,11 +222,14 @@ class UserService(
     fun updateUser(
         uuid: UUID,
         organizationName: String?,
+        slug: Optional<String?>? = null,
         email: Optional<String>? = null,
+        phone: Optional<String?>? = null,
         password: Optional<String>? = null,
         lastName: Optional<String>? = null,
         firstName: Optional<String>? = null,
         nickname: Optional<String?>? = null,
+        title: Optional<String>? = null,
         role: Optional<Role>? = null,
     ): User {
         val formattedEmail = email?.get().trimOrNullIfBlank()?.lowercase()
@@ -224,8 +238,14 @@ class UserService(
 
         return userRepository.save(
             getUserByUuid(uuid).apply {
+                slug?.let {
+                    this.slug = it.getOrNull()
+                }
                 formattedEmail?.let {
                     this.email = formattedEmail
+                }
+                phone?.let {
+                    this.phone = it.getOrNull()
                 }
                 password?.let {
                     this.password = password.get().hashedWithSalt(userConfig.salt!!)
@@ -240,10 +260,13 @@ class UserService(
                 nickname?.let {
                     this.nickname = it.orElse(this.firstName)!!
                 }
+                title?.let {
+                    this.title = it.get().trim()
+                }
                 role?.let {
                     this.role = it.get()
                 }
-                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, organizationName)
+                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, this.phone, organizationName)
             }
         )
     }

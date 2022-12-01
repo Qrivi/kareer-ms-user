@@ -128,23 +128,23 @@ class UserController(
     }
 
     @Operation(
-        summary = "Get a user by their UUID",
-        description = "Gets the user whose UUID matches the path variable. The `MANAGER` role can only request other users that are part of the same organization, whereas the `USER` role can only request their own details.",
+        summary = "Get a user by their UUID or slug",
+        description = "Gets the user whose UUID or slug matches the path variable. The `MANAGER` role can only request other users that are part of the same organization, whereas the `USER` role can only request their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
-    @GetMapping("/{uuid}")
+    @GetMapping("/{uuidOrSlug}")
     fun getUser(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-        @PathVariable uuid: String,
+        @PathVariable uuidOrSlug: String,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling GET /users/v1/{uuid} [getUser] for {}", consumerId)
         authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        if (Role.USER.matches(consumerRole) && uuid != consumerId)
-            throw InvalidCredentialsException()
+        val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserBySlug(uuidOrSlug)
 
-        val user = userService.getUserByUuid(uuid.toUuid())
+        if (Role.USER.matches(consumerRole) && user.uuid.toString() != consumerId)
+            throw InvalidCredentialsException()
 
         if (Role.MANAGER.matches(consumerRole)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
@@ -190,11 +190,13 @@ class UserController(
         val user = userService.createUser(
             organizationUuid = organization.uuid,
             organizationName = organization.name,
+            slug = dto.slug,
             email = dto.email!!,
             password = dto.password!!,
             lastName = dto.lastName!!,
             firstName = dto.firstName!!,
             nickname = dto.nickname,
+            title = dto.title!!,
             role = dto.role?.toRole() ?: Role.USER,
         )
 
@@ -261,11 +263,14 @@ class UserController(
         val updatedUser = userService.updateUser(
             uuid = uuid.toUuid(),
             organizationName = organizationName,
+            slug = dto.slug,
             email = dto.email,
+            phone = dto.phone,
             password = dto.password,
             lastName = dto.lastName,
             firstName = dto.firstName,
             nickname = dto.nickname,
+            title = dto.title,
             role = dto.role?.toRole()
         )
 

@@ -15,6 +15,12 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: slug
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
                   name: creation_date
                   type: TIMESTAMP
                   constraints:
@@ -52,6 +58,12 @@ databaseChangeLog:
                     unique: false
               - column:
                   name: nickname
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: title
                   type: VARCHAR(100)
                   constraints:
                     nullable: false

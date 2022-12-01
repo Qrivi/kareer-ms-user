@@ -9,6 +9,10 @@ import javax.validation.constraints.Size
 
 data class CreateUserDTO(
 
+    @get:Size(message = "{CreateUserDTO.slug.Size}", max = 50)
+    @get:Pattern(message = "{CreateUserDTO.slug.Pattern}", regexp = "^[\\w.]+\$")
+    val slug: String?,
+
     @get:NotBlank(message = "{CreateUserDTO.email.NotBlank}")
     @get:Size(message = "{CreateUserDTO.email.Size}", max = 100)
     @get:Email(message = "{CreateUserDTO.email.Email}")
@@ -34,6 +38,10 @@ data class CreateUserDTO(
 
     @get:Size(message = "{CreateUserDTO.nickname.Size}", max = 100)
     val nickname: String?,
+
+    @get:NotBlank(message = "{CreateUserDTO.title.NotBlank}")
+    @get:Size(message = "{CreateUserDTO.title.Size}", max = 100)
+    val title: String?,
 
     @get:NotBlank(message = "{CreateUserDTO.organizationUuid.NotBlank}")
     @get:Pattern(message = "{CreateUserDTO.organizationUuid.Pattern}", regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$")

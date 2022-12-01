@@ -10,6 +10,11 @@ import javax.validation.constraints.Size
 
 data class UpdateUserDTO(
 
+    val slug: Optional<
+        @Size(message = "{UpdateUserDTO.slug.Size}", max = 50)
+        @Pattern(message = "{CreateUserDTO.slug.Pattern}", regexp = "^[\\w.]+\$")
+        String?>?,
+
     val email: Optional<
         @NotBlank(message = "{UpdateUserDTO.email.NotBlank}")
         @Size(message = "{UpdateUserDTO.email.Size}", max = 100)
@@ -19,7 +24,7 @@ data class UpdateUserDTO(
     val phone: Optional<
         @Size(message = "{UpdateUserDTO.phone.Size}", max = 20)
         @Pattern(message = "{UpdateUserDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
-        String>?,
+        String?>?,
 
     val password: Optional<
         @NotBlank(message = "{UpdateUserDTO.password.NotBlank}")
@@ -41,6 +46,11 @@ data class UpdateUserDTO(
     val nickname: Optional<
         @Size(message = "{UpdateUserDTO.nickname.Size}", max = 100)
         String?>?,
+
+    val title: Optional<
+        @NotBlank(message = "{UpdateUserDTO.title.NotBlank}")
+        @Size(message = "{UpdateUserDTO.title.Size}", max = 100)
+        String>?,
 
     val role: Optional<
         @Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])

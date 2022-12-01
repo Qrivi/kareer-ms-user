@@ -25,6 +25,9 @@ class User(
     @Column(name = "uuid")
     val uuid: UUID? = null,
 
+    @Column(name = "slug")
+    var slug: String?,
+
     @Column(name = "organization_uuid")
     val organizationUuid: UUID?,
 
@@ -49,6 +52,9 @@ class User(
     @Column(name = "nickname")
     var nickname: String,
 
+    @Column(name = "title")
+    var title: String,
+
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     var role: Role,
@@ -71,12 +77,14 @@ class User(
 
     fun toDTO(avatarUrl: String?, bannerUrl: String?) = UserDTO(
         uuid = uuid!!,
+        slug = slug,
         creationDate = creationDate,
         email = email,
         phone = phone,
         lastName = lastName,
         firstName = firstName,
         nickname = nickname,
+        title = title,
         organizationUuid = organizationUuid,
         role = role.name,
         status = status.name,
