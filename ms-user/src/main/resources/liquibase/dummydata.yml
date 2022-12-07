@@ -1,0 +1,475 @@
+databaseChangeLog:
+  - changeSet:
+      id: user-0.0.1
+      author: Kristof Dewilde
+      comment: "Dummy data for testing organization-ms."
+      changes:
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "kareer@kommaboard.be"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdae605fQ4LpaoGkDLNwzFpmLMHzE8TC/eW"
+              - column:
+                  name: last_name
+                  value: "Admin"
+              - column:
+                  name: first_name
+                  value: "Admin"
+              - column:
+                  name: nickname
+                  value: "Admin"
+              - column:
+                  name: title
+                  value: "Super Administrator"
+              - column:
+                  name: role
+                  value: "ADMIN"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: keywords
+                  value: "admin admin admin kareer@kommaboard.be"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000001"
+              - column:
+                  name: slug
+                  value: "eindbaas"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "an@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332211"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Van den Eynde"
+              - column:
+                  name: first_name
+                  value: "An"
+              - column:
+                  name: nickname
+                  value: "An"
+              - column:
+                  name: title
+                  value: "Eindbaas"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a1"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b1"
+              - column:
+                  name: keywords
+                  value: "an van den eynde an an@kommaboard.be +32494332211 komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000002"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "leen@kommaboard.be"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Van den Eynde"
+              - column:
+                  name: first_name
+                  value: "Leen"
+              - column:
+                  name: nickname
+                  value: "Leen"
+              - column:
+                  name: title
+                  value: "HR Officer"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a2"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b2"
+              - column:
+                  name: keywords
+                  value: "leen van den eynde leen leen@kommaboard.be komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000003"
+              - column:
+                  name: slug
+                  value: "damian"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "damian@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332222"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Verhaegen"
+              - column:
+                  name: first_name
+                  value: "Damian"
+              - column:
+                  name: nickname
+                  value: "Damian"
+              - column:
+                  name: title
+                  value: "HR Officer"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a3"
+              - column:
+                  name: keywords
+                  value: "damian verhaegen damian damian@kommaboard.be +32494332222 komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000004"
+              - column:
+                  name: slug
+                  value: "pixeliner"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "peter@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332233"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Vercauteren"
+              - column:
+                  name: first_name
+                  value: "Peter"
+              - column:
+                  name: nickname
+                  value: "Vercauteren"
+              - column:
+                  name: title
+                  value: "Front-end Connaisseur"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a4"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b4"
+              - column:
+                  name: keywords
+                  value: "peter vercauteren peter peter@kommaboard.be +32494332233 komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000005"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "kristof@kommaboard.be"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Dewilde"
+              - column:
+                  name: first_name
+                  value: "Kristof"
+              - column:
+                  name: nickname
+                  value: "Qrivi"
+              - column:
+                  name: title
+                  value: "11X Developer"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a5"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b5"
+              - column:
+                  name: keywords
+                  value: "kristof dewilde kristof kristof@kommaboard.be komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000006"
+              - column:
+                  name: slug
+                  value: "aslina"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "lina@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332244"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Asly"
+              - column:
+                  name: first_name
+                  value: "Lina"
+              - column:
+                  name: nickname
+                  value: "Lina"
+              - column:
+                  name: title
+                  value: "Functional Analist"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a6"
+              - column:
+                  name: keywords
+                  value: "lina asly lina lina@kommaboard.be +32494332244 komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000007"
+              - column:
+                  name: slug
+                  value: "hannelore"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "hannelore@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332255"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Selderslaghs"
+              - column:
+                  name: first_name
+                  value: "Hannelore"
+              - column:
+                  name: nickname
+                  value: "Hannelore"
+              - column:
+                  name: title
+                  value: "Financial Controller"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a7"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b7"
+              - column:
+                  name: keywords
+                  value: "hannelore selderslaghs hannelore hannelore@kommaboard.be +32494332255 komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000008"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "stephanie@kommaboard.be"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Hotton"
+              - column:
+                  name: first_name
+                  value: "Stéphanie"
+              - column:
+                  name: nickname
+                  value: "Stéphanie"
+              - column:
+                  name: title
+                  value: "Senior Accountant"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a8"
+              - column:
+                  name: banner_reference
+                  value: "0000000000000000000000b8"
+              - column:
+                  name: keywords
+                  value: "stephanie hotton stephanie stephanie@kommaboard.be komma board"
+        - insert:
+            tableName: user
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000009"
+              - column:
+                  name: slug
+                  value: "cocktailsatyours"
+              - column:
+                  name: creation_date
+                  value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: email
+                  value: "christopher@kommaboard.be"
+              - column:
+                  name: phone
+                  value: "+32494332266"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Mungra"
+              - column:
+                  name: first_name
+                  value: "Christopher"
+              - column:
+                  name: nickname
+                  value: "Chris"
+              - column:
+                  name: title
+                  value: "Cocktail Man"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
+                  name: avatar_reference
+                  value: "0000000000000000000000a9"
+              - column:
+                  name: keywords
+                  value: "christopher mungra christopher christopher@kommaboard.be +32494332266 komma board"
+

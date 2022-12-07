@@ -25,7 +25,8 @@ class NotCommonValidator : ConstraintValidator<NotCommon, String> {
             setOf(
                 "password", "pass1234", "12345678", "01234567", "baseball", "trustno1", "superman", "testtest", "computer",
                 "michelle", "123456789", "0123456789", "012345678", "1234567890", "corvette", "00000000", "test1234", "kommaboard",
-                "password1234", "password123", "password12", "password1", "password!", "kommaboard!", "kommaboard123", "kommaboard1234"
+                "password1234", "password123", "password12", "password1", "password!", "kommaboard!", "kommaboard123", "kommaboard1234",
+                "kommaboard1!", "kommaboard12345"
             ).find { it.equals(value, ignoreCase = true) } == null
     }
 }

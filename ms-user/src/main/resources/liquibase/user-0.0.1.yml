@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: user-0.0.1
       author: Kristof Dewilde
+      comment: "Initial configuration for the user, invite and ticket tables."
       changes:
         - createTable:
             tableName: user
@@ -18,7 +19,7 @@ databaseChangeLog:
                   name: slug
                   type: VARCHAR(50)
                   constraints:
-                    nullable: false
+                    nullable: true
                     unique: false
               - column:
                   name: creation_date
