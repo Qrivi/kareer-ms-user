@@ -1,5 +1,7 @@
 databaseChangeLog:
   - include:
-      file: ./liquibase/user-0.0.1.yml
+      file: user-0.0.1.yml
+      relativeToChangelogFile: true
   - include:
-      file: ./liquibase/dummydata.yml
+      file: dummydata.yml
+      relativeToChangelogFile: true
