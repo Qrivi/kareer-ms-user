@@ -14,6 +14,9 @@ RUN gradle bootJar
 FROM eclipse-temurin:17-jre
 WORKDIR /kareer/ms-user
 
+# Update, upgrade and install jq for health check
+RUN apt-get update && apt-get upgrade -y && apt-get install -y jq
+
 # Create a user with limited permissions
 RUN groupadd -r kareer && useradd -g kareer kareer
 USER kareer:kareer
@@ -24,3 +27,9 @@ COPY --from=build /opt/build/libs/*.jar ./app.jar
 # Run
 EXPOSE 32002
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Health check
+HEALTHCHECK --start-period=30s --interval=30s --timeout=3s --retries=3 \
+  CMD curl --silent --fail --request GET http://localhost:32002/api/actuator/health \
+    | jq --exit-status -n 'inputs | if has("status") then .status=="UP" else false end' > /dev/null || exit 1
+
