@@ -10,7 +10,7 @@ import be.kommaboard.kareer.mailing.lib.dto.MailMeta
 import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
 import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
 import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
-import be.kommaboard.kareer.user.UserConfig
+import be.kommaboard.kareer.user.KareerConfig
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
@@ -43,7 +43,7 @@ import java.util.UUID
 @Transactional
 class UserService(
     private val clock: Clock,
-    private val userConfig: UserConfig,
+    private val kareerConfig: KareerConfig,
     private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
@@ -57,8 +57,8 @@ class UserService(
         if (userRepository.count() == 0L) {
             logger.warn("No admins found in database. Creating admin with default credentials...")
             createUser(
-                email = userConfig.adminEmail!!,
-                password = userConfig.adminPassword!!,
+                email = kareerConfig.adminEmail!!,
+                password = kareerConfig.adminPassword!!,
                 lastName = "Admin",
                 firstName = "Admin",
                 role = Role.ADMIN,
@@ -154,7 +154,7 @@ class UserService(
                 slug = slug,
                 email = formattedEmail,
                 phone = phone,
-                password = password.hashedWithSalt(userConfig.salt!!),
+                password = password.hashedWithSalt(kareerConfig.salt!!),
                 lastName = lastName.trim(),
                 firstName = firstName.trim(),
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
@@ -173,7 +173,7 @@ class UserService(
                 Ticket(
                     user = user,
                     creationDate = now,
-                    token = UUID.randomUUID().toString().hashedWithSalt(userConfig.salt!!),
+                    token = UUID.randomUUID().toString().hashedWithSalt(kareerConfig.salt!!),
                     kind = Ticket.Kind.CONFIRM_EMAIL,
                 )
             )
@@ -248,7 +248,7 @@ class UserService(
                     this.phone = it.getOrNull()
                 }
                 password?.let {
-                    this.password = password.get().hashedWithSalt(userConfig.salt!!)
+                    this.password = password.get().hashedWithSalt(kareerConfig.salt!!)
                 }
                 lastName?.let {
                     this.lastName = it.get().trim()
@@ -313,7 +313,7 @@ class UserService(
         // Verify that ticket was meant to confirm e-mail
         if (Ticket.Kind.CONFIRM_EMAIL != ticket.kind) throw TicketInvalidException(ticketUuid)
         // Verify that the ticket was not expired
-        if (ZonedDateTime.now(clock).isBefore(ticket.creationDate.plusHours(userConfig.confirmEmailTtl!!))) throw TicketExpiredException(ticketUuid)
+        if (ZonedDateTime.now(clock).isBefore(ticket.creationDate.plusHours(kareerConfig.confirmEmailTtl!!))) throw TicketExpiredException(ticketUuid)
         // Verify that the ticket was not used before
         if (ticket.used) throw TicketAlreadyUsedException(ticketUuid)
 

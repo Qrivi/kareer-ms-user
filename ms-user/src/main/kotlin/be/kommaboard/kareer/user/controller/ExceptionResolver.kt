@@ -9,15 +9,12 @@ import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
-import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
 class ExceptionResolver(
     private val messageService: MessageService,
 ) {

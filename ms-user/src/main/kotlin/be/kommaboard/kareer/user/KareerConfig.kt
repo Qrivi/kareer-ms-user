@@ -13,7 +13,7 @@ import javax.validation.constraints.Size
 
 @Validated
 @ConfigurationProperties(prefix = "kareer")
-data class UserConfig(
+data class KareerConfig(
 
     @get:NotBlank(message = "consumer-id cannot be blank.")
     var consumerId: String? = null,

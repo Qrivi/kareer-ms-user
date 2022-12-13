@@ -12,7 +12,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableConfigurationProperties(UserConfig::class)
+@EnableConfigurationProperties(KareerConfig::class)
 class UserApplication {
 
     @Bean

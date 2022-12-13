@@ -7,12 +7,10 @@ spring:
         sources:
           - name: ${spring.application.name}
       discovery:
-        enabled: false
         all-namespaces: true
       loadbalancer:
-        enabled: false
         mode: service
       reload:
-        enabled: true
         mode: polling
         period: 10000
+      enabled: false

@@ -10,10 +10,7 @@ data:
     spring:
       cloud:
         kubernetes:
-          discovery:
-            enabled: true
-          loadbalancer:
-            enabled: true
+          enabled: true
       rabbitmq:
         host: kareer.local
         port: 5672

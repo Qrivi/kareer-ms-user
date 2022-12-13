@@ -72,8 +72,8 @@ logging:
   level:
     root: INFO
     org.springframework: INFO
-    org.springframework.web: DEBUG
     org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.springframework.cloud.kubernetes.client.KubernetesClientUtils: ERROR
     io.kubernetes.client.spring.extended.controller.config.KubernetesInformerAutoConfiguration: ERROR
+

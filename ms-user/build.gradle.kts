@@ -1,9 +1,9 @@
 group = "be.kommaboard.kareer"
 version = "0.0.1"
 
-extra["springBootVersion"] = "2.7.2"
-extra["springCloudVersion"] = "2021.0.3"
-extra["springCloudKubernetesVersion"] = "2.1.3"
+extra["springBootVersion"] = "2.7.6"
+extra["springCloudVersion"] = "2021.0.5"
+extra["springCloudKubernetesVersion"] = "2.1.5"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 
@@ -15,9 +15,9 @@ repositories {
 }
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
-    id("org.springframework.boot") version "2.7.2"
-    id("io.spring.dependency-management") version "1.0.12.RELEASE"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("org.springframework.boot") version "2.7.6"
+    id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.7.10"
     kotlin("plugin.spring") version "1.7.10"
     kotlin("plugin.jpa") version "1.7.10"
@@ -56,10 +56,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
     // Liquibase
-    implementation("org.liquibase:liquibase-core:4.14.0")
+    implementation("org.liquibase:liquibase-core:4.17.2")
     // OpenAPI + Swagger UI
-    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.9")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.13")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")
@@ -67,8 +67,8 @@ dependencies {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.6" // Kotlin version
-        languageVersion = "1.6" // Kotlin version
+        apiVersion = "1.7" // Kotlin version
+        languageVersion = "1.7" // Kotlin version
         jvmTarget = "17" // JVM version
         freeCompilerArgs = listOf("-Xjsr305=strict") // strict null-safety
     }

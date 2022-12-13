@@ -15,7 +15,7 @@ import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.storage.lib.dto.request.CreateFileReferenceDTO
 import be.kommaboard.kareer.storage.lib.dto.response.UrlDTO
-import be.kommaboard.kareer.user.UserConfig
+import be.kommaboard.kareer.user.KareerConfig
 import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
@@ -56,7 +56,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/users/v1")
 class UserController(
-    private val userConfig: UserConfig,
+    private val kareerConfig: KareerConfig,
     private val userService: UserService,
     private val organizationProxy: OrganizationProxy,
     private val storageProxy: StorageProxy,
@@ -73,7 +73,7 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
         logger.info("Handling GET /users/v1/all [getAllUsers] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         val users = userService.getAllUsers()
 
@@ -101,7 +101,7 @@ class UserController(
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         if (page < 0 || size < 1)
             throw InvalidPageOrSizeException()
@@ -139,7 +139,7 @@ class UserController(
         @PathVariable uuidOrSlug: String,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling GET /users/v1/{uuid} [getUser] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserBySlug(uuidOrSlug)
 
@@ -172,7 +172,7 @@ class UserController(
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling POST /users/v1 [createUser] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN)
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
@@ -180,7 +180,7 @@ class UserController(
         val organization = try {
             organizationProxy.getOrganization(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 uuid = dto.organizationUuid!!,
             )
         } catch (e: FeignException) {
@@ -220,7 +220,7 @@ class UserController(
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling PATCH /users/v1/{uuid} [updateUser] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
         val user = userService.getUserByUuid(uuid.toUuid())
@@ -253,7 +253,7 @@ class UserController(
         val organizationName = try {
             organizationProxy.getOrganization(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 uuid = user.organizationUuid.toString(),
             ).name
         } catch (e: FeignException) {
@@ -289,7 +289,7 @@ class UserController(
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling POST /users/v1/verify [verifyUserCredentials] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (validation.hasErrors())
             throw RequestValidationException(validation)
@@ -321,7 +321,7 @@ class UserController(
         @PathVariable uuid: String,
     ): ResponseEntity<UrlDTO> {
         logger.info("Handling PUT /users/v1/{uuid}/avatar [updateUserAvatar] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
         val user = userService.getUserByUuid(uuid.toUuid())
@@ -344,7 +344,7 @@ class UserController(
         // Upload new avatar and get its reference
         val fileReference = storageProxy.createFileReference(
             consumerRole = Role.SYSTEM.name,
-            consumerId = userConfig.consumerId!!,
+            consumerId = kareerConfig.consumerId!!,
             dto = CreateFileReferenceDTO(
                 content = Base64Utils.encodeToString(file.bytes),
                 contentType = file.contentType,
@@ -355,7 +355,7 @@ class UserController(
         userService.getUserByUuid(uuid.toUuid()).avatarReference?.let {
             storageProxy.deleteFileReference(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 id = it,
             )
         }
@@ -384,7 +384,7 @@ class UserController(
         @PathVariable uuid: String,
     ): ResponseEntity<Unit> {
         logger.info("Handling DELETE /users/v1/{uuid}/avatar [deleteUserAvatar] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
         val user = userService.getUserByUuid(uuid.toUuid())
@@ -404,7 +404,7 @@ class UserController(
 
         val response = storageProxy.deleteFileReference(
             consumerRole = Role.SYSTEM.name,
-            consumerId = userConfig.consumerId!!,
+            consumerId = kareerConfig.consumerId!!,
             id = userService.getUserByUuid(uuid.toUuid()).avatarReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
         )
         userService.updateUserAvatar(
@@ -427,7 +427,7 @@ class UserController(
         @PathVariable uuid: String,
     ): ResponseEntity<UrlDTO> {
         logger.info("Handling PUT /users/v1/{uuid}/banner [updateUserBanner] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
         val user = userService.getUserByUuid(uuid.toUuid())
@@ -450,7 +450,7 @@ class UserController(
         // Upload new banner and get its reference
         val fileReference = storageProxy.createFileReference(
             consumerRole = Role.SYSTEM.name,
-            consumerId = userConfig.consumerId!!,
+            consumerId = kareerConfig.consumerId!!,
             dto = CreateFileReferenceDTO(
                 content = Base64Utils.encodeToString(file.bytes),
                 contentType = file.contentType,
@@ -461,7 +461,7 @@ class UserController(
         userService.getUserByUuid(uuid.toUuid()).bannerReference?.let {
             storageProxy.deleteFileReference(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 id = it,
             )
         }
@@ -490,7 +490,7 @@ class UserController(
         @PathVariable uuid: String,
     ): ResponseEntity<Unit> {
         logger.info("Handling DELETE /users/v1/{uuid}/banner [deleteUserBanner] for {}", consumerId)
-        authorizationCheck(consumerId, userConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
         val user = userService.getUserByUuid(uuid.toUuid())
@@ -510,7 +510,7 @@ class UserController(
 
         val response = storageProxy.deleteFileReference(
             consumerRole = Role.SYSTEM.name,
-            consumerId = userConfig.consumerId!!,
+            consumerId = kareerConfig.consumerId!!,
             id = userService.getUserByUuid(uuid.toUuid()).bannerReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
         )
         userService.updateUserBanner(
@@ -526,14 +526,14 @@ class UserController(
         val avatarUrl = this.avatarReference?.let { id ->
             storageProxy.getFileReference(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 id = id,
             ).url
         }
         val bannerUrl = this.bannerReference?.let { id ->
             storageProxy.getFileReference(
                 consumerRole = Role.SYSTEM.name,
-                consumerId = userConfig.consumerId!!,
+                consumerId = kareerConfig.consumerId!!,
                 id = id,
             ).url
         }
