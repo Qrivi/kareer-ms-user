@@ -48,7 +48,7 @@ spring:
           time_zone: UTC
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     open-in-view: false
   liquibase:
     enabled: true
