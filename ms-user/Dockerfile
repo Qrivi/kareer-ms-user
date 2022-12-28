@@ -29,7 +29,7 @@ EXPOSE 32002
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # Health check
-HEALTHCHECK --start-period=30s --interval=30s --timeout=3s --retries=3 \
+HEALTHCHECK --start-period=30s --interval=30s --timeout=10s --retries=3 \
   CMD curl --silent --fail --request GET http://localhost:32002/api/actuator/health \
     | jq --exit-status -n 'inputs | if has("status") then .status=="UP" else false end' > /dev/null || exit 1
 
