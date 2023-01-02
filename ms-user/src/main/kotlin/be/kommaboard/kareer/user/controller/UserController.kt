@@ -4,6 +4,7 @@ import be.kommaboard.kareer.authorization.InternalHttpHeaders
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.authorizationCheck
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
+import be.kommaboard.kareer.authorization.isRole
 import be.kommaboard.kareer.authorization.toRole
 import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
@@ -112,7 +113,7 @@ class UserController(
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
-            organizationUuid = if (Role.ADMIN.matches(consumerRole)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).organizationUuid,
+            organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).organizationUuid,
             role = role.trimOrNullIfBlank()?.toRole(),
         )
 
@@ -143,15 +144,9 @@ class UserController(
 
         val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserBySlug(uuidOrSlug)
 
-        if (Role.USER.matches(consumerRole) && user.uuid.toString() != consumerId)
+        // If the consumer is a regular user or manager, they can only retrieve user data of users belonging to their organization
+        if (consumerRole.isRole(Role.MANAGER, Role.USER) && userService.getUserByUuid(consumerId.toUuid()).organizationUuid != user.organizationUuid)
             throw InvalidCredentialsException()
-
-        if (Role.MANAGER.matches(consumerRole)) {
-            val manager = userService.getUserByUuid(consumerId.toUuid())
-
-            if (manager.organizationUuid != user.organizationUuid)
-                throw InvalidCredentialsException()
-        }
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -228,10 +223,10 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole) || !Role.USER.matches(dto.role.getOrNull() ?: Role.USER.name))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
-            if (Role.MANAGER.matches(consumerRole)) {
+            if (consumerRole.isRole(Role.MANAGER)) {
                 val manager = userService.getUserByUuid(consumerId.toUuid())
                 if (manager.organizationUuid != user.organizationUuid)
                     throw InvalidCredentialsException()
@@ -239,9 +234,9 @@ class UserController(
         }
 
         // If we are trying to update the role to anything but USER...
-        if (dto.role != null && !Role.USER.matches(dto.role.getOrNull()!!)) {
+        if (dto.role != null && !dto.role.getOrNull().isRole(Role.USER)) {
             // ... then the requester must be a MANAGER or higher
-            if (!Role.MANAGER.matches(consumerRole) && !Role.ADMIN.matches(consumerRole) && !Role.SYSTEM.matches(consumerRole))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
         }
 
@@ -329,10 +324,10 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
-            if (Role.MANAGER.matches(consumerRole)) {
+            if (consumerRole.isRole(Role.MANAGER)) {
                 val manager = userService.getUserByUuid(consumerId.toUuid())
                 if (manager.organizationUuid != user.organizationUuid)
                     throw InvalidCredentialsException()
@@ -392,10 +387,10 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
-            if (Role.MANAGER.matches(consumerRole)) {
+            if (consumerRole.isRole(Role.MANAGER)) {
                 val manager = userService.getUserByUuid(consumerId.toUuid())
                 if (manager.organizationUuid != user.organizationUuid)
                     throw InvalidCredentialsException()
@@ -435,10 +430,10 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
-            if (Role.MANAGER.matches(consumerRole)) {
+            if (consumerRole.isRole(Role.MANAGER)) {
                 val manager = userService.getUserByUuid(consumerId.toUuid())
                 if (manager.organizationUuid != user.organizationUuid)
                     throw InvalidCredentialsException()
@@ -498,10 +493,10 @@ class UserController(
         // If we are trying to update a user other than ourselves, we need to check who's performing the request first
         if (uuid != consumerId) {
             // Normal user's can only edit their own details
-            if (Role.USER.matches(consumerRole))
+            if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
             // And managers can only edit their own or their employees' details
-            if (Role.MANAGER.matches(consumerRole)) {
+            if (consumerRole.isRole(Role.MANAGER)) {
                 val manager = userService.getUserByUuid(consumerId.toUuid())
                 if (manager.organizationUuid != user.organizationUuid)
                     throw InvalidCredentialsException()

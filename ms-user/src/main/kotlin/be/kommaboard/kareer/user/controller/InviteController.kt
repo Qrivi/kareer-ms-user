@@ -4,6 +4,7 @@ import be.kommaboard.kareer.authorization.InternalHttpHeaders
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.authorizationCheck
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
+import be.kommaboard.kareer.authorization.isRole
 import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
@@ -119,7 +120,7 @@ class InviteController(
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
 
-        if (Role.MANAGER.matches(consumerRole)) {
+        if (consumerRole.isRole(Role.MANAGER)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
             if (manager.organizationUuid != invite.inviter.organizationUuid)
@@ -192,7 +193,7 @@ class InviteController(
         val status = dto.status!!.toInviteStatus().get()
 
         // Extra requirements if performed as a manager
-        if (Role.MANAGER.matches(consumerRole)) {
+        if (consumerRole.isRole(Role.MANAGER)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
             // Managers can only update invites sent by themselves or other managers in their organization
