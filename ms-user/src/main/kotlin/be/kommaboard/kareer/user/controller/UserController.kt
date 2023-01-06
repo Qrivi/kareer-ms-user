@@ -304,8 +304,8 @@ class UserController(
     // region User avatar and banner
 
     @Operation(
-        summary = "Update a user's avatar",
-        description = "Updates a user's avatar. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        summary = "Replace a user's avatar",
+        description = "Replaces a user's avatar. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
     @PutMapping("/{uuid}/avatar", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -410,8 +410,8 @@ class UserController(
     }
 
     @Operation(
-        summary = "Update a user's banner",
-        description = "Updates an user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        summary = "Replace a user's banner",
+        description = "Replaces an user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
     @PutMapping("/{uuid}/banner", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
