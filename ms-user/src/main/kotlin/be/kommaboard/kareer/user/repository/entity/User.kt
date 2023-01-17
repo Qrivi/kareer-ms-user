@@ -87,7 +87,7 @@ class User(
 
     fun fullName() = "$firstName $lastName"
 
-    fun toDTO(avatarUrl: String?, bannerUrl: String?) = UserDTO(
+    fun toDTO(avatarUrl: String? = null, bannerUrl: String? = null) = UserDTO(
         uuid = uuid!!,
         slug = slug,
         creationDate = creationDate,

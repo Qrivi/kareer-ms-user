@@ -81,7 +81,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(ListDTO(users.map { it.toRichDTO() }))
+            .body(ListDTO(users.map { it.toDTO() }))
     }
 
     @Operation(
@@ -127,7 +127,7 @@ class UserController(
                     .link(request, usersPage)
                     .build()
             )
-            .body(ListDTO(usersPage.content.map { it.toRichDTO() }, usersPage))
+            .body(ListDTO(usersPage.content.map { if (consumerRole.isRole(Role.SYSTEM)) it.toDTO() else it.toRichDTO() }, usersPage))
     }
 
     @Operation(
@@ -153,7 +153,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(user.toRichDTO())
+            .body(if (consumerRole.isRole(Role.SYSTEM)) user.toDTO() else user.toRichDTO())
     }
 
     @Operation(
@@ -201,7 +201,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(user.toDTO(null, null))
+            .body(user.toDTO())
     }
 
     @Operation(
@@ -276,7 +276,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(updatedUser.toRichDTO())
+            .body(if (consumerRole.isRole(Role.SYSTEM)) updatedUser.toDTO() else updatedUser.toRichDTO())
     }
 
     @Operation(hidden = true)
@@ -301,7 +301,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(user.toDTO(null, null))
+            .body(user.toDTO())
     }
 
     // endregion
@@ -537,12 +537,12 @@ class UserController(
         logger.info("Handling PUT /users/v1/{uuid}/preferences [updateUserPreferences] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-            if (uuid.toUuid() != consumerId.toUuid())
-                throw InvalidCredentialsException()
+        if (uuid.toUuid() != consumerId.toUuid())
+            throw InvalidCredentialsException()
 
-            val user = userService.updateUserPreferences(
+        val user = userService.updateUserPreferences(
             uuid = uuid.toUuid(),
-        preferences = body,
+            preferences = body,
         )
 
         return ResponseEntity
