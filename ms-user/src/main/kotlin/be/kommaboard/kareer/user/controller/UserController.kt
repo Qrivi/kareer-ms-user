@@ -23,9 +23,11 @@ import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.proxy.StorageProxy
+import be.kommaboard.kareer.user.repository.entity.Invite
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
-import be.kommaboard.kareer.user.service.exception.OrganizationDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.InvalidInviteException
+import be.kommaboard.kareer.user.service.exception.InvalidOrganizationUuidException
 import feign.FeignException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -174,16 +176,31 @@ class UserController(
         if (validation.hasErrors())
             throw RequestValidationException(validation)
 
+        // Get the invite details if we were passed an invite UUID
+        val invite = if (dto.inviteUuid == null) null else userService.getInviteByUuid(dto.inviteUuid!!.toUuid())
+
+        // Only the SYSTEM (aka an internal call from ms-authentication) is allowed to create users based on invite
+        if (invite != null && !consumerRole.isRole(Role.SYSTEM))
+            throw InvalidCredentialsException()
+
+        // Only PENDING invites can be used to create a new user
+        if (invite != null && invite.status != Invite.Status.PENDING)
+            throw InvalidInviteException()
+
+        // We'll need the organization to assign to the newly created user
+        val organizationUuid = invite?.inviter?.organizationUuid ?: dto.organizationUuid?.toUuid() ?: throw InvalidOrganizationUuidException()
+
         val organization = try {
             organizationProxy.getOrganization(
                 consumerRole = Role.SYSTEM.name,
                 consumerId = kareerConfig.consumerId!!,
-                uuid = dto.organizationUuid!!,
+                uuid = organizationUuid.toString(),
             )
         } catch (e: FeignException) {
-            throw OrganizationDoesNotExistException()
+            throw InvalidOrganizationUuidException()
         }
 
+        // Create the user
         val user = userService.createUser(
             role = dto.role?.toRole() ?: Role.USER,
             organizationUuid = organization.uuid,
@@ -197,6 +214,10 @@ class UserController(
             title = dto.title!!,
             birthday = dto.birthday
         )
+
+        // Prevent an invite from being used multiple times
+        if (invite != null)
+            userService.updateInviteStatus(invite, Invite.Status.ACCEPTED)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

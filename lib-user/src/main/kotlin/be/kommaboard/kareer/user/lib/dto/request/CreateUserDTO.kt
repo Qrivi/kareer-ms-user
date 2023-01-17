@@ -11,8 +11,8 @@ import javax.validation.constraints.Size
 
 data class CreateUserDTO(
 
-    @get:NotBlank(message = "{CreateUserDTO.organizationUuid.NotBlank}")
-    @get:Pattern(message = "{CreateUserDTO.organizationUuid.Pattern}", regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$")
+    val inviteUuid: String?,
+
     val organizationUuid: String?,
 
     @get:Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
