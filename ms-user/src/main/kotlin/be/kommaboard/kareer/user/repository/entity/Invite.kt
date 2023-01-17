@@ -13,8 +13,10 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.Table
 
 @Entity
+@Table(name = "invite")
 class Invite(
 
     @Id
@@ -27,7 +29,7 @@ class Invite(
     val uuid: UUID? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inviter_uuid")
+    @JoinColumn(name = "user_uuid")
     val inviter: User,
 
     @Column(name = "creation_date")

@@ -3,17 +3,27 @@ package be.kommaboard.kareer.user.repository.entity
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
+import org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import org.hibernate.annotations.GenericGenerator
 import java.time.ZonedDateTime
 import java.util.UUID
+import javax.persistence.CollectionTable
 import javax.persistence.Column
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.PrimaryKeyJoinColumn
+import javax.persistence.SecondaryTable
+import javax.persistence.Table
 
 @Entity
+@Table(name="user")
+@SecondaryTable(name = "user_preferences", pkJoinColumns = [PrimaryKeyJoinColumn(name = "user_uuid")])
 class User(
 
     @Id
@@ -33,6 +43,14 @@ class User(
 
     @Column(name = "creation_date")
     val creationDate: ZonedDateTime,
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    var role: Role,
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: Status,
 
     @Column(name = "email")
     var email: String,
@@ -55,13 +73,8 @@ class User(
     @Column(name = "title")
     var title: String,
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    var role: Role,
-
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    var status: Status,
+    @Column(name = "birthday")
+    var birthday: ZonedDateTime?,
 
     @Column(name = "avatar_reference")
     var avatarReference: String?,
@@ -71,6 +84,9 @@ class User(
 
     @Column(name = "keywords")
     var keywords: String,
+
+    @Column(name = "preferences", table = "user_preferences")
+    var preferences: String?,
 ) {
 
     fun fullName() = "$firstName $lastName"
@@ -79,16 +95,18 @@ class User(
         uuid = uuid!!,
         slug = slug,
         creationDate = creationDate,
+        organizationUuid = organizationUuid,
+        role = role.name,
+        status = status.name,
         email = email,
         phone = phone,
         lastName = lastName,
         firstName = firstName,
         nickname = nickname,
         title = title,
-        organizationUuid = organizationUuid,
-        role = role.name,
-        status = status.name,
+        birthday = birthday,
         avatarUrl = avatarUrl,
         bannerUrl = bannerUrl,
+        preferences = preferences,
     )
 }

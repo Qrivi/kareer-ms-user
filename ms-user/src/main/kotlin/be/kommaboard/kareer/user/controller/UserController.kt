@@ -104,6 +104,8 @@ class UserController(
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
+        // TODO Add filter on status
+
         if (page < 0 || size < 1)
             throw InvalidPageOrSizeException()
 
@@ -156,7 +158,7 @@ class UserController(
 
     @Operation(
         summary = "Create a new user",
-        description = "Creates a new user. If using the `ADMIN` role, this bypasses the invitation system. Endpoint is also used internally when registering via auth-ms.",
+        description = "Creates a new user. Bypasses the invitation system. Endpoint is also used internally when registering via auth-ms.",
         responses = [ApiResponse(responseCode = "201")],
     )
     @PostMapping
@@ -183,6 +185,7 @@ class UserController(
         }
 
         val user = userService.createUser(
+            role = dto.role?.toRole() ?: Role.USER,
             organizationUuid = organization.uuid,
             organizationName = organization.name,
             slug = dto.slug,
@@ -192,7 +195,7 @@ class UserController(
             firstName = dto.firstName!!,
             nickname = dto.nickname,
             title = dto.title!!,
-            role = dto.role?.toRole() ?: Role.USER,
+            birthday = dto.birthday
         )
 
         return ResponseEntity
@@ -258,6 +261,7 @@ class UserController(
         val updatedUser = userService.updateUser(
             uuid = uuid.toUuid(),
             organizationName = organizationName,
+            role = dto.role?.toRole(),
             slug = dto.slug,
             email = dto.email,
             phone = dto.phone,
@@ -266,7 +270,7 @@ class UserController(
             firstName = dto.firstName,
             nickname = dto.nickname,
             title = dto.title,
-            role = dto.role?.toRole()
+            birthday = dto.birthday,
         )
 
         return ResponseEntity
@@ -513,6 +517,38 @@ class UserController(
             reference = null,
         )
         return response
+    }
+
+    // endregion
+    // region User avatar and banner
+
+    @Operation(
+        summary = "Replace a user's preferences",
+        description = "Replaces a user's preferences. There are no constraints, but the idea is to store key-value pairs clients can then use to read and persist user preferences.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @PutMapping("/{uuid}/preferences")
+    fun updateUserPreferences(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @RequestBody body: String?,
+        @PathVariable uuid: String,
+    ): ResponseEntity<String> {
+        logger.info("Handling PUT /users/v1/{uuid}/preferences [updateUserPreferences] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+            if (uuid.toUuid() != consumerId.toUuid())
+                throw InvalidCredentialsException()
+
+            val user = userService.updateUserPreferences(
+            uuid = uuid.toUuid(),
+        preferences = body,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(body)
     }
 
     // endregion

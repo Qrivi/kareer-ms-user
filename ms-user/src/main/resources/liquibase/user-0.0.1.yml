@@ -16,16 +16,34 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: slug
-                  type: VARCHAR(50)
+                  name: organization_uuid
+                  type: UUID
                   constraints:
                     nullable: true
+                    unique: false
+              - column:
+                  name: role
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
                     unique: false
               - column:
                   name: creation_date
                   type: TIMESTAMP
                   constraints:
                     nullable: false
+                    unique: false
+              - column:
+                  name: slug
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
                     unique: false
               - column:
                   name: email
@@ -70,24 +88,6 @@ databaseChangeLog:
                     nullable: false
                     unique: false
               - column:
-                  name: organization_uuid
-                  type: UUID
-                  constraints:
-                    nullable: true
-                    unique: false
-              - column:
-                  name: role
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-                    unique: false
-              - column:
-                  name: status
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-                    unique: false
-              - column:
                   name: avatar_reference
                   type: VARCHAR(100)
                   constraints:
@@ -105,6 +105,27 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: false
+              - column:
+                  name: birthday
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+                    unique: false
+        - createTable:
+            tableName: user_preferences
+            columns:
+              - column:
+                  name: user_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: preferences
+                  type: BLOB
+                  constraints:
+                    nullable: true
+                    unique: false
         - createTable:
             tableName: invite
             columns:
@@ -117,7 +138,7 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: inviter_uuid
+                  name: user_uuid
                   type: UUID
                   constraints:
                     nullable: false
@@ -193,3 +214,31 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: false
+
+        - addForeignKeyConstraint:
+            constraintName: user_preferences_user_uuid
+            baseTableName: user_preferences
+            baseColumnNames: user_uuid
+            referencedTableName: user
+            referencedColumnNames: uuid
+            onUpdate: CASCADE
+            onDelete: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: invite_user_uuid
+            baseTableName: invite
+            baseColumnNames: user_uuid
+            referencedTableName: user
+            referencedColumnNames: uuid
+            onUpdate: CASCADE
+            onDelete: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: ticket_user_uuid
+            baseTableName: ticket
+            baseColumnNames: user_uuid
+            referencedTableName: user
+            referencedColumnNames: uuid
+            onUpdate: CASCADE
+            onDelete: CASCADE
+            validate: true

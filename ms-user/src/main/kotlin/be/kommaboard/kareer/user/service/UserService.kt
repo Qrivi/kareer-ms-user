@@ -127,6 +127,9 @@ class UserService(
     }
 
     fun createUser(
+        organizationUuid: UUID? = null,
+        organizationName: String? = null,
+        role: Role,
         slug: String? = null,
         email: String,
         phone: String? = null,
@@ -135,9 +138,7 @@ class UserService(
         firstName: String,
         nickname: String? = null,
         title: String,
-        organizationUuid: UUID? = null,
-        organizationName: String? = null,
-        role: Role,
+        birthday: ZonedDateTime?=null,
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()
@@ -149,9 +150,11 @@ class UserService(
         // Create the new user
         val user = userRepository.saveAndFlush(
             User(
+                slug = slug,
                 organizationUuid = organizationUuid,
                 creationDate = now,
-                slug = slug,
+                role = role,
+                status = if (activate) Status.ACTIVATED else Status.REGISTERED,
                 email = formattedEmail,
                 phone = phone,
                 password = password.hashedWithSalt(kareerConfig.salt!!),
@@ -159,11 +162,11 @@ class UserService(
                 firstName = firstName.trim(),
                 nickname = nickname.trimOrNullIfBlank() ?: firstName,
                 title = title.trim(),
-                role = role,
-                status = if (activate) Status.ACTIVATED else Status.REGISTERED,
+                birthday = birthday,
                 avatarReference = null,
                 bannerReference = null,
-                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, phone, organizationName)
+                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, phone, organizationName),
+                preferences = null,
             )
         )
 
@@ -222,6 +225,7 @@ class UserService(
     fun updateUser(
         uuid: UUID,
         organizationName: String?,
+        role: Optional<Role>? = null,
         slug: Optional<String?>? = null,
         email: Optional<String>? = null,
         phone: Optional<String?>? = null,
@@ -230,7 +234,7 @@ class UserService(
         firstName: Optional<String>? = null,
         nickname: Optional<String?>? = null,
         title: Optional<String>? = null,
-        role: Optional<Role>? = null,
+        birthday: Optional<ZonedDateTime?>? = null,
     ): User {
         val formattedEmail = email?.get().trimOrNullIfBlank()?.lowercase()
         if (formattedEmail != null && userRepository.existsByEmailIgnoreCase(formattedEmail))
@@ -238,6 +242,9 @@ class UserService(
 
         return userRepository.save(
             getUserByUuid(uuid).apply {
+                role?.let {
+                    this.role = it.get()
+                }
                 slug?.let {
                     this.slug = it.getOrNull()
                 }
@@ -263,8 +270,8 @@ class UserService(
                 title?.let {
                     this.title = it.get().trim()
                 }
-                role?.let {
-                    this.role = it.get()
+                birthday?.let {
+                    this.birthday = it.getOrNull()
                 }
                 keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, this.phone, organizationName)
             }
@@ -286,6 +293,15 @@ class UserService(
     ) = userRepository.save(
         getUserByUuid(uuid).apply {
             this.bannerReference = reference
+        }
+    )
+
+    fun updateUserPreferences(
+        uuid: UUID,
+        preferences: String?
+    ) = userRepository.save(
+        getUserByUuid(uuid).apply {
+            this.preferences = preferences
         }
     )
 

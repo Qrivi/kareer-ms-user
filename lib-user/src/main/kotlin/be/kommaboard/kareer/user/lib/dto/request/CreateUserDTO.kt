@@ -2,12 +2,21 @@ package be.kommaboard.kareer.user.lib.dto.request
 
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import java.time.ZonedDateTime
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Past
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 
 data class CreateUserDTO(
+
+    @get:NotBlank(message = "{CreateUserDTO.organizationUuid.NotBlank}")
+    @get:Pattern(message = "{CreateUserDTO.organizationUuid.Pattern}", regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$")
+    val organizationUuid: String?,
+
+    @get:Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
+    val role: String?,
 
     @get:Size(message = "{CreateUserDTO.slug.Size}", max = 50)
     @get:Pattern(message = "{CreateUserDTO.slug.Pattern}", regexp = "^[\\w.]+\$")
@@ -43,10 +52,6 @@ data class CreateUserDTO(
     @get:Size(message = "{CreateUserDTO.title.Size}", max = 100)
     val title: String?,
 
-    @get:NotBlank(message = "{CreateUserDTO.organizationUuid.NotBlank}")
-    @get:Pattern(message = "{CreateUserDTO.organizationUuid.Pattern}", regexp = "^\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}$")
-    val organizationUuid: String?,
-
-    @get:Pattern(message = "{CreateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
-    val role: String?,
+    @get:Past(message = "{CreateUserDTO.birthday.Past}")
+    val birthday: ZonedDateTime?
 )
