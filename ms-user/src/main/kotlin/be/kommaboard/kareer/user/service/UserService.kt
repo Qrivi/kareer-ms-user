@@ -138,7 +138,7 @@ class UserService(
         firstName: String,
         nickname: String? = null,
         title: String,
-        birthday: ZonedDateTime?=null,
+        birthday: ZonedDateTime? = null,
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()

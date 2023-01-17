@@ -7,22 +7,18 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import org.hibernate.annotations.GenericGenerator
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.persistence.CollectionTable
 import javax.persistence.Column
-import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
-import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
-import javax.persistence.JoinColumn
 import javax.persistence.PrimaryKeyJoinColumn
 import javax.persistence.SecondaryTable
 import javax.persistence.Table
 
 @Entity
-@Table(name="user")
+@Table(name = "user")
 @SecondaryTable(name = "user_preferences", pkJoinColumns = [PrimaryKeyJoinColumn(name = "user_uuid")])
 class User(
 
