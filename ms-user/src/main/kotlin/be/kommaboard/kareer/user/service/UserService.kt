@@ -236,8 +236,10 @@ class UserService(
         title: Optional<String>? = null,
         birthday: Optional<ZonedDateTime?>? = null,
     ): User {
-        val formattedEmail = email?.get().trimOrNullIfBlank()?.lowercase()
-        if (formattedEmail != null && userRepository.existsByEmailIgnoreCase(formattedEmail))
+        val user = getUserByUuid(uuid)
+        val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()
+
+        if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail))
             throw UserAlreadyExistsException(formattedEmail)
 
         return userRepository.save(
