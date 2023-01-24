@@ -242,7 +242,7 @@ class UserService(
         return userRepository.save(
             user.apply {
                 role?.let { this.role = it }
-                slug?.let { this.slug = it.trimOrNullIfBlank() }
+                slug?.let { this.slug = it.trimOrNullIfBlank()?.lowercase() }
                 formattedEmail?.let { this.email = formattedEmail }
                 phone?.let { this.phone = it.trimOrNullIfBlank() }
                 password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
