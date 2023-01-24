@@ -79,7 +79,7 @@ databaseChangeLog:
                   name: nickname
                   type: VARCHAR(100)
                   constraints:
-                    nullable: false
+                    nullable: true
                     unique: false
               - column:
                   name: title

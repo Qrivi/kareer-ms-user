@@ -14,7 +14,7 @@ data class UserDTO(
     val phone: String?,
     val lastName: String,
     val firstName: String,
-    val nickname: String,
+    val nickname: String?,
     val title: String,
     val birthday: ZonedDateTime?,
     val avatarUrl: String?,

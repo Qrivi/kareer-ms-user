@@ -10,7 +10,6 @@ import be.kommaboard.kareer.authorization.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
-import be.kommaboard.kareer.common.getOrNull
 import be.kommaboard.kareer.common.toSort
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
@@ -258,7 +257,7 @@ class UserController(
         }
 
         // If we are trying to update the role to anything but USER...
-        if (dto.role != null && !dto.role.getOrNull().isRole(Role.USER)) {
+        if (dto.role != null && !dto.role.isRole(Role.USER)) {
             // ... then the requester must be a MANAGER or higher
             if (consumerRole.isRole(Role.USER))
                 throw InvalidCredentialsException()
@@ -561,7 +560,7 @@ class UserController(
         if (uuid.toUuid() != consumerId.toUuid())
             throw InvalidCredentialsException()
 
-        val user = userService.updateUserPreferences(
+        userService.updateUserPreferences(
             uuid = uuid.toUuid(),
             preferences = body,
         )

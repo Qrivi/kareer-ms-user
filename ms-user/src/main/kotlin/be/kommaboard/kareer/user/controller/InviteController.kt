@@ -18,9 +18,9 @@ import be.kommaboard.kareer.user.lib.dto.request.UpdateInviteDTO
 import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.entity.Invite
+import be.kommaboard.kareer.user.repository.entity.toInviteStatus
 import be.kommaboard.kareer.user.service.UserService
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
-import be.kommaboard.kareer.user.toInviteStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.LoggerFactory
@@ -190,7 +190,7 @@ class InviteController(
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
-        val status = dto.status!!.toInviteStatus().get()
+        val status = dto.status?.toInviteStatus() ?: throw InvalidInviteStatusException(dto.status ?: "")
 
         // Extra requirements if performed as a manager
         if (consumerRole.isRole(Role.MANAGER)) {
@@ -202,7 +202,7 @@ class InviteController(
 
             // Managers can not accept or decline invites (only the invitee can), but can retract invites or undo retraction
             if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED)
-                throw InvalidInviteStatusException(dto.status!!.get())
+                throw InvalidInviteStatusException(status.name.lowercase())
         }
 
         val updatedInvite = userService.updateInviteStatus(

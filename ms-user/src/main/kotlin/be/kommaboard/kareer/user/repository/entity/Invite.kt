@@ -1,6 +1,7 @@
 package be.kommaboard.kareer.user.repository.entity
 
 import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
+import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import org.hibernate.annotations.GenericGenerator
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -65,4 +66,10 @@ class Invite(
         inviteeFirstName = inviteeFirstName,
         status = status.name,
     )
+}
+
+fun String.toInviteStatus(): Invite.Status = try {
+    Invite.Status.valueOf(this.trim().uppercase())
+} catch (e: IllegalArgumentException) {
+    throw InvalidInviteStatusException(this.trim())
 }

@@ -64,7 +64,7 @@ class User(
     var firstName: String,
 
     @Column(name = "nickname")
-    var nickname: String,
+    var nickname: String?,
 
     @Column(name = "title")
     var title: String,

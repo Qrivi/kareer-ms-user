@@ -3,7 +3,6 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.hashedWithSalt
-import be.kommaboard.kareer.common.getOrNull
 import be.kommaboard.kareer.common.makeKeywords
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
 import java.time.ZonedDateTime
-import java.util.Optional
 import java.util.UUID
 
 @Service
@@ -47,7 +45,6 @@ class UserService(
     private val inviteRepository: InviteRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
-    private val organizationProxy: OrganizationProxy,
     private val mailingQueueService: MailingQueueService,
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -225,16 +222,16 @@ class UserService(
     fun updateUser(
         uuid: UUID,
         organizationName: String?,
-        role: Optional<Role>? = null,
-        slug: Optional<String?>? = null,
-        email: Optional<String>? = null,
-        phone: Optional<String?>? = null,
-        password: Optional<String>? = null,
-        lastName: Optional<String>? = null,
-        firstName: Optional<String>? = null,
-        nickname: Optional<String?>? = null,
-        title: Optional<String>? = null,
-        birthday: Optional<ZonedDateTime?>? = null,
+        role: Role? = null,
+        slug: String? = null,
+        email: String? = null,
+        phone: String? = null,
+        password: String? = null,
+        lastName: String? = null,
+        firstName: String? = null,
+        nickname: String? = null,
+        title: String? = null,
+        birthday: ZonedDateTime? = null,
     ): User {
         val user = getUserByUuid(uuid)
         val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()
@@ -243,38 +240,17 @@ class UserService(
             throw UserAlreadyExistsException(formattedEmail)
 
         return userRepository.save(
-            getUserByUuid(uuid).apply {
-                role?.let {
-                    this.role = it.get()
-                }
-                slug?.let {
-                    this.slug = it.getOrNull()
-                }
-                formattedEmail?.let {
-                    this.email = formattedEmail
-                }
-                phone?.let {
-                    this.phone = it.getOrNull()
-                }
-                password?.let {
-                    this.password = password.get().hashedWithSalt(kareerConfig.salt!!)
-                }
-                lastName?.let {
-                    this.lastName = it.get().trim()
-                }
-                firstName?.let {
-                    this.firstName = it.get().trim()
-                    this.nickname = it.get().trim()
-                }
-                nickname?.let {
-                    this.nickname = it.orElse(this.firstName)!!
-                }
-                title?.let {
-                    this.title = it.get().trim()
-                }
-                birthday?.let {
-                    this.birthday = it.getOrNull()
-                }
+            user.apply {
+                role?.let { this.role = it }
+                slug?.let { this.slug = it.trimOrNullIfBlank() }
+                formattedEmail?.let { this.email = formattedEmail }
+                phone?.let { this.phone = it.trimOrNullIfBlank() }
+                password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
+                lastName?.let { this.lastName = it.trim() }
+                firstName?.let { this.firstName = it.trim() }
+                nickname?.let { this.nickname = it.trimOrNullIfBlank() }
+                title?.let { this.title = it.trim() }
+                birthday?.let { this.birthday = it }
                 keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, this.phone, organizationName)
             }
         )
