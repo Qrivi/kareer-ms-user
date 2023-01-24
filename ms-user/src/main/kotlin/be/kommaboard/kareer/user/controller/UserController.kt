@@ -100,6 +100,7 @@ class UserController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "creationDate") sort: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
         request: HttpServletRequest,
     ): ResponseEntity<ListDTO<UserDTO>> {
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
@@ -128,7 +129,7 @@ class UserController(
                     .link(request, usersPage)
                     .build()
             )
-            .body(ListDTO(usersPage.content.map { if (consumerRole.isRole(Role.SYSTEM)) it.toDTO() else it.toRichDTO() }, usersPage))
+            .body(ListDTO(usersPage.content.map { if (skipStorage) it.toDTO() else it.toRichDTO() }, usersPage))
     }
 
     @Operation(
@@ -141,6 +142,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuidOrSlug: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling GET /users/v1/{uuid} [getUser] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
@@ -154,7 +156,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (consumerRole.isRole(Role.SYSTEM)) user.toDTO() else user.toRichDTO())
+            .body(if (skipStorage) user.toDTO() else user.toRichDTO())
     }
 
     @Operation(
@@ -234,6 +236,7 @@ class UserController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
         @Valid @RequestBody dto: UpdateUserDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
@@ -296,7 +299,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (consumerRole.isRole(Role.SYSTEM)) updatedUser.toDTO() else updatedUser.toRichDTO())
+            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
     }
 
     @Operation(hidden = true)
