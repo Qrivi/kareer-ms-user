@@ -113,6 +113,15 @@ class UserService(
     ) = ticketRepository.findByUuid(uuid)
         ?: throw TicketDoesNotExistException()
 
+    fun getUserByUuidAndPassword(
+        uuid: UUID,
+        password: String,
+    ): User {
+        val user = userRepository.findByUuid(uuid) ?: throw IncorrectCredentialsException()
+        if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
+        return user
+    }
+
     fun getUserByEmailAndPassword(
         email: String,
         password: String,

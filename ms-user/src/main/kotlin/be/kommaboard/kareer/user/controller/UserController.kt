@@ -19,6 +19,7 @@ import be.kommaboard.kareer.user.KareerConfig
 import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
+import be.kommaboard.kareer.user.lib.dto.request.VerifyPasswordDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.proxy.StorageProxy
@@ -300,6 +301,35 @@ class UserController(
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+    }
+
+    @Operation(
+        summary = "Verify a user's password",
+        description = "Returns the user's details if the password is correct. This endpoint can be used in a verification flow, eg. before allowing a user to change their password.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @PostMapping("/{uuid}/verify")
+    fun verifyUserPassword(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @Valid @RequestBody dto: VerifyPasswordDTO,
+        validation: BindingResult,
+    ): ResponseEntity<UserDTO> {
+        logger.info("Handling POST /users/v1/{uuid}/verify [verifyUserPassword] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        if (validation.hasErrors())
+            throw RequestValidationException(validation)
+
+        val user = userService.getUserByUuidAndPassword(
+            uuid= consumerId.toUuid(),
+            password = dto.password!!
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(user.toDTO())
     }
 
     @Operation(hidden = true)
