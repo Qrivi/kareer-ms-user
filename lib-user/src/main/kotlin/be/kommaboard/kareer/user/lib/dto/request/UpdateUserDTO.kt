@@ -14,7 +14,7 @@ data class UpdateUserDTO(
     val role: String?,
 
     @get:Size(message = "{UpdateUserDTO.slug.Size}", max = 50)
-    @get:Pattern(message = "{UpdateUserDTO.slug.Pattern}", regexp = "^[\\w.]+\$")
+    @get:Pattern(message = "{UpdateUserDTO.slug.Pattern}", regexp = "^\\s*\$|^[\\w.]+\$")
     val slug: String?,
 
     @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.email.NotBlank}")
