@@ -10,7 +10,6 @@ import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
 import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
 import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
 import be.kommaboard.kareer.user.KareerConfig
-import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
@@ -235,15 +234,18 @@ class UserService(
     ): User {
         val user = getUserByUuid(uuid)
         val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()
+        val formattedSlug = slug?.trimOrNullIfBlank()?.lowercase()
 
         if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail))
             throw UserAlreadyExistsException(formattedEmail)
+        if (user.organizationUuid != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.organizationUuid, formattedSlug))
+            throw UserAlreadyExistsException(formattedSlug)
 
         return userRepository.save(
             user.apply {
                 role?.let { this.role = it }
-                slug?.let { this.slug = it.trimOrNullIfBlank()?.lowercase() }
-                formattedEmail?.let { this.email = formattedEmail }
+                formattedSlug?.let { this.slug = it }
+                formattedEmail?.let { this.email = it }
                 phone?.let { this.phone = it.trimOrNullIfBlank() }
                 password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
                 lastName?.let { this.lastName = it.trim() }
