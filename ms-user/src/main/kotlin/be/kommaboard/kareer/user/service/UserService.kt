@@ -244,7 +244,7 @@ class UserService(
         return userRepository.save(
             user.apply {
                 role?.let { this.role = it }
-                formattedSlug?.let { this.slug = it }
+                slug?.let { this.slug = formattedSlug }
                 formattedEmail?.let { this.email = it }
                 phone?.let { this.phone = it.trimOrNullIfBlank() }
                 password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
