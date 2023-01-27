@@ -322,7 +322,7 @@ class UserController(
             throw RequestValidationException(validation)
 
         val user = userService.getUserByUuidAndPassword(
-            uuid= consumerId.toUuid(),
+            uuid = consumerId.toUuid(),
             password = dto.password!!
         )
 
