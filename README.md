@@ -28,12 +28,12 @@ echo $(htpasswd -bnBC 12 "" password | tr -d ':\n' | sed 's/$2y/$2a/')
 
 ### Run locally
 
-Requires `http://kareer.local` to point to your local host. Expects a Postgres database `kareer` running on port 5432 and a user `admin` with password `admin` with full permissions on this database. Requires JDK 17 to build the project. Gradle is not required as a wrapper is included.
+Requires `http://kareer.internal` to point to your local host. Expects a Postgres database `kareer` running on port 5432 and a user `admin` with password `admin` with full permissions on this database. Requires JDK 17 to build the project. Gradle is not required as a wrapper is included.
 
 ```shell
 cd ms-user
 # Update hosts file if required
-echo '127.0.0.1  kareer.local' | sudo tee -a /etc/hosts
+echo '127.0.0.1  kareer.internal' | sudo tee -a /etc/hosts
 # Run Postgres in Docker if required
 docker compose run -d -p 5432:5432 kareer-postgres
 # Build and run the microservice

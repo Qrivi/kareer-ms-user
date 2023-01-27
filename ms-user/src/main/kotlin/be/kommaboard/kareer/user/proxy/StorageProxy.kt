@@ -41,5 +41,5 @@ interface StorageProxy {
 interface KubernetesStorageProxy : StorageProxy
 
 @Profile("!kubernetes")
-@FeignClient("ms-storage", url = "http://kareer.local:32004")
+@FeignClient("ms-storage", url = "http://kareer.internal:32004")
 interface LocalStorageProxy : StorageProxy

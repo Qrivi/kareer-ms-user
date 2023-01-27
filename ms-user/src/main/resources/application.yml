@@ -28,13 +28,13 @@ springdoc:
 
 spring:
   rabbitmq:
-    host: kareer.local
+    host: kareer.internal
     port: 5672
     username: admin
     password: admin
     connection-timeout: 60000
   datasource:
-    url: jdbc:postgresql://kareer.local:5432/kareer
+    url: jdbc:postgresql://kareer.internal:5432/kareer
     username: admin
     password: admin
     hikari:

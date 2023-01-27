@@ -12,7 +12,7 @@ data:
         kubernetes:
           enabled: true
       rabbitmq:
-        host: kareer.local
+        host: kareer.internal
         port: 5672
         username: admin
         password: admin
