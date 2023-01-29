@@ -159,6 +159,8 @@ class InviteController(
         if (validation.hasErrors())
             throw RequestValidationException(validation)
 
+        // TODO Add a check to avoid creation of multiple invites to the same e-mail address
+
         val invite = userService.createInvite(
             manager = manager,
             organization = organization,

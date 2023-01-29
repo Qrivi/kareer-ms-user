@@ -5,6 +5,7 @@ kareer:
   admin-password: KareerAdmin69
   confirm-email-ttl: 168 # hours aka 7 days
   reset-password-ttl: 24 # hours aka 1 day
+  register-url: http://kareer.internal:32100/auth/register?invite={inviteUuid}&email={inviteeEmail}
 
 server:
   port: 32002

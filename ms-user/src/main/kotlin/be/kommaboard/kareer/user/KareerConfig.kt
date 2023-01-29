@@ -2,6 +2,7 @@ package be.kommaboard.kareer.user
 
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import org.hibernate.validator.constraints.URL
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
 import javax.validation.constraints.Email
@@ -39,4 +40,8 @@ data class KareerConfig(
     @get:NotNull(message = "reset-password-ttl cannot be blank.")
     @get:Min(message = "reset-password-ttl must be at least 1 hr.", value = 1L)
     var resetPasswordTtl: Long? = null,
+
+    @get:NotBlank(message = "register-url cannot be blank.")
+    @get:URL(message = "register-url must be valid.")
+    var registerUrl: String? = null,
 )

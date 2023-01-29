@@ -220,7 +220,11 @@ class UserService(
                 recipientEmail = invite.inviteeEmail,
                 recipientName = invite.inviteeFirstName,
             ),
-            inviterName = manager.fullName(), organizationName = organization.name, inviteLink = "https://kommaboard.be/kareerfrontent/?uuid=${invite.uuid}"
+            inviterName = manager.fullName(),
+            organizationName = organization.name,
+            inviteLink = kareerConfig.registerUrl!!
+                .replace("{inviteUuid}", invite.uuid.toString())
+                .replace("{inviteeEmail}", invite.inviteeEmail),
         )
         mailingQueueService.sendToQueue(mailDTO)
 
