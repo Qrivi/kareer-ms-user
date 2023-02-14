@@ -2,7 +2,7 @@ package be.kommaboard.kareer.user.lib.dto.request
 
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
-import java.time.ZonedDateTime
+import java.time.LocalDate
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Past
@@ -53,5 +53,5 @@ data class CreateUserDTO(
     val title: String?,
 
     @get:Past(message = "{CreateUserDTO.birthday.Past}")
-    val birthday: ZonedDateTime?
+    val birthday: LocalDate?
 )

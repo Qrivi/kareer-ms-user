@@ -1,5 +1,6 @@
 package be.kommaboard.kareer.user.lib.dto.response
 
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -16,7 +17,7 @@ data class UserDTO(
     val firstName: String,
     val nickname: String?,
     val title: String,
-    val birthday: ZonedDateTime?,
+    val birthday: LocalDate?,
     val avatarUrl: String?,
     val bannerUrl: String?,
     val preferences: String?,

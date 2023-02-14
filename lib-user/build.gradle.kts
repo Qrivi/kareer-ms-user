@@ -1,5 +1,5 @@
 group = "be.kommaboard.kareer"
-version = "0.0.1"
+version = "0.0.2"
 
 extra["springBootVersion"] = "2.7.6"
 

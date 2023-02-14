@@ -33,6 +33,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -143,7 +144,7 @@ class UserService(
         firstName: String,
         nickname: String? = null,
         title: String,
-        birthday: ZonedDateTime? = null,
+        birthday: LocalDate? = null,
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()
@@ -186,8 +187,6 @@ class UserService(
                 )
             )
         }
-
-        // TODO Add message to the queue to send out activation e-mail
 
         return user
     }
@@ -243,7 +242,7 @@ class UserService(
         firstName: String? = null,
         nickname: String? = null,
         title: String? = null,
-        birthday: ZonedDateTime? = null,
+        birthday: LocalDate? = null,
     ): User {
         val user = getUserByUuid(uuid)
         val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()

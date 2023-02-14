@@ -5,6 +5,7 @@ import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import org.hibernate.annotations.GenericGenerator
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -70,7 +71,7 @@ class User(
     var title: String,
 
     @Column(name = "birthday")
-    var birthday: ZonedDateTime?,
+    var birthday: LocalDate?,
 
     @Column(name = "avatar_reference")
     var avatarReference: String?,
