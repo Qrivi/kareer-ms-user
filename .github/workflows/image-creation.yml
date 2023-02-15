@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v4.0.0
         with:
           context: ./ms-user
-          tags: kareer/ms-user:dev-latest
+          tags: docker.qrivi.dev/kareer/ms-user:dev-latest
           push: true
       - name: Inform the team
         id: inform-team
