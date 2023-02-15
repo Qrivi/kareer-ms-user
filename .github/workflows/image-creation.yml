@@ -1,0 +1,61 @@
+name: Image creation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop ]
+
+jobs:
+  dev-latest:
+    name: dev-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Checkout codebase
+        id: checkout-codebase
+        uses: actions/checkout@v3.0.2
+        with:
+          ref: ${{ github.ref }}
+      - name: Log in to registry
+        id: login-to-registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: docker.qrivi.dev
+          username: kareer
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push image
+        id: build-and-push-image
+        uses: docker/build-push-action@v4.0.0
+        with:
+          context: ./ms-user
+          tags: kareer/ms-user:dev-latest
+          push: true
+      - name: Inform the team
+        id: inform-team
+        run: |
+          curl -X POST -H "Content-type: application/json" --data "{
+            \"blocks\": [
+              {
+                \"type\": \"section\",
+                \"text\": {
+                  \"type\": \"mrkdown\",
+                  \"text\": \"CI/CD built and pushed a new image! :whale:\"
+                }
+              },
+              {
+                \"type\": \"section\",
+                \"fields\": [
+                  {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Image*\n`kareer/ms-user:dev-latest`\"
+                  },
+                  {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Registry*\n<https://docker.qrivi.dev/v2/|docker.qrivi.dev>\"
+                  }
+                ]
+              }
+            ]
+          }" $SLACK_WEBHOOK_URL
