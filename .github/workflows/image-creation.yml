@@ -53,7 +53,7 @@ jobs:
                   },
                   {
                     \"type\": \"mrkdwn\",
-                    \"text\": \"*Registry*\n<https://docker.qrivi.dev/v2/|docker.qrivi.dev>\"
+                    \"text\": \"*Registry*\n<https://docker.qrivi.dev/v2/|docker.qrivi.dev> (private)\"
                   }
                 ]
               }
