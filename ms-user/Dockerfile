@@ -25,11 +25,11 @@ USER kareer:kareer
 COPY --from=build /opt/build/libs/*.jar ./app.jar
 
 # Run
-EXPOSE 32002
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 8006
+ENTRYPOINT ["java", "-XX:InitialRAMPercentage=60", "-XX:MaxRAMPercentage=90", "-XX:+HeapDumpOnOutOfMemoryError", "-jar", "app.jar"]
 
 # Health check
 HEALTHCHECK --start-period=30s --interval=30s --timeout=10s --retries=3 \
-  CMD curl --silent --fail --request GET http://localhost:32002/api/actuator/health \
+  CMD curl --silent --fail --request GET http://localhost:8006/api/actuator/health \
     | jq --exit-status -n 'inputs | if has("status") then .status=="UP" else false end' > /dev/null || exit 1
 

@@ -2,12 +2,12 @@ package be.kommaboard.kareer.user.lib.dto.request
 
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Past
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import java.time.LocalDate
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Past
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Size
 
 data class CreateUserDTO(
 
@@ -53,5 +53,5 @@ data class CreateUserDTO(
     val title: String?,
 
     @get:Past(message = "{CreateUserDTO.birthday.Past}")
-    val birthday: LocalDate?
+    val birthday: LocalDate?,
 )

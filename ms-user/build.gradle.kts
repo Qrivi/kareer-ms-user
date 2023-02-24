@@ -1,9 +1,9 @@
 group = "be.kommaboard.kareer"
 version = "0.0.2"
 
-extra["springBootVersion"] = "2.7.6"
-extra["springCloudVersion"] = "2021.0.5"
-extra["springCloudKubernetesVersion"] = "2.1.5"
+extra["springBootVersion"] = "3.0.3"
+extra["springCloudVersion"] = "2022.0.1"
+extra["springCloudKubernetesVersion"] = "3.0.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 
@@ -15,12 +15,12 @@ repositories {
 }
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    id("org.springframework.boot") version "2.7.6"
+    id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
+    id("org.springframework.boot") version "3.0.3"
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.spring") version "1.7.10"
-    kotlin("plugin.jpa") version "1.7.10"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.spring") version "1.8.10"
+    kotlin("plugin.jpa") version "1.8.10"
 }
 
 dependencyManagement {
@@ -33,10 +33,10 @@ dependencyManagement {
 
 dependencies {
     // Kareer Libraries
-    implementation("be.kommaboard.kareer:lib-authorization:0.0.1")
-    implementation("be.kommaboard.kareer:lib-common:0.0.1")
+    implementation("be.kommaboard.kareer:lib-authorization:0.0.2")
+    implementation("be.kommaboard.kareer:lib-common:0.0.2")
     implementation("be.kommaboard.kareer:lib-user:$version")
-    implementation("be.kommaboard.kareer:lib-mailing:0.0.1")
+    implementation("be.kommaboard.kareer:lib-mailing:0.0.2")
     implementation("be.kommaboard.kareer:lib-organization:0.0.1")
     implementation("be.kommaboard.kareer:lib-storage:0.0.1")
     // Kotlin (required by Spring Web)
@@ -48,10 +48,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     // Spring Cloud
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client")
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config")
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-loadbalancer")
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-loadbalancer")
     // Spring Data
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
@@ -67,8 +67,8 @@ dependencies {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        apiVersion = "1.7" // Kotlin version
-        languageVersion = "1.7" // Kotlin version
+        apiVersion = "1.8" // Kotlin version
+        languageVersion = "1.8" // Kotlin version
         jvmTarget = "17" // JVM version
         freeCompilerArgs = listOf("-Xjsr305=strict") // strict null-safety
     }

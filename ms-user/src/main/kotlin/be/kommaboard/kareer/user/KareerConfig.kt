@@ -2,18 +2,18 @@ package be.kommaboard.kareer.user
 
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import org.hibernate.validator.constraints.URL
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.validation.annotation.Validated
-import javax.validation.constraints.Email
-import javax.validation.constraints.Min
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
-import javax.validation.constraints.Size
 
 @Validated
-@ConfigurationProperties(prefix = "kareer")
+@ConfigurationProperties(prefix = "kareer.config")
 data class KareerConfig(
 
     @get:NotBlank(message = "consumer-id cannot be blank.")

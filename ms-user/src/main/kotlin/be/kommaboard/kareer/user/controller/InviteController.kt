@@ -23,6 +23,8 @@ import be.kommaboard.kareer.user.service.UserService
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -37,8 +39,6 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/users/v1/invites")

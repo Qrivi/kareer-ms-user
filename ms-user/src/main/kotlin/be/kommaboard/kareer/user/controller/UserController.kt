@@ -31,10 +31,12 @@ import be.kommaboard.kareer.user.service.exception.InvalidOrganizationUuidExcept
 import feign.FeignException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mapping.PropertyReferenceException
-import org.springframework.data.util.ClassTypeInformation
+import org.springframework.data.util.TypeInformation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -53,8 +55,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
+import java.util.Base64
 
 @RestController
 @RequestMapping("/users/v1")
@@ -113,7 +114,7 @@ class UserController(
             throw InvalidPageOrSizeException()
 
         if (sort.contains("password")) // Disable sorting on password
-            throw PropertyReferenceException("password", ClassTypeInformation.from(User::class.java), listOf())
+            throw PropertyReferenceException("password", TypeInformation.of(User::class.java), listOf())
 
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page, size, sort.toSort()),
@@ -128,7 +129,7 @@ class UserController(
                 HttpHeadersBuilder()
                     .contentLanguage()
                     .link(request, usersPage)
-                    .build()
+                    .build(),
             )
             .body(ListDTO(usersPage.content.map { if (skipStorage) it.toDTO() else it.toRichDTO() }, usersPage))
     }
@@ -214,7 +215,7 @@ class UserController(
             firstName = dto.firstName!!,
             nickname = dto.nickname,
             title = dto.title!!,
-            birthday = dto.birthday
+            birthday = dto.birthday,
         )
 
         // Prevent an invite from being used multiple times
@@ -323,7 +324,7 @@ class UserController(
 
         val user = userService.getUserByUuidAndPassword(
             uuid = consumerId.toUuid(),
-            password = dto.password!!
+            password = dto.password!!,
         )
 
         return ResponseEntity
@@ -348,7 +349,7 @@ class UserController(
 
         val user = userService.getUserByEmailAndPassword(
             email = dto.email!!,
-            password = dto.password!!
+            password = dto.password!!,
         )
 
         return ResponseEntity
@@ -398,9 +399,9 @@ class UserController(
             consumerRole = Role.SYSTEM.name,
             consumerId = kareerConfig.consumerId!!,
             dto = CreateFileReferenceDTO(
-                content = Base64Utils.encodeToString(file.bytes),
+                content = Base64.getEncoder().encodeToString(file.bytes),
                 contentType = file.contentType,
-            )
+            ),
         )
 
         // Remove the old avatar from storage
@@ -506,7 +507,7 @@ class UserController(
             dto = CreateFileReferenceDTO(
                 content = Base64Utils.encodeToString(file.bytes),
                 contentType = file.contentType,
-            )
+            ),
         )
 
         // Remove the old banner from storage

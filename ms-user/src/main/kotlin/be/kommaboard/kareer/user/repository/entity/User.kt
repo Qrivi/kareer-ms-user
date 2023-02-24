@@ -3,20 +3,19 @@ package be.kommaboard.kareer.user.repository.entity
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
-import org.bouncycastle.asn1.x500.style.RFC4519Style.title
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
+import jakarta.persistence.PrimaryKeyJoinColumn
+import jakarta.persistence.SecondaryTable
+import jakarta.persistence.Table
 import org.hibernate.annotations.GenericGenerator
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.PrimaryKeyJoinColumn
-import javax.persistence.SecondaryTable
-import javax.persistence.Table
 
 @Entity
 @Table(name = "user")

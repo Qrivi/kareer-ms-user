@@ -1,6 +1,6 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 data class VerifyPasswordDTO(
 
