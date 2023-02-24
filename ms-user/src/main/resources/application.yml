@@ -18,7 +18,6 @@ spring:
     kubernetes:
       loadbalancer:
         mode: service
-      enabled: false
   rabbitmq:
     host: ${kareer.external.rabbitmq.host}
     port: ${kareer.external.rabbitmq.port}
