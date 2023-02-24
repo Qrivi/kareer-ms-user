@@ -13,4 +13,4 @@ Repository is split up in `ms-user` containing the actual application, and `lib-
 ## Artifacts
 
 - `lib-user` is published as a Java library to [maven.qrivi.dev](https://maven.qrivi.dev) (public Maven repository). Needs to be build and pushed manually by a developer.
-- `ms-user` is published as a Docker image to [docker.qrivi.dev](https://docker.qrivi.dev) (private Docker registry). Is built and publisched automatically by GitHub Actions CI/CD.
+- `ms-user` is published as a Docker image to [docker.qrivi.dev](https://docker.qrivi.dev) (private Docker registry). Is built and published automatically by GitHub Actions CI/CD.
