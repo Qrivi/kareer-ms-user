@@ -1,0 +1,9 @@
+# Test database setup
+# Includes database setup and fills it with dummy data
+databaseChangeLog:
+  - include:
+      file: changelog.yml
+      relativeToChangelogFile: true
+  - include:
+      file: dummydata.yml
+      relativeToChangelogFile: true

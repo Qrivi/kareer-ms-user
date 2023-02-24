@@ -1,7 +1,6 @@
+# Production database setup
+# Includes every database structure manipulation
 databaseChangeLog:
   - include:
       file: user-0.0.1.yml
-      relativeToChangelogFile: true
-  - include:
-      file: dummydata.yml
       relativeToChangelogFile: true
