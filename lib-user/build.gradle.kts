@@ -1,3 +1,4 @@
+// lib-user
 group = "be.kommaboard.kareer"
 version = "0.0.2"
 

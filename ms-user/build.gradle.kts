@@ -1,3 +1,4 @@
+// ms-user
 group = "be.kommaboard.kareer"
 version = "0.0.2"
 
@@ -56,10 +57,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
     // Liquibase
-    implementation("org.liquibase:liquibase-core:4.17.2")
+    implementation("org.liquibase:liquibase-core:4.19.0")
     // OpenAPI + Swagger UI
-    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.13")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.13")
+    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.14")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")
