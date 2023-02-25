@@ -46,14 +46,14 @@ data class KareerConfig(
     var adminPassword: String? = null,
 
     /**
-     * Time to live for the "confirm e-mail address" link
+     * Time To Live for the "confirm e-mail address" link
      */
     @get:NotNull(message = "confirm-email-ttl cannot be blank.")
     @get:Min(message = "confirm-email-ttl must be at least 1 hr.", value = 1L)
     var confirmEmailTtl: Long? = null,
 
     /**
-     * Time to live for the "reset password" link
+     * Time To Live for the "reset password" link
      */
     @get:NotNull(message = "reset-password-ttl cannot be blank.")
     @get:Min(message = "reset-password-ttl must be at least 1 hr.", value = 1L)
