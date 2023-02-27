@@ -84,8 +84,9 @@ class InviteController(
         logger.info("Handling GET /users/v1/invites [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
-        if (page < 0 || size < 1)
+        if (page < 0 || size < 1) {
             throw InvalidPageOrSizeException()
+        }
 
         val invitesPage = userService.getPagedInvites(
             pageRequest = PageRequest.of(page, size, sort.toSort()),
@@ -99,7 +100,7 @@ class InviteController(
                 HttpHeadersBuilder()
                     .contentLanguage()
                     .link(request, invitesPage)
-                    .build()
+                    .build(),
             )
             .body(ListDTO(invitesPage.content.map(Invite::toDTO), invitesPage))
     }
@@ -123,8 +124,9 @@ class InviteController(
         if (consumerRole.isRole(Role.MANAGER)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
-            if (manager.organizationUuid != invite.inviter.organizationUuid)
+            if (manager.organizationUuid != invite.inviter.organizationUuid) {
                 throw InvalidCredentialsException()
+            }
         }
 
         return ResponseEntity
@@ -142,7 +144,8 @@ class InviteController(
     fun createInvite(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-        @Valid @RequestBody dto: CreateInviteDTO,
+        @Valid @RequestBody
+        dto: CreateInviteDTO,
         validation: BindingResult,
     ): ResponseEntity<InviteDTO> {
         logger.info("Handling POST /users/v1/invites [createInvite] for {}", consumerId)
@@ -156,8 +159,9 @@ class InviteController(
             uuid = manager.organizationUuid.toString(),
         )
 
-        if (validation.hasErrors())
+        if (validation.hasErrors()) {
             throw RequestValidationException(validation)
+        }
 
         // TODO Add a check to avoid creation of multiple invites to the same e-mail address
 
@@ -185,7 +189,8 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
-        @Valid @RequestBody dto: UpdateInviteDTO,
+        @Valid @RequestBody
+        dto: UpdateInviteDTO,
         validation: BindingResult,
     ): ResponseEntity<InviteDTO> {
         logger.info("Handling PATCH /users/v1/invites/{uuid} [updateInvite] for {}", consumerId)
@@ -199,12 +204,14 @@ class InviteController(
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
             // Managers can only update invites sent by themselves or other managers in their organization
-            if (manager.organizationUuid != invite.inviter.organizationUuid)
+            if (manager.organizationUuid != invite.inviter.organizationUuid) {
                 throw InvalidCredentialsException()
+            }
 
             // Managers can not accept or decline invites (only the invitee can), but can retract invites or undo retraction
-            if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED)
+            if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED) {
                 throw InvalidInviteStatusException(status.name.lowercase())
+            }
         }
 
         val updatedInvite = userService.updateInviteStatus(

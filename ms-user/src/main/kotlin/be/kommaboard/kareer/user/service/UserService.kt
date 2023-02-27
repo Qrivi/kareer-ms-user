@@ -148,8 +148,9 @@ class UserService(
         activate: Boolean = false,
     ): User {
         val formattedEmail = email.trim().lowercase()
-        if (userRepository.existsByEmailIgnoreCase(formattedEmail))
+        if (userRepository.existsByEmailIgnoreCase(formattedEmail)) {
             throw UserAlreadyExistsException(formattedEmail)
+        }
 
         val now = ZonedDateTime.now(clock)
 
@@ -173,7 +174,7 @@ class UserService(
                 bannerReference = null,
                 keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, phone, organizationName),
                 preferences = null,
-            )
+            ),
         )
 
         // Create a ticket to activate the user later
@@ -184,7 +185,7 @@ class UserService(
                     creationDate = now,
                     token = UUID.randomUUID().toString().hashedWithSalt(kareerConfig.salt!!),
                     kind = Ticket.Kind.CONFIRM_EMAIL,
-                )
+                ),
             )
         }
 
@@ -199,8 +200,9 @@ class UserService(
         inviteeFirstName: String,
     ): Invite {
         val formattedInviteeEmail = inviteeEmail.trim().lowercase()
-        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail))
+        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail)) {
             throw UserAlreadyExistsException(formattedInviteeEmail)
+        }
 
         val invite = inviteRepository.saveAndFlush(
             Invite(
@@ -210,7 +212,7 @@ class UserService(
                 inviteeLastName = inviteeLastName.trim(),
                 inviteeFirstName = inviteeFirstName.trim(),
                 status = Invite.Status.PENDING,
-            )
+            ),
         )
 
         val mailDTO = UserInvitationMailDTO(
@@ -248,10 +250,12 @@ class UserService(
         val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()
         val formattedSlug = slug?.trimOrNullIfBlank()?.lowercase()
 
-        if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail))
+        if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail)) {
             throw UserAlreadyExistsException(formattedEmail)
-        if (user.organizationUuid != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.organizationUuid, formattedSlug))
+        }
+        if (user.organizationUuid != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.organizationUuid, formattedSlug)) {
             throw UserAlreadyExistsException(formattedSlug)
+        }
 
         return userRepository.save(
             user.apply {
@@ -266,35 +270,35 @@ class UserService(
                 title?.let { this.title = it.trim() }
                 birthday?.let { this.birthday = it }
                 keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, this.phone, organizationName)
-            }
+            },
         )
     }
 
     fun updateUserAvatar(
         uuid: UUID,
-        reference: String?
+        reference: String?,
     ) = userRepository.save(
         getUserByUuid(uuid).apply {
             this.avatarReference = reference
-        }
+        },
     )
 
     fun updateUserBanner(
         uuid: UUID,
-        reference: String?
+        reference: String?,
     ) = userRepository.save(
         getUserByUuid(uuid).apply {
             this.bannerReference = reference
-        }
+        },
     )
 
     fun updateUserPreferences(
         uuid: UUID,
-        preferences: String?
+        preferences: String?,
     ) = userRepository.save(
         getUserByUuid(uuid).apply {
             this.preferences = preferences
-        }
+        },
     )
 
     fun updateInviteStatus(
