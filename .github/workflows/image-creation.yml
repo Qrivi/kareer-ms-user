@@ -37,7 +37,7 @@ jobs:
         id: extract-metadata
         uses: docker/metadata-action@v4.3.0
         with:
-          images: ${{ env.REGISTRY }}/kareer-ms-user
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/kareer-ms-user
           flavor: |
             latest=auto
             prefix=dev-,onlatest=true
