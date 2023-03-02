@@ -32,7 +32,7 @@ jobs:
           password: ${{ env.REGISTRY_PASSWORD }}
       - name: Extract version
         id: extract-version
-        run: cat ./ms-user/build.gradle.kts | grep ^version | awk -F'"' '{print $2}' >> $GITHUB_OUTPUT
+        run: echo "version=$(cat ./ms-user/build.gradle.kts | grep ^version | awk -F'"' '{print $2}')" >> $GITHUB_OUTPUT
       - name: Extract metadata
         id: extract-metadata
         uses: docker/metadata-action@v4.3.0
