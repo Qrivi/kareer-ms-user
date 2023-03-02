@@ -24,8 +24,10 @@ USER kareer:kareer
 # Get all our stuff together
 COPY --from=build /opt/build/libs/*.jar ./app.jar
 
+
 # Run
 EXPOSE 8006
+LABEL maintainer="Komma Board <kareer@kommaboard.be>"
 ENTRYPOINT ["java", "-XX:InitialRAMPercentage=60", "-XX:MaxRAMPercentage=90", "-XX:+HeapDumpOnOutOfMemoryError", "-jar", "app.jar"]
 
 # Health check

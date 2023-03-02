@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REGISTRY_USER: ${{ github.actor }}
+  REGISTRY_USER: KommaBoard
   REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -30,13 +30,27 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Extract version
+        id: extract-version
+        run: cat ./ms-user/build.gradle.kts | grep ^version | awk -F'"' '{print $2}' >> $GITHUB_OUTPUT
+      - name: Extract metadata
+        id: extract-metadata
+        uses: docker/metadata-action@v4.3.0
+        with:
+          images: ${{ env.REGISTRY }}/kareer/ms-user
+          flavor: |
+            latest=auto
+            prefix=dev-,onlatest=true
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.extract-version.outputs.version }}
       - name: Build and push image
         id: build-and-push-image
         uses: docker/build-push-action@v4.0.0
         with:
           context: ./ms-user
-          tags: ${{ env.REGISTRY }}/kareer/ms-user:dev-latest
           push: true
+          tags: ${{ steps.extract-metadata.outputs.tags }}
+          labels: ${{ steps.extract-metadata.outputs.labels }}
       - name: Inform the team
         id: inform-team
         run: |
