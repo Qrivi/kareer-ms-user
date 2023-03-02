@@ -25,9 +25,15 @@ USER kareer:kareer
 COPY --from=build /opt/build/libs/*.jar ./app.jar
 
 
-# Run
+# Add some info
 EXPOSE 8006
 LABEL maintainer="Komma Board <kareer@kommaboard.be>"
+LABEL org.opencontainers.image.vendor="Komma Board <kareer@kommaboard.be>"
+LABEL org.opencontainers.image.title="kareer-ms-user"
+LABEL org.opencontainers.image.name="kareer-ms-user"
+LABEL org.opencontainers.image.description="Kareer microservice for user management"
+
+# Run
 ENTRYPOINT ["java", "-XX:InitialRAMPercentage=60", "-XX:MaxRAMPercentage=90", "-XX:+HeapDumpOnOutOfMemoryError", "-jar", "app.jar"]
 
 # Health check

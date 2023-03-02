@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REGISTRY_USER: KommaBoard
+  REGISTRY_USER: kommaboard
   REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout codebase
         id: checkout-codebase
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
         with:
           ref: ${{ github.ref }}
       - name: Log in to registry
@@ -54,13 +54,14 @@ jobs:
       - name: Inform the team
         id: inform-team
         run: |
-          curl -X POST -H "Content-type: application/json" --data "{
+          META_TAGS="$(echo ${{ join(fromJSON(steps.extract-metadata.outputs.json).tags) }} | sed 's/${{ env.REGISTRY }}\/${{ env.REGISTRY_USER }}\/kareer-ms-user:/\`/g' | sed 's/,/\`, /g')\`"
+          SLACK_CONTENT="{
             \"blocks\": [
               {
                 \"type\": \"section\",
                 \"text\": {
                   \"type\": \"mrkdwn\",
-                  \"text\": \"CI/CD built and pushed a new image! :whale:\"
+                  \"text\": \"CI/CD pushed new image tags to <https://github.com/kommaboard/kareer-ms-user/pkgs/container/kareer-ms-user|GitHub Packages>! :whale:\"
                 }
               },
               {
@@ -68,13 +69,14 @@ jobs:
                 \"fields\": [
                   {
                     \"type\": \"mrkdwn\",
-                    \"text\": \"*Image*\n\`kareer/ms-user:dev-latest\`\"
+                    \"text\": \"*Image*\n\`kommaboard\/kareer-ms-user\`\"
                   },
                   {
                     \"type\": \"mrkdwn\",
-                    \"text\": \"*Registry*\n<https://docker.qrivi.dev/v2/|docker.qrivi.dev> (private)\"
+                    \"text\": \"*Tags*\n$META_TAGS\"
                   }
                 ]
               }
             ]
-          }" $SLACK_WEBHOOK_URL
+          }"
+          curl -X POST -H "Content-type: application/json" --data "$SLACK_CONTENT" $SLACK_WEBHOOK_URL
