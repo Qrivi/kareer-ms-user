@@ -76,7 +76,7 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @RequestParam status: String?,
-        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "creationDate") sort: String,
         request: HttpServletRequest,
@@ -84,12 +84,12 @@ class InviteController(
         logger.info("Handling GET /users/v1/invites [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
-        if (page < 0 || size < 1) {
+        if (page < 1 || size < 1) {
             throw InvalidPageOrSizeException()
         }
 
         val invitesPage = userService.getPagedInvites(
-            pageRequest = PageRequest.of(page, size, sort.toSort()),
+            pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
             organizationUuid = userService.getUserByUuid(consumerId.toUuid()).organizationUuid!!,
             status = status.trimOrNullIfBlank()?.toInviteStatus(),
         )

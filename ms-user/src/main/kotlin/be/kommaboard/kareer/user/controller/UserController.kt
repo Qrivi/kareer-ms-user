@@ -99,7 +99,7 @@ class UserController(
         @RequestParam keywords: String?,
         @RequestParam organizationUuid: String?,
         @RequestParam role: String?,
-        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "creationDate") sort: String,
         @RequestParam(defaultValue = "false") skipStorage: Boolean,
@@ -110,7 +110,7 @@ class UserController(
 
         // TODO Add filter on status
 
-        if (page < 0 || size < 1) {
+        if (page < 1 || size < 1) {
             throw InvalidPageOrSizeException()
         }
 
@@ -120,7 +120,7 @@ class UserController(
         }
 
         val usersPage = userService.getPagedUsers(
-            pageRequest = PageRequest.of(page, size, sort.toSort()),
+            pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
             organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).organizationUuid,
             role = role.trimOrNullIfBlank()?.toRole(),
