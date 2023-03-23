@@ -40,7 +40,6 @@ import org.springframework.data.util.TypeInformation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.util.Base64Utils
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -529,7 +528,7 @@ class UserController(
             consumerRole = Role.SYSTEM.name,
             consumerId = kareerConfig.consumerId!!,
             dto = CreateFileReferenceDTO(
-                content = Base64Utils.encodeToString(file.bytes),
+                content = Base64.getEncoder().encodeToString(file.bytes),
                 contentType = file.contentType,
             ),
         )

@@ -29,7 +29,7 @@ interface UserRepository : JpaRepository<User, UUID> {
 
     fun findBySlug(slug: String): User?
 
-    fun findByEmail(email: String): User?
+    fun findByEmailIgnoreCase(email: String): User?
 
     fun existsByEmailIgnoreCase(email: String): Boolean
 

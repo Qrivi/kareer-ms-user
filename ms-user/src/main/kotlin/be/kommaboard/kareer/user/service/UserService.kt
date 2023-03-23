@@ -127,7 +127,7 @@ class UserService(
         email: String,
         password: String,
     ): User {
-        val user = userRepository.findByEmail(email) ?: throw IncorrectCredentialsException()
+        val user = userRepository.findByEmailIgnoreCase(email) ?: throw IncorrectCredentialsException()
         if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
         return user
     }
