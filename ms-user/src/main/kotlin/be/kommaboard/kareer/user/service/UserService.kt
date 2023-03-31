@@ -83,11 +83,11 @@ class UserService(
         organizationUuid: UUID?,
         role: Role?,
     ) = when {
-        keywords != null && organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUuid, role, keywords, pageRequest)
-        keywords != null && organizationUuid != null -> userRepository.findAllByOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUuid, keywords, pageRequest)
+        keywords != null && organizationUuid != null && role != null -> userRepository.findAllByDetailsOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUuid, role, keywords, pageRequest)
+        keywords != null && organizationUuid != null -> userRepository.findAllByDetailsOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUuid, keywords, pageRequest)
         keywords != null && role != null -> userRepository.findAllByRoleAndKeywordsContainsIgnoreCase(role, keywords, pageRequest)
-        organizationUuid != null && role != null -> userRepository.findAllByOrganizationUuidAndRole(organizationUuid, role, pageRequest)
-        organizationUuid != null -> userRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
+        organizationUuid != null && role != null -> userRepository.findAllByDetailsOrganizationUuidAndRole(organizationUuid, role, pageRequest)
+        organizationUuid != null -> userRepository.findAllByDetailsOrganizationUuid(organizationUuid, pageRequest)
         keywords != null -> userRepository.findAllByKeywordsContainsIgnoreCase(keywords, pageRequest)
         role != null -> userRepository.findAllByRole(role, pageRequest)
         else -> userRepository.findAll(pageRequest)
@@ -276,7 +276,7 @@ class UserService(
         if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail)) {
             throw UserAlreadyExistsException(formattedEmail)
         }
-        if (user.details != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.details.organizationUuid, formattedSlug)) {
+        if (user.details != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByDetailsOrganizationUuidAndSlugIgnoreCase(user.details.organizationUuid, formattedSlug)) {
             throw UserAlreadyExistsException(formattedSlug)
         }
 
