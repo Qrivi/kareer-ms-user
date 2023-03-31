@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 data class UserDetailsDTO(
-    val organizationUuid: UUID?,
+    val organizationUuid: UUID,
     val startDate: LocalDate,
     val phone: String?,
     val locationAddress: String?,
