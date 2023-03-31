@@ -2,17 +2,17 @@ package be.kommaboard.kareer.user.controller
 
 import be.kommaboard.kareer.authorization.InternalHttpHeaders
 import be.kommaboard.kareer.authorization.Role
-import be.kommaboard.kareer.authorization.authorizationCheck
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
-import be.kommaboard.kareer.authorization.isRole
-import be.kommaboard.kareer.authorization.toRole
-import be.kommaboard.kareer.authorization.toUuid
+import be.kommaboard.kareer.authorization.util.authorizationCheck
+import be.kommaboard.kareer.authorization.util.isRole
+import be.kommaboard.kareer.authorization.util.toRole
+import be.kommaboard.kareer.authorization.util.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
-import be.kommaboard.kareer.common.toSort
-import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
+import be.kommaboard.kareer.common.util.toSort
+import be.kommaboard.kareer.common.util.trimOrNullIfBlank
 import be.kommaboard.kareer.storage.lib.dto.request.CreateFileReferenceDTO
 import be.kommaboard.kareer.storage.lib.dto.response.UrlDTO
 import be.kommaboard.kareer.user.KareerConfig

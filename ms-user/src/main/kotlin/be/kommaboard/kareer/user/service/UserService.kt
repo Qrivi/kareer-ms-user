@@ -3,10 +3,10 @@ package be.kommaboard.kareer.user.service
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
-import be.kommaboard.kareer.authorization.hashedWithSalt
-import be.kommaboard.kareer.authorization.toRole
-import be.kommaboard.kareer.common.makeKeywords
-import be.kommaboard.kareer.common.trimOrNullIfBlank
+import be.kommaboard.kareer.authorization.util.hashedWithSalt
+import be.kommaboard.kareer.authorization.util.toRole
+import be.kommaboard.kareer.common.util.makeKeywords
+import be.kommaboard.kareer.common.util.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
 import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
 import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
