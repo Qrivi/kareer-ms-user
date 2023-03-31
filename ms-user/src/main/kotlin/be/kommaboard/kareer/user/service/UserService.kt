@@ -2,7 +2,9 @@ package be.kommaboard.kareer.user.service
 
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
+import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
 import be.kommaboard.kareer.authorization.hashedWithSalt
+import be.kommaboard.kareer.authorization.toRole
 import be.kommaboard.kareer.common.makeKeywords
 import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.mailing.lib.dto.MailMeta
@@ -10,12 +12,19 @@ import be.kommaboard.kareer.mailing.lib.dto.UserInvitationMailDTO
 import be.kommaboard.kareer.mailing.lib.service.MailingQueueService
 import be.kommaboard.kareer.organization.lib.dto.response.OrganizationDTO
 import be.kommaboard.kareer.user.KareerConfig
+import be.kommaboard.kareer.user.lib.dto.request.CreateAdminDTO
+import be.kommaboard.kareer.user.lib.dto.request.CreateInvitationDTO
+import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
+import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
 import be.kommaboard.kareer.user.repository.InviteRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
-import be.kommaboard.kareer.user.repository.entity.Invite
+import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
+import be.kommaboard.kareer.user.repository.entity.UserDetails
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
@@ -53,21 +62,20 @@ class UserService(
     fun onApplicationEvent(event: ContextRefreshedEvent) {
         if (userRepository.count() == 0L) {
             logger.warn("No admins found in database. Creating admin with default credentials...")
-            createUser(
-                email = kareerConfig.adminEmail!!,
-                password = kareerConfig.adminPassword!!,
-                lastName = "Admin",
-                firstName = "Admin",
-                role = Role.ADMIN,
-                title = "Super Administrator",
-                activate = true,
+            createAdmin(
+                CreateAdminDTO(
+                    email = kareerConfig.adminEmail!!,
+                    password = kareerConfig.adminPassword!!,
+                    lastName = "istrator",
+                    firstName = "Admin",
+                ),
             )
         }
     }
 
     fun getAllUsers(): List<User> = userRepository.findAll()
 
-    fun getAllInvites(): List<Invite> = inviteRepository.findAll()
+    fun getAllInvites(): List<Invitation> = inviteRepository.findAll()
 
     fun getPagedUsers(
         pageRequest: PageRequest,
@@ -88,7 +96,7 @@ class UserService(
     fun getPagedInvites(
         pageRequest: PageRequest,
         organizationUuid: UUID,
-        status: Invite.Status?,
+        status: Invitation.Status?,
     ) = when {
         status != null -> inviteRepository.findAllByOrganizationUuidAndStatus(organizationUuid, status, pageRequest)
         else -> inviteRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
@@ -132,47 +140,78 @@ class UserService(
         return user
     }
 
-    fun createUser(
-        organizationUuid: UUID? = null,
-        organizationName: String? = null,
-        role: Role,
-        slug: String? = null,
-        email: String,
-        phone: String? = null,
-        password: String,
-        lastName: String,
-        firstName: String,
-        nickname: String? = null,
-        title: String,
-        birthday: LocalDate? = null,
-        activate: Boolean = false,
+    fun createAdmin(
+        dto: CreateAdminDTO,
     ): User {
-        val formattedEmail = email.trim().lowercase()
+        val formattedEmail = dto.email!!.trim().lowercase()
+        if (userRepository.existsByEmailIgnoreCase(formattedEmail)) {
+            throw UserAlreadyExistsException(formattedEmail)
+        }
+
+        return userRepository.save(
+            User(
+                creationDate = ZonedDateTime.now(clock),
+                role = Role.ADMIN,
+                status = Status.ACTIVATED,
+                password = dto.password!!.hashedWithSalt(kareerConfig.salt!!),
+                email = formattedEmail,
+                lastName = dto.lastName!!.trim(),
+                firstName = dto.firstName!!.trim(),
+                nickname = null,
+                slug = null,
+                details = null,
+                avatarReference = null,
+                bannerReference = null,
+                keywords = "admin",
+                preferences = null,
+            ),
+        )
+    }
+
+    fun createUser(
+        dto: CreateUserDTO,
+        invitation: Invitation,
+        organization: OrganizationDTO,
+    ): User {
+        val formattedEmail = dto.email!!.trim().lowercase()
         if (userRepository.existsByEmailIgnoreCase(formattedEmail)) {
             throw UserAlreadyExistsException(formattedEmail)
         }
 
         val now = ZonedDateTime.now(clock)
+        val localNow = LocalDate.now(clock)
+        val activate = dto.email.equals(invitation.inviteeEmail, true)
 
         // Create the new user
         val user = userRepository.saveAndFlush(
             User(
-                slug = slug,
-                organizationUuid = organizationUuid,
                 creationDate = now,
-                role = role,
+                role = Role.USER,
                 status = if (activate) Status.ACTIVATED else Status.REGISTERED,
+                password = dto.password!!.hashedWithSalt(kareerConfig.salt!!),
                 email = formattedEmail,
-                phone = phone,
-                password = password.hashedWithSalt(kareerConfig.salt!!),
-                lastName = lastName.trim(),
-                firstName = firstName.trim(),
-                nickname = nickname.trimOrNullIfBlank() ?: firstName,
-                title = title.trim(),
-                birthday = birthday,
+                lastName = dto.lastName!!.trim(),
+                firstName = dto.firstName!!.trim(),
+                nickname = dto.nickname.trimOrNullIfBlank() ?: dto.firstName,
+                slug = dto.slug,
+                details = UserDetails(
+                    organizationUuid = organization.uuid,
+                    phone = dto.details!!.phone,
+                    locationAddress = dto.details!!.locationAddress.trimOrNullIfBlank(),
+                    locationAddress2 = dto.details!!.locationAddress2.trimOrNullIfBlank(),
+                    locationCode = dto.details!!.locationCode.trimOrNullIfBlank(),
+                    locationCity = dto.details!!.locationCity.trimOrNullIfBlank(),
+                    locationCountry = dto.details!!.locationCountry.trimOrNullIfBlank(),
+                    title = dto.details!!.title.trimOrNullIfBlank() ?: "${organization.name} Employee",
+                    skills = skillsMap(dto.details!!.skills!!),
+                    experience = dto.details!!.experience ?: localNow,
+                    birthday = dto.details!!.birthday,
+                    startDate = localNow,
+                    about = dto.details!!.about!!,
+                ),
                 avatarReference = null,
                 bannerReference = null,
-                keywords = makeKeywords(firstName, lastName, firstName, formattedEmail, phone, organizationName),
+                keywords = makeKeywords(dto.firstName, dto.lastName, dto.firstName, formattedEmail, organization.name),
                 preferences = null,
             ),
         )
@@ -187,141 +226,191 @@ class UserService(
                     kind = Ticket.Kind.CONFIRM_EMAIL,
                 ),
             )
+
+            // TODO Send "confirm email address" mail
         }
 
         return user
     }
 
     fun createInvite(
+        dto: CreateInvitationDTO,
         manager: User,
         organization: OrganizationDTO,
-        inviteeEmail: String,
-        inviteeLastName: String,
-        inviteeFirstName: String,
-    ): Invite {
-        val formattedInviteeEmail = inviteeEmail.trim().lowercase()
-        if (userRepository.existsByEmailIgnoreCase(formattedInviteeEmail)) {
-            throw UserAlreadyExistsException(formattedInviteeEmail)
-        }
-
-        val invite = inviteRepository.saveAndFlush(
-            Invite(
+    ): Invitation {
+        val invitation = inviteRepository.saveAndFlush(
+            Invitation(
                 inviter = manager,
                 creationDate = ZonedDateTime.now(clock),
-                inviteeEmail = formattedInviteeEmail,
-                inviteeLastName = inviteeLastName.trim(),
-                inviteeFirstName = inviteeFirstName.trim(),
-                status = Invite.Status.PENDING,
+                inviteeEmail = dto.email!!.trim().lowercase(),
+                inviteeLastName = dto.lastName!!.trim(),
+                inviteeFirstName = dto.firstName!!.trim(),
+                status = Invitation.Status.PENDING,
             ),
         )
 
         val mailDTO = UserInvitationMailDTO(
             meta = MailMeta(
                 language = LocaleContextHolder.getLocale().language,
-                recipientEmail = invite.inviteeEmail,
-                recipientName = invite.inviteeFirstName,
+                recipientEmail = invitation.inviteeEmail,
+                recipientName = invitation.inviteeFirstName,
             ),
             inviterName = manager.fullName(),
             organizationName = organization.name,
             inviteLink = kareerConfig.registerUrl!!
-                .replace("{inviteUuid}", invite.uuid.toString())
-                .replace("{inviteeEmail}", invite.inviteeEmail),
+                .replace("{inviteUuid}", invitation.uuid.toString())
+                .replace("{inviteeEmail}", invitation.inviteeEmail),
         )
         mailingQueueService.sendToQueue(mailDTO)
 
-        return invite
+        return invitation
     }
 
     fun updateUser(
-        uuid: UUID,
-        organizationName: String?,
-        role: Role? = null,
-        slug: String? = null,
-        email: String? = null,
-        phone: String? = null,
-        password: String? = null,
-        lastName: String? = null,
-        firstName: String? = null,
-        nickname: String? = null,
-        title: String? = null,
-        birthday: LocalDate? = null,
+        user: User,
+        dto: UpdateUserDTO,
     ): User {
-        val user = getUserByUuid(uuid)
-        val formattedEmail = email?.trimOrNullIfBlank()?.lowercase()
-        val formattedSlug = slug?.trimOrNullIfBlank()?.lowercase()
+        val formattedEmail = dto.email?.trimOrNullIfBlank()?.lowercase()
+        val formattedSlug = dto.slug?.trimOrNullIfBlank()?.lowercase()
 
         if (formattedEmail != null && formattedEmail != user.email && userRepository.existsByEmailIgnoreCase(formattedEmail)) {
             throw UserAlreadyExistsException(formattedEmail)
         }
-        if (user.organizationUuid != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.organizationUuid, formattedSlug)) {
+        if (user.details != null && formattedSlug != null && formattedSlug != user.slug && userRepository.existsByOrganizationUuidAndSlugIgnoreCase(user.details.organizationUuid, formattedSlug)) {
             throw UserAlreadyExistsException(formattedSlug)
+        }
+
+        val organizationName = user.keywords.substringBeforeLast(" ")
+
+        return userRepository.save(
+            user.apply {
+                dto.role?.let { this.role = it.toRole() }
+                dto.slug?.let { this.slug = formattedSlug }
+                formattedEmail?.let { this.email = it }
+                dto.password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
+                dto.lastName?.let { this.lastName = it.trim() }
+                dto.firstName?.let { this.firstName = it.trim() }
+                dto.nickname?.let { this.nickname = it.trimOrNullIfBlank() }
+                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, organizationName)
+            },
+        )
+    }
+
+    fun updateUserDetails(
+        user: User,
+        dto: UpdateUserDetailsDTO,
+    ): User {
+        if (user.role != Role.USER && user.role != Role.MANAGER) {
+            throw InvalidCredentialsException()
         }
 
         return userRepository.save(
             user.apply {
-                role?.let { this.role = it }
-                slug?.let { this.slug = formattedSlug }
-                formattedEmail?.let { this.email = it }
-                phone?.let { this.phone = it.trimOrNullIfBlank() }
-                password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
-                lastName?.let { this.lastName = it.trim() }
-                firstName?.let { this.firstName = it.trim() }
-                nickname?.let { this.nickname = it.trimOrNullIfBlank() }
-                title?.let { this.title = it.trim() }
-                birthday?.let { this.birthday = it }
-                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, this.phone, organizationName)
+                this.details?.apply {
+                    dto.phone?.let { this.phone = it }
+                    dto.locationAddress?.let { this.locationAddress = it.trimOrNullIfBlank() }
+                    dto.locationAddress2?.let { this.locationAddress2 = it.trimOrNullIfBlank() }
+                    dto.locationCode?.let { this.locationCode = it.trimOrNullIfBlank() }
+                    dto.locationCity?.let { this.locationCity = it.trimOrNullIfBlank() }
+                    dto.locationCountry?.let { this.locationCountry = it.trimOrNullIfBlank() }
+                    dto.title?.let { this.title = it }
+                    dto.skills?.let { this.skills = skillsMap(it) }
+                    dto.experience?.let { this.experience = it }
+                    dto.birthday?.let { this.birthday = it }
+                    dto.about?.let { this.about = it }
+                }
             },
         )
     }
 
     fun updateUserAvatar(
-        uuid: UUID,
+        user: User,
         reference: String?,
     ) = userRepository.save(
-        getUserByUuid(uuid).apply {
+        user.apply {
             this.avatarReference = reference
         },
     )
 
     fun updateUserBanner(
-        uuid: UUID,
+        user: User,
         reference: String?,
     ) = userRepository.save(
-        getUserByUuid(uuid).apply {
+        user.apply {
             this.bannerReference = reference
         },
     )
 
     fun updateUserPreferences(
-        uuid: UUID,
+        user: User,
         preferences: String?,
     ) = userRepository.save(
-        getUserByUuid(uuid).apply {
+        user.apply {
             this.preferences = preferences
         },
     )
 
     fun updateInviteStatus(
-        invite: Invite,
-        status: Invite.Status,
-    ): Invite {
-        invite.status = status
+        invitation: Invitation,
+        status: Invitation.Status,
+    ): Invitation {
+        invitation.status = status
 
-        return inviteRepository.save(invite)
+        return inviteRepository.save(invitation)
+    }
+
+    fun appendUserDetailsSkills(
+        user: User,
+        dto: EditUserDetailsSkillsDTO,
+    ): User {
+        if (user.role != Role.USER && user.role != Role.MANAGER) {
+            throw InvalidCredentialsException()
+        }
+
+        return userRepository.save(
+            user.apply {
+                this.details.apply {
+                    dto.skills?.forEach {
+                        if (it.isNotBlank()) {
+                            this!!.skills[it.lowercase().trim()] = it.trim()
+                        }
+                    }
+                }
+            },
+        )
+    }
+
+    fun removeUserDetailsSkills(
+        user: User,
+        dto: EditUserDetailsSkillsDTO,
+    ): User {
+        if (user.role != Role.USER && user.role != Role.MANAGER) {
+            throw InvalidCredentialsException()
+        }
+
+        return userRepository.save(
+            user.apply {
+                this.details.apply {
+                    dto.skills?.forEach {
+                        if (it.isNotBlank()) {
+                            this!!.skills.remove(it.lowercase().trim())
+                        }
+                    }
+                }
+            },
+        )
     }
 
     fun confirmEmail(
-        userUuid: UUID,
+        user: User,
+        ticket: Ticket,
         ticketUuid: UUID,
         token: String,
     ): User {
-        val user = getUserByUuid(userUuid)
-        val ticket = getTicketByUuid(ticketUuid)
-
         // Verify that passed token matches with ticket in the database
         if (token != ticket.token) throw TicketInvalidException(ticketUuid)
         // Verify that passed user UUID matches with user linked to ticket in the database
-        if (userUuid != ticket.user.uuid) throw TicketInvalidException(ticketUuid)
+        if (user.uuid != ticket.user.uuid) throw TicketInvalidException(ticketUuid)
         // Verify that ticket was meant to confirm e-mail
         if (Ticket.Kind.CONFIRM_EMAIL != ticket.kind) throw TicketInvalidException(ticketUuid)
         // Verify that the ticket was not expired
@@ -339,4 +428,6 @@ class UserService(
 
         return user
     }
+
+    private fun skillsMap(skills: List<String>) = skills.filterNot { it.isBlank() }.associate { it.lowercase().trim() to it.trim() }.toMutableMap()
 }

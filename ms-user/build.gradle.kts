@@ -1,6 +1,6 @@
 // ms-user
 group = "be.kommaboard.kareer"
-version = "0.0.2"
+version = "0.0.3"
 
 extra["springBootVersion"] = "3.0.3"
 extra["springCloudVersion"] = "2022.0.1"

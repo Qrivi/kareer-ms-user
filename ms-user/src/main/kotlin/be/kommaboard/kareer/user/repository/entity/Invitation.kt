@@ -1,6 +1,6 @@
 package be.kommaboard.kareer.user.repository.entity
 
-import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
+import be.kommaboard.kareer.user.lib.dto.response.InvitationDTO
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -18,7 +18,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "invite")
-class Invite(
+class Invitation(
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -57,7 +57,7 @@ class Invite(
         RETRACTED,
     }
 
-    fun toDTO() = InviteDTO(
+    fun toDTO() = InvitationDTO(
         uuid = uuid!!,
         inviterUuid = inviter.uuid!!,
         creationDate = creationDate,
@@ -68,8 +68,8 @@ class Invite(
     )
 }
 
-fun String.toInviteStatus(): Invite.Status = try {
-    Invite.Status.valueOf(this.trim().uppercase())
+fun String.toInvitationStatus(): Invitation.Status = try {
+    Invitation.Status.valueOf(this.trim().uppercase())
 } catch (e: IllegalArgumentException) {
     throw InvalidInviteStatusException(this.trim())
 }

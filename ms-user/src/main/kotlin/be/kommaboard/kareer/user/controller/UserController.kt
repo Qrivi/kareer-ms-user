@@ -17,18 +17,18 @@ import be.kommaboard.kareer.storage.lib.dto.request.CreateFileReferenceDTO
 import be.kommaboard.kareer.storage.lib.dto.response.UrlDTO
 import be.kommaboard.kareer.user.KareerConfig
 import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
+import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyPasswordDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.proxy.StorageProxy
-import be.kommaboard.kareer.user.repository.entity.Invite
+import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
 import be.kommaboard.kareer.user.service.exception.InvalidInviteException
-import be.kommaboard.kareer.user.service.exception.InvalidOrganizationUuidException
-import feign.FeignException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -66,7 +66,7 @@ class UserController(
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    // region User
+    // region User and UserDetails
 
     @Operation(hidden = true)
     @GetMapping("/all")
@@ -121,7 +121,7 @@ class UserController(
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
-            organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).organizationUuid,
+            organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid,
             role = role.trimOrNullIfBlank()?.toRole(),
         )
 
@@ -154,7 +154,7 @@ class UserController(
         val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserBySlug(uuidOrSlug)
 
         // If the consumer is a regular user or manager, they can only retrieve user data of users belonging to their organization
-        if (consumerRole.isRole(Role.MANAGER, Role.USER) && userService.getUserByUuid(consumerId.toUuid()).organizationUuid != user.organizationUuid) {
+        if (consumerRole.isRole(Role.MANAGER, Role.USER) && userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid != user.details!!.organizationUuid) {
             throw InvalidCredentialsException()
         }
 
@@ -164,9 +164,14 @@ class UserController(
             .body(if (skipStorage) user.toDTO() else user.toRichDTO())
     }
 
+    fun createAdmin(): ResponseEntity<UserDTO> {
+        // TODO implement 👽
+        throw NotImplementedError()
+    }
+
     @Operation(
         summary = "Create a new user",
-        description = "Creates a new user. Bypasses the invitation system. Endpoint is also used internally when registering via auth-ms.",
+        description = "Creates a new user. Endpoint is used internally when registering via auth-ms.",
         responses = [ApiResponse(responseCode = "201")],
     )
     @PostMapping
@@ -178,57 +183,36 @@ class UserController(
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling POST /users/v1 [createUser] for {}", consumerId)
-        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (validation.hasErrors()) {
             throw RequestValidationException(validation)
         }
 
-        // Get the invite details if we were passed an invite UUID
-        val invite = if (dto.inviteUuid == null) null else userService.getInviteByUuid(dto.inviteUuid!!.toUuid())
-
-        // Only the SYSTEM (aka an internal call from ms-authentication) is allowed to create users based on invite
-        if (invite != null && !consumerRole.isRole(Role.SYSTEM)) {
-            throw InvalidCredentialsException()
-        }
+        // Get the invite details if we were passed an invitation UUID
+        val invitation = userService.getInviteByUuid(dto.invitationUuid!!.toUuid())
 
         // Only PENDING invites can be used to create a new user
-        if (invite != null && invite.status != Invite.Status.PENDING) {
+        if (invitation.status != Invitation.Status.PENDING) {
             throw InvalidInviteException()
         }
 
-        // We'll need the organization to assign to the newly created user
-        val organizationUuid = invite?.inviter?.organizationUuid ?: dto.organizationUuid?.toUuid() ?: throw InvalidOrganizationUuidException()
-
-        val organization = try {
-            organizationProxy.getOrganization(
-                consumerRole = Role.SYSTEM.name,
-                consumerId = kareerConfig.consumerId!!,
-                uuid = organizationUuid.toString(),
-            )
-        } catch (e: FeignException) {
-            throw InvalidOrganizationUuidException()
-        }
+        // Assuming this won't throw a FeignException because the inviter should always belong to an existing organization
+        val organization = organizationProxy.getOrganization(
+            consumerRole = Role.SYSTEM.name,
+            consumerId = kareerConfig.consumerId!!,
+            uuid = invitation.inviter.details!!.organizationUuid.toString(),
+        )
 
         // Create the user
         val user = userService.createUser(
-            role = dto.role?.toRole() ?: Role.USER,
-            organizationUuid = organization.uuid,
-            organizationName = organization.name,
-            slug = dto.slug,
-            email = dto.email!!,
-            password = dto.password!!,
-            lastName = dto.lastName!!,
-            firstName = dto.firstName!!,
-            nickname = dto.nickname,
-            title = dto.title!!,
-            birthday = dto.birthday,
+            dto = dto,
+            invitation = invitation,
+            organization = organization,
         )
 
-        // Prevent an invite from being used multiple times
-        if (invite != null) {
-            userService.updateInviteStatus(invite, Invite.Status.ACCEPTED)
-        }
+        // Prevent an invitation from being used multiple times
+        userService.updateInviteStatus(invitation, Invitation.Status.ACCEPTED)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -255,22 +239,7 @@ class UserController(
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
-        val user = userService.getUserByUuid(uuid.toUuid())
-
-        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
-        if (uuid != consumerId) {
-            // Normal user's can only edit their own details
-            if (consumerRole.isRole(Role.USER)) {
-                throw InvalidCredentialsException()
-            }
-            // And managers can only edit their own or their employees' details
-            if (consumerRole.isRole(Role.MANAGER)) {
-                val manager = userService.getUserByUuid(consumerId.toUuid())
-                if (manager.organizationUuid != user.organizationUuid) {
-                    throw InvalidCredentialsException()
-                }
-            }
-        }
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
         // If we are trying to update the role to anything but USER...
         if (dto.role != null && !dto.role.isRole(Role.USER)) {
@@ -285,30 +254,46 @@ class UserController(
             throw RequestValidationException(validation)
         }
 
-        // Get the organization's name
-        val organizationName = try {
-            organizationProxy.getOrganization(
-                consumerRole = Role.SYSTEM.name,
-                consumerId = kareerConfig.consumerId!!,
-                uuid = user.organizationUuid.toString(),
-            ).name
-        } catch (e: FeignException) {
-            null
+        val updatedUser = userService.updateUser(
+            user = user,
+            dto = dto,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+    }
+
+    @Operation(
+        summary = "Update a user's details",
+        description = "Updates an user's details. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @PatchMapping("/{uuid}/details")
+    fun updateUserDetails(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
+        @Valid @RequestBody
+        dto: UpdateUserDetailsDTO,
+        validation: BindingResult,
+    ): ResponseEntity<UserDTO> {
+        logger.info("Handling PATCH /users/v1/{uuid}/details [updateUserDetails] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        // Get the user details, for later
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
+
+        // Make sure the request body is valid
+        if (validation.hasErrors()) {
+            throw RequestValidationException(validation)
         }
 
-        val updatedUser = userService.updateUser(
-            uuid = uuid.toUuid(),
-            organizationName = organizationName,
-            role = dto.role?.toRole(),
-            slug = dto.slug,
-            email = dto.email,
-            phone = dto.phone,
-            password = dto.password,
-            lastName = dto.lastName,
-            firstName = dto.firstName,
-            nickname = dto.nickname,
-            title = dto.title,
-            birthday = dto.birthday,
+        val updatedUser = userService.updateUserDetails(
+            user = user,
+            dto = dto,
         )
 
         return ResponseEntity
@@ -326,12 +311,17 @@ class UserController(
     fun verifyUserPassword(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
         @Valid @RequestBody
         dto: VerifyPasswordDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling POST /users/v1/{uuid}/verify [verifyUserPassword] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        if (uuid != consumerId) {
+            throw InvalidCredentialsException()
+        }
 
         if (validation.hasErrors()) {
             throw RequestValidationException(validation)
@@ -376,6 +366,79 @@ class UserController(
     }
 
     // endregion
+    // region UserDetails skills
+
+    @Operation(
+        summary = "Append to user's skills",
+        description = "Appends entries to a user's skills. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        responses = [ApiResponse(responseCode = "201")],
+    )
+    @PostMapping("/{uuid}/details/skills")
+    fun addUserDetailsSkills(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
+        @Valid @RequestBody
+        dto: EditUserDetailsSkillsDTO,
+        validation: BindingResult,
+    ): ResponseEntity<UserDTO> {
+        logger.info("Handling POST /users/v1/{uuid}/details/skills [addUserDetailsSkills] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
+
+        if (validation.hasErrors()) {
+            throw RequestValidationException(validation)
+        }
+
+        val updatedUser = userService.appendUserDetailsSkills(
+            user = user,
+            dto = dto,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+    }
+
+    @Operation(
+        summary = "Remove from user's skills",
+        description = "Removes entries to a user's skills. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @DeleteMapping("/{uuid}/details/skills")
+    fun removeUserDetailsSkills(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
+        @Valid @RequestBody
+        dto: EditUserDetailsSkillsDTO,
+        validation: BindingResult,
+    ): ResponseEntity<UserDTO> {
+        logger.info("Handling DELETE /users/v1/{uuid}/details/skills [removeUserDetailsSkills] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
+
+        if (validation.hasErrors()) {
+            throw RequestValidationException(validation)
+        }
+
+        val updatedUser = userService.removeUserDetailsSkills(
+            user = user,
+            dto = dto,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+    }
+
+    // endregion
     // region User avatar and banner
 
     @Operation(
@@ -393,23 +456,7 @@ class UserController(
         logger.info("Handling PUT /users/v1/{uuid}/avatar [updateUserAvatar] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        // Get the user details, for later
-        val user = userService.getUserByUuid(uuid.toUuid())
-
-        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
-        if (uuid != consumerId) {
-            // Normal user's can only edit their own details
-            if (consumerRole.isRole(Role.USER)) {
-                throw InvalidCredentialsException()
-            }
-            // And managers can only edit their own or their employees' details
-            if (consumerRole.isRole(Role.MANAGER)) {
-                val manager = userService.getUserByUuid(consumerId.toUuid())
-                if (manager.organizationUuid != user.organizationUuid) {
-                    throw InvalidCredentialsException()
-                }
-            }
-        }
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
         // TODO Add file type/size checks
 
@@ -434,7 +481,7 @@ class UserController(
 
         // Update the user details
         userService.updateUserAvatar(
-            uuid = uuid.toUuid(),
+            user = user,
             reference = fileReference.id,
         )
 
@@ -458,23 +505,7 @@ class UserController(
         logger.info("Handling DELETE /users/v1/{uuid}/avatar [deleteUserAvatar] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        // Get the user details, for later
-        val user = userService.getUserByUuid(uuid.toUuid())
-
-        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
-        if (uuid != consumerId) {
-            // Normal user's can only edit their own details
-            if (consumerRole.isRole(Role.USER)) {
-                throw InvalidCredentialsException()
-            }
-            // And managers can only edit their own or their employees' details
-            if (consumerRole.isRole(Role.MANAGER)) {
-                val manager = userService.getUserByUuid(consumerId.toUuid())
-                if (manager.organizationUuid != user.organizationUuid) {
-                    throw InvalidCredentialsException()
-                }
-            }
-        }
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
         val response = storageProxy.deleteFileReference(
             consumerRole = Role.SYSTEM.name,
@@ -482,7 +513,7 @@ class UserController(
             id = userService.getUserByUuid(uuid.toUuid()).avatarReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
         )
         userService.updateUserAvatar(
-            uuid = uuid.toUuid(),
+            user = user,
             reference = null,
         )
         return response
@@ -503,23 +534,7 @@ class UserController(
         logger.info("Handling PUT /users/v1/{uuid}/banner [updateUserBanner] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        // Get the user details, for later
-        val user = userService.getUserByUuid(uuid.toUuid())
-
-        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
-        if (uuid != consumerId) {
-            // Normal user's can only edit their own details
-            if (consumerRole.isRole(Role.USER)) {
-                throw InvalidCredentialsException()
-            }
-            // And managers can only edit their own or their employees' details
-            if (consumerRole.isRole(Role.MANAGER)) {
-                val manager = userService.getUserByUuid(consumerId.toUuid())
-                if (manager.organizationUuid != user.organizationUuid) {
-                    throw InvalidCredentialsException()
-                }
-            }
-        }
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
         // TODO Add file type/size checks
 
@@ -544,7 +559,7 @@ class UserController(
 
         // Update the user details
         userService.updateUserBanner(
-            uuid = uuid.toUuid(),
+            user = user,
             reference = fileReference.id,
         )
 
@@ -568,23 +583,7 @@ class UserController(
         logger.info("Handling DELETE /users/v1/{uuid}/banner [deleteUserBanner] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        // Get the user details, for later
-        val user = userService.getUserByUuid(uuid.toUuid())
-
-        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
-        if (uuid != consumerId) {
-            // Normal user's can only edit their own details
-            if (consumerRole.isRole(Role.USER)) {
-                throw InvalidCredentialsException()
-            }
-            // And managers can only edit their own or their employees' details
-            if (consumerRole.isRole(Role.MANAGER)) {
-                val manager = userService.getUserByUuid(consumerId.toUuid())
-                if (manager.organizationUuid != user.organizationUuid) {
-                    throw InvalidCredentialsException()
-                }
-            }
-        }
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
         val response = storageProxy.deleteFileReference(
             consumerRole = Role.SYSTEM.name,
@@ -592,14 +591,14 @@ class UserController(
             id = userService.getUserByUuid(uuid.toUuid()).bannerReference ?: "<0>", // I am lazy: I will just return the 404 or the error from ms-storage
         )
         userService.updateUserBanner(
-            uuid = uuid.toUuid(),
+            user = user,
             reference = null,
         )
         return response
     }
 
     // endregion
-    // region User avatar and banner
+    // region User preferences
 
     @Operation(
         summary = "Replace a user's preferences",
@@ -616,12 +615,12 @@ class UserController(
         logger.info("Handling PUT /users/v1/{uuid}/preferences [updateUserPreferences] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        if (uuid.toUuid() != consumerId.toUuid()) {
+        if (uuid != consumerId) {
             throw InvalidCredentialsException()
         }
 
         userService.updateUserPreferences(
-            uuid = uuid.toUuid(),
+            user = userService.getUserByUuid(uuid.toUuid()),
             preferences = body,
         )
 
@@ -632,6 +631,26 @@ class UserController(
     }
 
     // endregion
+
+    private fun getUserIfPermitted(userUuid: String, consumerId: String, consumerRole: String): User {
+        val user = userService.getUserByUuid(userUuid.toUuid())
+
+        // If we are trying to update a user other than ourselves, we need to check who's performing the request first
+        if (userUuid != consumerId) {
+            // Normal user's can only edit their own details
+            if (consumerRole.isRole(Role.USER)) {
+                throw InvalidCredentialsException()
+            }
+            // And managers can only edit their own or their employees' details
+            if (consumerRole.isRole(Role.MANAGER)) {
+                val manager = userService.getUserByUuid(consumerId.toUuid())
+                if (manager.details!!.organizationUuid != user.details?.organizationUuid) {
+                    throw InvalidCredentialsException()
+                }
+            }
+        }
+        return user
+    }
 
     private fun User.toRichDTO(): UserDTO {
         val avatarUrl = this.avatarReference?.let { id ->
