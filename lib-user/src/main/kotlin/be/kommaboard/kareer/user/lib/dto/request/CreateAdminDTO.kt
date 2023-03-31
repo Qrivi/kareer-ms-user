@@ -14,7 +14,7 @@ data class CreateAdminDTO(
     val email: String?,
 
     @get:NotBlank(message = "{CreateAdminDTO.password.NotBlank}")
-    @get:Size(message = "{CreateAdminDTO.password.size}", min = 8)
+    @get:Size(message = "{CreateAdminDTO.password.Size}", min = 8)
     @get:NotCommon(message = "{CreateAdminDTO.password.NotCommon}")
     @get:NotSimple(message = "{CreateAdminDTO.password.NotSimple}")
     val password: String?,

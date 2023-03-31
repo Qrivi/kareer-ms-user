@@ -5,6 +5,7 @@ import java.util.UUID
 
 data class UserDetailsDTO(
     val organizationUuid: UUID?,
+    val startDate: LocalDate,
     val phone: String?,
     val locationAddress: String?,
     val locationAddress2: String?,
@@ -13,8 +14,7 @@ data class UserDetailsDTO(
     val locationCountry: String?,
     val title: String,
     val skills: List<String>,
-    val experience: LocalDate,
+    val experienceDate: LocalDate,
     val birthday: LocalDate?,
-    val startDate: LocalDate,
     val about: String,
 )

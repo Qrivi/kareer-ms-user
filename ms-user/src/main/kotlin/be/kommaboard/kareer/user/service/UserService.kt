@@ -204,7 +204,7 @@ class UserService(
                     locationCountry = dto.details!!.locationCountry.trimOrNullIfBlank(),
                     title = dto.details!!.title.trimOrNullIfBlank() ?: "${organization.name} Employee",
                     skills = skillsMap(dto.details!!.skills!!),
-                    experience = dto.details!!.experience ?: localNow,
+                    experienceDate = dto.details!!.experienceDate ?: localNow,
                     birthday = dto.details!!.birthday,
                     startDate = localNow,
                     about = dto.details!!.about!!,
@@ -315,7 +315,7 @@ class UserService(
                     dto.locationCountry?.let { this.locationCountry = it.trimOrNullIfBlank() }
                     dto.title?.let { this.title = it }
                     dto.skills?.let { this.skills = skillsMap(it) }
-                    dto.experience?.let { this.experience = it }
+                    dto.experienceDate?.let { this.experienceDate = it }
                     dto.birthday?.let { this.birthday = it }
                     dto.about?.let { this.about = it }
                 }

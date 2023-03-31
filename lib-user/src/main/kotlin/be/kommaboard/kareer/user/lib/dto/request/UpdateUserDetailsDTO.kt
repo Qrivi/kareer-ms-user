@@ -39,8 +39,8 @@ data class UpdateUserDetailsDTO(
     @get:ItemSize(message = "{UpdateUserDetailsDTO.skills.ItemSize}", min = 1, max = 25)
     val skills: List<String>?,
 
-    @get:Past(message = "{UpdateUserDetailsDTO.experience.Past}")
-    val experience: LocalDate?,
+    @get:Past(message = "{UpdateUserDetailsDTO.experienceDate.Past}")
+    val experienceDate: LocalDate?,
 
     @get:Past(message = "{UpdateUserDetailsDTO.birthday.Past}")
     val birthday: LocalDate?,

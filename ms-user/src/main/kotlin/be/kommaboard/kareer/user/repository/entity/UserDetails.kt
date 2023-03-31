@@ -31,6 +31,9 @@ class UserDetails(
     @Column(name = "organization_uuid")
     val organizationUuid: UUID,
 
+    @Column(name = "start_date")
+    val startDate: LocalDate,
+
     @Column(name = "phone")
     var phone: String?,
 
@@ -61,14 +64,11 @@ class UserDetails(
     @Column(name = "skill_value")
     var skills: MutableMap<String, String>,
 
-    @Column(name = "experience")
-    var experience: LocalDate,
+    @Column(name = "experience_date")
+    var experienceDate: LocalDate,
 
     @Column(name = "birthday")
     var birthday: LocalDate?,
-
-    @Column(name = "start_date")
-    val startDate: LocalDate,
 
     @Column(name = "about")
     var about: String,
@@ -84,7 +84,7 @@ class UserDetails(
         locationCountry = locationCountry,
         title = title,
         skills = skills.values.toList(),
-        experience = experience,
+        experienceDate = experienceDate,
         birthday = birthday,
         startDate = startDate,
         about = about,
