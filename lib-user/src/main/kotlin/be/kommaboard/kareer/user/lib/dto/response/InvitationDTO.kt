@@ -3,7 +3,7 @@ package be.kommaboard.kareer.user.lib.dto.response
 import java.time.ZonedDateTime
 import java.util.UUID
 
-data class InviteDTO(
+data class InvitationDTO(
     val uuid: UUID,
     val inviterUuid: UUID,
     val creationDate: ZonedDateTime,

@@ -3,28 +3,20 @@ package be.kommaboard.kareer.user.lib.dto.request
 import be.kommaboard.kareer.user.lib.constraint.NotCommon
 import be.kommaboard.kareer.user.lib.constraint.NotSimple
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
-import java.time.LocalDate
 
 data class UpdateUserDTO(
 
     @get:Pattern(message = "{UpdateUserDTO.role.Pattern}", regexp = "^(user|manager)$", flags = [Pattern.Flag.CASE_INSENSITIVE])
     val role: String?,
 
-    @get:Size(message = "{UpdateUserDTO.slug.Size}", max = 50)
-    @get:Pattern(message = "{UpdateUserDTO.slug.Pattern}", regexp = "^\\s*\$|^[\\w.]+\$")
-    val slug: String?,
+    // TODO Add status?
 
     @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.email.NotBlank}")
     @get:Size(message = "{UpdateUserDTO.email.Size}", max = 100)
     @get:Email(message = "{UpdateUserDTO.email.Email}")
     val email: String?,
-
-    @get:Size(message = "{UpdateUserDTO.phone.Size}", max = 20)
-    @get:Pattern(message = "{UpdateUserDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
-    val phone: String?,
 
     @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.password.NotBlank}")
     @get:Size(message = "{UpdateUserDTO.password.size}", min = 8)
@@ -43,10 +35,7 @@ data class UpdateUserDTO(
     @get:Size(message = "{UpdateUserDTO.nickname.Size}", max = 100)
     val nickname: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.title.NotBlank}")
-    @get:Size(message = "{UpdateUserDTO.title.Size}", max = 100)
-    val title: String?,
-
-    @get:Past(message = "{UpdateUserDTO.birthday.Past}")
-    val birthday: LocalDate?,
+    @get:Size(message = "{UpdateUserDTO.slug.Size}", max = 50)
+    @get:Pattern(message = "{UpdateUserDTO.slug.Pattern}", regexp = "^\\s*\$|^[\\w.]+\$")
+    val slug: String?,
 )

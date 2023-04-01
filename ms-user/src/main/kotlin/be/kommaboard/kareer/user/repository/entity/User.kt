@@ -7,13 +7,15 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
 import jakarta.persistence.PrimaryKeyJoinColumn
 import jakarta.persistence.SecondaryTable
 import jakarta.persistence.Table
 import org.hibernate.annotations.GenericGenerator
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -31,12 +33,6 @@ class User(
     @Column(name = "uuid")
     val uuid: UUID? = null,
 
-    @Column(name = "slug")
-    var slug: String?,
-
-    @Column(name = "organization_uuid")
-    val organizationUuid: UUID?,
-
     @Column(name = "creation_date")
     val creationDate: ZonedDateTime,
 
@@ -51,9 +47,6 @@ class User(
     @Column(name = "email")
     var email: String,
 
-    @Column(name = "phone")
-    var phone: String?,
-
     @Column(name = "password")
     var password: String,
 
@@ -66,11 +59,12 @@ class User(
     @Column(name = "nickname")
     var nickname: String?,
 
-    @Column(name = "title")
-    var title: String,
+    @Column(name = "slug")
+    var slug: String?,
 
-    @Column(name = "birthday")
-    var birthday: LocalDate?,
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "details_uuid")
+    val details: UserDetails?,
 
     @Column(name = "avatar_reference")
     var avatarReference: String?,
@@ -89,18 +83,15 @@ class User(
 
     fun toDTO(avatarUrl: String? = null, bannerUrl: String? = null) = UserDTO(
         uuid = uuid!!,
-        slug = slug,
         creationDate = creationDate,
-        organizationUuid = organizationUuid,
         role = role.name,
         status = status.name,
         email = email,
-        phone = phone,
         lastName = lastName,
         firstName = firstName,
         nickname = nickname,
-        title = title,
-        birthday = birthday,
+        slug = slug,
+        details = details?.toDTO(),
         avatarUrl = avatarUrl,
         bannerUrl = bannerUrl,
         preferences = preferences,

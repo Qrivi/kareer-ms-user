@@ -13,17 +13,17 @@ interface UserRepository : JpaRepository<User, UUID> {
 
     fun findAllByRole(role: Role, pageable: Pageable): Page<User>
 
-    fun findAllByOrganizationUuid(organizationUUID: UUID, pageable: Pageable): Page<User>
+    fun findAllByDetailsOrganizationUuid(organizationUUID: UUID, pageable: Pageable): Page<User>
 
     fun findAllByKeywordsContainsIgnoreCase(keywords: String, pageable: Pageable): Page<User>
 
-    fun findAllByOrganizationUuidAndRole(organizationUUID: UUID, role: Role, pageable: Pageable): Page<User>
+    fun findAllByDetailsOrganizationUuidAndRole(organizationUUID: UUID, role: Role, pageable: Pageable): Page<User>
 
     fun findAllByRoleAndKeywordsContainsIgnoreCase(role: Role, keywords: String, pageable: Pageable): Page<User>
 
-    fun findAllByOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUUID: UUID, keywords: String, pageable: Pageable): Page<User>
+    fun findAllByDetailsOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUUID: UUID, keywords: String, pageable: Pageable): Page<User>
 
-    fun findAllByOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUUID: UUID, role: Role, keywords: String, pageable: Pageable): Page<User>
+    fun findAllByDetailsOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUUID: UUID, role: Role, keywords: String, pageable: Pageable): Page<User>
 
     fun findByUuid(uuid: UUID): User?
 
@@ -33,5 +33,5 @@ interface UserRepository : JpaRepository<User, UUID> {
 
     fun existsByEmailIgnoreCase(email: String): Boolean
 
-    fun existsByOrganizationUuidAndSlugIgnoreCase(organizationUuid: UUID, slug: String): Boolean
+    fun existsByDetailsOrganizationUuidAndSlugIgnoreCase(organizationUuid: UUID, slug: String): Boolean
 }

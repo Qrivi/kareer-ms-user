@@ -2,8 +2,354 @@ databaseChangeLog:
   - changeSet:
       id: user-0.0.1
       author: Kristof Dewilde
-      comment: "Dummy data for testing organization-ms."
+      comment: "Dummy data for testing user-ms."
       changes:
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000001"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2011-01-01"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Founder & Manager"
+              - column:
+                  name: experience_date
+                  value: "2011-01-01"
+              - column:
+                  name: birthday
+                  value: "1991-01-01"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000002"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2012-02-02"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "HR Manager"
+              - column:
+                  name: experience_date
+                  value: "2012-02-02"
+              - column:
+                  name: birthday
+                  value: "1992-02-02"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0001-000000000003"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2013-03-03"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Project Matcher"
+              - column:
+                  name: experience_date
+                  value: "2013-03-03"
+              - column:
+                  name: birthday
+                  value: "1993-03-03"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000004"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2014-04-04"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Frontend Connaisseur"
+              - column:
+                  name: experience_date
+                  value: "2014-04-04"
+              - column:
+                  name: birthday
+                  value: "1994-04-04"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000005"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2019-10-10"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 2"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "11X Developer"
+              - column:
+                  name: experience_date
+                  value: "2017-07-07"
+              - column:
+                  name: birthday
+                  value: "1993-09-26"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000006"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2016-06-06"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "React Rookie"
+              - column:
+                  name: experience_date
+                  value: "2016-06-06"
+              - column:
+                  name: birthday
+                  value: "1996-06-06"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000007"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2017-07-07"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Financial Controller"
+              - column:
+                  name: experience_date
+                  value: "2017-07-07"
+              - column:
+                  name: birthday
+                  value: "1997-07-07"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000008"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2018-08-08"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Senorita Accountant"
+              - column:
+                  name: experience_date
+                  value: "2018-08-08"
+              - column:
+                  name: birthday
+                  value: "1998-08-08"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+        - insert:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  value: "00000000-0000-0000-0002-000000000009"
+              - column:
+                  name: organization_uuid
+                  value: "00000000-0000-0000-0000-000000000001"
+              - column:
+                  name: start_date
+                  value: "2019-09-09"
+              - column:
+                  name: phone
+                  value: "+32494112233"
+              - column:
+                  name: location_address
+                  value: "Rue de la Loi 1"
+              - column:
+                  name: location_code
+                  value: "1000"
+              - column:
+                  name: location_city
+                  value: "Bruxelles"
+              - column:
+                  name: location_country
+                  value: "Belgium"
+              - column:
+                  name: title
+                  value: "Business Controller"
+              - column:
+                  name: experience_date
+                  value: "2019-09-09"
+              - column:
+                  name: birthday
+                  value: "1999-09-09"
+              - column:
+                  name: about
+                  value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec ultricies lacinia, nisl nunc aliquet nisl, eget aliquet nisl nisl"
+
         - insert:
             tableName: user
             columns:
@@ -13,6 +359,12 @@ databaseChangeLog:
               - column:
                   name: creation_date
                   value: "2022-01-01 10:00:00.000000"
+              - column:
+                  name: role
+                  value: "ADMIN"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
               - column:
                   name: email
                   value: "kareer@kommaboard.be"
@@ -29,17 +381,8 @@ databaseChangeLog:
                   name: nickname
                   value: "Admin"
               - column:
-                  name: title
-                  value: "Super Administrator"
-              - column:
-                  name: role
-                  value: "ADMIN"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
-              - column:
                   name: keywords
-                  value: "admin admin admin kareer@kommaboard.be"
+                  value: "admin istrator kareer@kommaboard.be"
         - insert:
             tableName: user
             columns:
@@ -47,17 +390,17 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0001-000000000001"
               - column:
-                  name: slug
-                  value: "eindbaas"
-              - column:
                   name: creation_date
                   value: "2022-05-05 15:15:00.000000"
               - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "an@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332211"
               - column:
                   name: password
                   value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
@@ -71,17 +414,11 @@ databaseChangeLog:
                   name: nickname
                   value: "An"
               - column:
-                  name: title
-                  value: "Eindbaas"
+                  name: slug
+                  value: "eindbaas"
               - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "MANAGER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0001-000000000001"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a1"
@@ -101,6 +438,12 @@ databaseChangeLog:
                   name: creation_date
                   value: "2022-06-06 16:16:00.000000"
               - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "leen@kommaboard.be"
               - column:
@@ -116,17 +459,8 @@ databaseChangeLog:
                   name: nickname
                   value: "Leen"
               - column:
-                  name: title
-                  value: "HR Officer"
-              - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "MANAGER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0001-000000000002"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a2"
@@ -143,17 +477,17 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0001-000000000003"
               - column:
-                  name: slug
-                  value: "damian"
-              - column:
                   name: creation_date
                   value: "2022-07-07 17:17:00.000000"
               - column:
+                  name: role
+                  value: "MANAGER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "damian@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332222"
               - column:
                   name: password
                   value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
@@ -167,17 +501,11 @@ databaseChangeLog:
                   name: nickname
                   value: "Damian"
               - column:
-                  name: title
-                  value: "HR Officer"
+                  name: slug
+                  value: "damian"
               - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "MANAGER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0001-000000000003"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a3"
@@ -191,17 +519,17 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0002-000000000004"
               - column:
-                  name: slug
-                  value: "pixeliner"
-              - column:
                   name: creation_date
                   value: "2022-08-08 18:18:00.000000"
               - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "peter@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332233"
               - column:
                   name: password
                   value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
@@ -215,17 +543,11 @@ databaseChangeLog:
                   name: nickname
                   value: "Vercauteren"
               - column:
-                  name: title
-                  value: "Front-end Connaisseur"
+                  name: slug
+                  value: "pixeliner"
               - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000004"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a4"
@@ -245,6 +567,12 @@ databaseChangeLog:
                   name: creation_date
                   value: "2022-09-09 19:19:00.000000"
               - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "kristof@kommaboard.be"
               - column:
@@ -260,17 +588,8 @@ databaseChangeLog:
                   name: nickname
                   value: "Qrivi"
               - column:
-                  name: title
-                  value: "11X Developer"
-              - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000005"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a5"
@@ -287,41 +606,35 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0002-000000000006"
               - column:
-                  name: slug
-                  value: "aslina"
-              - column:
                   name: creation_date
                   value: "2022-10-10 20:20:00.000000"
-              - column:
-                  name: email
-                  value: "lina@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332244"
-              - column:
-                  name: password
-                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
-              - column:
-                  name: last_name
-                  value: "Asly"
-              - column:
-                  name: first_name
-                  value: "Lina"
-              - column:
-                  name: nickname
-                  value: "Lina"
-              - column:
-                  name: title
-                  value: "Functional Analist"
-              - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
               - column:
                   name: role
                   value: "USER"
               - column:
                   name: status
                   value: "ACTIVATED"
+              - column:
+                  name: email
+                  value: "jimmy@kommaboard.be"
+              - column:
+                  name: password
+                  value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
+              - column:
+                  name: last_name
+                  value: "Da Silva"
+              - column:
+                  name: first_name
+                  value: "Jimmy"
+              - column:
+                  name: nickname
+                  value: "Jimbo"
+              - column:
+                  name: slug
+                  value: "jimmy.lamim.da.silva"
+              - column:
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000006"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a6"
@@ -335,17 +648,17 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0002-000000000007"
               - column:
-                  name: slug
-                  value: "hannelore"
-              - column:
                   name: creation_date
                   value: "2022-11-11 21:21:00.000000"
               - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "hannelore@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332255"
               - column:
                   name: password
                   value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
@@ -359,17 +672,11 @@ databaseChangeLog:
                   name: nickname
                   value: "Hannelore"
               - column:
-                  name: title
-                  value: "Financial Controller"
+                  name: slug
+                  value: "hannelore"
               - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000007"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a7"
@@ -389,6 +696,12 @@ databaseChangeLog:
                   name: creation_date
                   value: "2022-12-12 22:22:00.000000"
               - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "stephanie@kommaboard.be"
               - column:
@@ -404,17 +717,8 @@ databaseChangeLog:
                   name: nickname
                   value: "Stéphanie"
               - column:
-                  name: title
-                  value: "Senior Accountant"
-              - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000008"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a8"
@@ -431,17 +735,17 @@ databaseChangeLog:
                   name: uuid
                   value: "00000000-0000-0000-0002-000000000009"
               - column:
-                  name: slug
-                  value: "cocktailsatyours"
-              - column:
                   name: creation_date
                   value: "2023-01-01 09:00:00.000000"
               - column:
+                  name: role
+                  value: "USER"
+              - column:
+                  name: status
+                  value: "ACTIVATED"
+              - column:
                   name: email
                   value: "christopher@kommaboard.be"
-              - column:
-                  name: phone
-                  value: "+32494332266"
               - column:
                   name: password
                   value: "$2a$12$d4cOXB.py0DYQh8ICeKdaerYA/1dpa5kg/vWUdVeIQrjRcC3ISPNq"
@@ -455,17 +759,11 @@ databaseChangeLog:
                   name: nickname
                   value: "Chris"
               - column:
-                  name: title
-                  value: "Cocktail Man"
+                  name: slug
+                  value: "cocktailsatyours"
               - column:
-                  name: organization_uuid
-                  value: "00000000-0000-0000-0000-000000000001"
-              - column:
-                  name: role
-                  value: "USER"
-              - column:
-                  name: status
-                  value: "ACTIVATED"
+                  name: details_uuid
+                  value: "00000000-0000-0000-0002-000000000009"
               - column:
                   name: avatar_reference
                   value: "0000000000000000000000a9"
@@ -473,3 +771,219 @@ databaseChangeLog:
                   name: keywords
                   value: "christopher mungra christopher christopher@kommaboard.be +32494332266 komma board"
 
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0001-000000000001"
+              - column:
+                  name: skill_key
+                  value: "managingpeople"
+              - column:
+                  name: skill_value
+                  value: "Managing People"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0001-000000000002"
+              - column:
+                  name: skill_key
+                  value: "recruiting"
+              - column:
+                  name: skill_value
+                  value: "Recruiting"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0001-000000000003"
+              - column:
+                  name: skill_key
+                  value: "benching"
+              - column:
+                  name: skill_value
+                  value: "benching"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0001-000000000003"
+              - column:
+                  name: skill_key
+                  value: "projectmatching"
+              - column:
+                  name: skill_value
+                  value: "Project Matching"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000004"
+              - column:
+                  name: skill_key
+                  value: "react"
+              - column:
+                  name: skill_value
+                  value: "React"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000004"
+              - column:
+                  name: skill_key
+                  value: "nextjs"
+              - column:
+                  name: skill_value
+                  value: "Next.js"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000004"
+              - column:
+                  name: skill_key
+                  value: "git"
+              - column:
+                  name: skill_value
+                  value: "git"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000005"
+              - column:
+                  name: skill_key
+                  value: "kotlin"
+              - column:
+                  name: skill_value
+                  value: "Kotlin"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000005"
+              - column:
+                  name: skill_key
+                  value: "java"
+              - column:
+                  name: skill_value
+                  value: "Java"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000005"
+              - column:
+                  name: skill_key
+                  value: "rocketleague"
+              - column:
+                  name: skill_value
+                  value: "Rocket League"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000006"
+              - column:
+                  name: skill_key
+                  value: "vue"
+              - column:
+                  name: skill_value
+                  value: "Vue"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000006"
+              - column:
+                  name: skill_key
+                  value: "figma"
+              - column:
+                  name: skill_value
+                  value: "Figma"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000007"
+              - column:
+                  name: skill_key
+                  value: "excel"
+              - column:
+                  name: skill_value
+                  value: "Excel"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000008"
+              - column:
+                  name: skill_key
+                  value: "excel"
+              - column:
+                  name: skill_value
+                  value: "Excel"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000008"
+              - column:
+                  name: skill_key
+                  value: "word"
+              - column:
+                  name: skill_value
+                  value: "Word"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000009"
+              - column:
+                  name: skill_key
+                  value: "excel"
+              - column:
+                  name: skill_value
+                  value: "Excel"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000009"
+              - column:
+                  name: skill_key
+                  value: "word"
+              - column:
+                  name: skill_value
+                  value: "Word"
+        - insert:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  value: "00000000-0000-0000-0002-000000000009"
+              - column:
+                  name: skill_key
+                  value: "powerpoint"
+              - column:
+                  name: skill_value
+                  value: "PowerPoint"

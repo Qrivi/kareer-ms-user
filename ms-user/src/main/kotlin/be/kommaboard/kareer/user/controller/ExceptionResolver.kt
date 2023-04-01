@@ -6,7 +6,6 @@ import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InvalidInviteException
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
-import be.kommaboard.kareer.user.service.exception.InvalidOrganizationUuidException
 import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
@@ -37,12 +36,6 @@ class ExceptionResolver(
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
         .body(ErrorsDTO(commonMessageService["exception.InvalidInviteStatus", e.value]))
-
-    @ExceptionHandler
-    fun resolve(e: InvalidOrganizationUuidException) = ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .headers(HttpHeadersBuilder().contentLanguage().build())
-        .body(ErrorsDTO(commonMessageService["exception.InvalidOrganizationUuid"]))
 
     @ExceptionHandler
     fun resolve(e: InviteDoesNotExistException) = ResponseEntity

@@ -2,23 +2,23 @@ package be.kommaboard.kareer.user.controller
 
 import be.kommaboard.kareer.authorization.InternalHttpHeaders
 import be.kommaboard.kareer.authorization.Role
-import be.kommaboard.kareer.authorization.authorizationCheck
 import be.kommaboard.kareer.authorization.exception.InvalidCredentialsException
-import be.kommaboard.kareer.authorization.isRole
-import be.kommaboard.kareer.authorization.toUuid
+import be.kommaboard.kareer.authorization.util.authorizationCheck
+import be.kommaboard.kareer.authorization.util.isRole
+import be.kommaboard.kareer.authorization.util.toUuid
 import be.kommaboard.kareer.common.dto.ListDTO
 import be.kommaboard.kareer.common.exception.InvalidPageOrSizeException
 import be.kommaboard.kareer.common.exception.RequestValidationException
-import be.kommaboard.kareer.common.toSort
-import be.kommaboard.kareer.common.trimOrNullIfBlank
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
+import be.kommaboard.kareer.common.util.toSort
+import be.kommaboard.kareer.common.util.trimOrNullIfBlank
 import be.kommaboard.kareer.user.KareerConfig
-import be.kommaboard.kareer.user.lib.dto.request.CreateInviteDTO
-import be.kommaboard.kareer.user.lib.dto.request.UpdateInviteDTO
-import be.kommaboard.kareer.user.lib.dto.response.InviteDTO
+import be.kommaboard.kareer.user.lib.dto.request.CreateInvitationDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateInvitationDTO
+import be.kommaboard.kareer.user.lib.dto.response.InvitationDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
-import be.kommaboard.kareer.user.repository.entity.Invite
-import be.kommaboard.kareer.user.repository.entity.toInviteStatus
+import be.kommaboard.kareer.user.repository.entity.Invitation
+import be.kommaboard.kareer.user.repository.entity.toInvitationStatus
 import be.kommaboard.kareer.user.service.UserService
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import io.swagger.v3.oas.annotations.Operation
@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/users/v1/invites")
-class InviteController(
+class InvitationController(
     private val kareerConfig: KareerConfig,
     private val userService: UserService,
     private val organizationProxy: OrganizationProxy,
@@ -54,7 +54,7 @@ class InviteController(
     fun getAllInvites(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-    ): ResponseEntity<ListDTO<InviteDTO>> {
+    ): ResponseEntity<ListDTO<InvitationDTO>> {
         logger.info("Handling GET /users/v1/invites/all [getAllInvites] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
@@ -63,7 +63,7 @@ class InviteController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(ListDTO(invites.map(Invite::toDTO)))
+            .body(ListDTO(invites.map(Invitation::toDTO)))
     }
 
     @Operation(
@@ -80,7 +80,7 @@ class InviteController(
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "creationDate") sort: String,
         request: HttpServletRequest,
-    ): ResponseEntity<ListDTO<InviteDTO>> {
+    ): ResponseEntity<ListDTO<InvitationDTO>> {
         logger.info("Handling GET /users/v1/invites [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
@@ -90,8 +90,8 @@ class InviteController(
 
         val invitesPage = userService.getPagedInvites(
             pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
-            organizationUuid = userService.getUserByUuid(consumerId.toUuid()).organizationUuid!!,
-            status = status.trimOrNullIfBlank()?.toInviteStatus(),
+            organizationUuid = userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid,
+            status = status.trimOrNullIfBlank()?.toInvitationStatus(),
         )
 
         return ResponseEntity
@@ -102,7 +102,7 @@ class InviteController(
                     .link(request, invitesPage)
                     .build(),
             )
-            .body(ListDTO(invitesPage.content.map(Invite::toDTO), invitesPage))
+            .body(ListDTO(invitesPage.content.map(Invitation::toDTO), invitesPage))
     }
 
     @Operation(
@@ -115,7 +115,7 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
-    ): ResponseEntity<InviteDTO> {
+    ): ResponseEntity<InvitationDTO> {
         logger.info("Handling GET /users/v1/invites/{uuid} [getInvite] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER)
 
@@ -124,7 +124,7 @@ class InviteController(
         if (consumerRole.isRole(Role.MANAGER)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
-            if (manager.organizationUuid != invite.inviter.organizationUuid) {
+            if (manager.details!!.organizationUuid != invite.inviter.details!!.organizationUuid) {
                 throw InvalidCredentialsException()
             }
         }
@@ -145,9 +145,9 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @Valid @RequestBody
-        dto: CreateInviteDTO,
+        dto: CreateInvitationDTO,
         validation: BindingResult,
-    ): ResponseEntity<InviteDTO> {
+    ): ResponseEntity<InvitationDTO> {
         logger.info("Handling POST /users/v1/invites [createInvite] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
@@ -156,7 +156,7 @@ class InviteController(
         val organization = organizationProxy.getOrganization(
             consumerRole = Role.SYSTEM.name,
             consumerId = kareerConfig.consumerId!!,
-            uuid = manager.organizationUuid.toString(),
+            uuid = manager.details!!.organizationUuid.toString(),
         )
 
         if (validation.hasErrors()) {
@@ -166,11 +166,9 @@ class InviteController(
         // TODO Add a check to avoid creation of multiple invites to the same e-mail address
 
         val invite = userService.createInvite(
+            dto = dto,
             manager = manager,
             organization = organization,
-            inviteeEmail = dto.email!!,
-            inviteeLastName = dto.lastName!!,
-            inviteeFirstName = dto.firstName!!,
         )
 
         return ResponseEntity
@@ -190,32 +188,32 @@ class InviteController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @PathVariable uuid: String,
         @Valid @RequestBody
-        dto: UpdateInviteDTO,
+        dto: UpdateInvitationDTO,
         validation: BindingResult,
-    ): ResponseEntity<InviteDTO> {
+    ): ResponseEntity<InvitationDTO> {
         logger.info("Handling PATCH /users/v1/invites/{uuid} [updateInvite] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
         val invite = userService.getInviteByUuid(uuid.toUuid())
-        val status = dto.status?.toInviteStatus() ?: throw InvalidInviteStatusException(dto.status ?: "")
+        val status = dto.status?.toInvitationStatus() ?: throw InvalidInviteStatusException(dto.status ?: "")
 
         // Extra requirements if performed as a manager
         if (consumerRole.isRole(Role.MANAGER)) {
             val manager = userService.getUserByUuid(consumerId.toUuid())
 
             // Managers can only update invites sent by themselves or other managers in their organization
-            if (manager.organizationUuid != invite.inviter.organizationUuid) {
+            if (manager.details!!.organizationUuid != invite.inviter.details!!.organizationUuid) {
                 throw InvalidCredentialsException()
             }
 
             // Managers can not accept or decline invites (only the invitee can), but can retract invites or undo retraction
-            if (status != Invite.Status.PENDING && status != Invite.Status.RETRACTED) {
+            if (status != Invitation.Status.PENDING && status != Invitation.Status.RETRACTED) {
                 throw InvalidInviteStatusException(status.name.lowercase())
             }
         }
 
         val updatedInvite = userService.updateInviteStatus(
-            invite = invite,
+            invitation = invite,
             status = status,
         )
 
