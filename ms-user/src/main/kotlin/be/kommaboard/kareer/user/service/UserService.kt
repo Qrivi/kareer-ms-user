@@ -291,7 +291,7 @@ class UserService(
                 dto.lastName?.let { this.lastName = it.trim() }
                 dto.firstName?.let { this.firstName = it.trim() }
                 dto.nickname?.let { this.nickname = it.trimOrNullIfBlank() }
-                keywords = makeKeywords(this.firstName, this.lastName, this.firstName, this.email, organizationName)
+                keywords = makeKeywords(this.fullName(), this.firstName, this.email, organizationName)
             },
         )
     }
@@ -363,7 +363,7 @@ class UserService(
         user: User,
         dto: EditUserDetailsSkillsDTO,
     ): User {
-        if (user.role != Role.USER && user.role != Role.MANAGER) {
+        if (user.details == null) {
             throw InvalidCredentialsException()
         }
 
@@ -372,7 +372,7 @@ class UserService(
                 this.details.apply {
                     dto.skills?.forEach {
                         if (it.isNotBlank()) {
-                            this!!.skills[it.lowercase().trim()] = it.trim()
+                            this!!.skills[it.trim().lowercase().replace("\\W".toRegex(), "")] = it.trim()
                         }
                     }
                 }
@@ -384,7 +384,7 @@ class UserService(
         user: User,
         dto: EditUserDetailsSkillsDTO,
     ): User {
-        if (user.role != Role.USER && user.role != Role.MANAGER) {
+        if (user.details == null) {
             throw InvalidCredentialsException()
         }
 
@@ -393,7 +393,7 @@ class UserService(
                 this.details.apply {
                     dto.skills?.forEach {
                         if (it.isNotBlank()) {
-                            this!!.skills.remove(it.lowercase().trim())
+                            this!!.skills.remove(it.trim().lowercase().replace("\\W".toRegex(), ""))
                         }
                     }
                 }
@@ -429,5 +429,5 @@ class UserService(
         return user
     }
 
-    private fun skillsMap(skills: List<String>) = skills.filterNot { it.isBlank() }.associate { it.lowercase().trim() to it.trim() }.toMutableMap()
+    private fun skillsMap(skills: List<String>) = skills.filterNot { it.isBlank() }.associate { it.trim().lowercase().replace("\\W".toRegex(), "") to it.trim() }.toMutableMap()
 }
