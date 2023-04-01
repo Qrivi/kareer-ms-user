@@ -63,7 +63,7 @@ class User(
     var slug: String?,
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_uuid")
+    @JoinColumn(name = "details_uuid")
     val details: UserDetails?,
 
     @Column(name = "avatar_reference")

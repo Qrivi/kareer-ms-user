@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: user-0.0.1
       author: Kristof Dewilde
-      comment: "Initial configuration for the user, invite and ticket tables."
+      comment: "Initial configuration for the user, details, invitation and ticket tables."
       changes:
         - createTable:
             tableName: user
@@ -16,10 +16,10 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: organization_uuid
-                  type: UUID
+                  name: creation_date
+                  type: TIMESTAMP
                   constraints:
-                    nullable: true
+                    nullable: false
                     unique: false
               - column:
                   name: role
@@ -34,29 +34,11 @@ databaseChangeLog:
                     nullable: false
                     unique: false
               - column:
-                  name: creation_date
-                  type: TIMESTAMP
-                  constraints:
-                    nullable: false
-                    unique: false
-              - column:
-                  name: slug
-                  type: VARCHAR(50)
-                  constraints:
-                    nullable: true
-                    unique: false
-              - column:
                   name: email
                   type: VARCHAR(100)
                   constraints:
                     nullable: false
                     unique: true
-              - column:
-                  name: phone
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: true
-                    unique: false
               - column:
                   name: password
                   type: VARCHAR(60)
@@ -82,11 +64,17 @@ databaseChangeLog:
                     nullable: true
                     unique: false
               - column:
-                  name: title
-                  type: VARCHAR(100)
+                  name: slug
+                  type: VARCHAR(50)
                   constraints:
-                    nullable: false
+                    nullable: true
                     unique: false
+              - column:
+                  name: details_uuid
+                  type: UUID
+                  constraints:
+                    nullable: true
+                    unique: true
               - column:
                   name: avatar_reference
                   type: VARCHAR(100)
@@ -105,11 +93,109 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: false
+        - createTable:
+            tableName: user_details
+            columns:
+              - column:
+                  name: uuid
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: user_details_pkey
+                    nullable: false
+                    unique: true
+              - column:
+                  name: organization_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: phone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: location_address
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: location_address2
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: location_code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: location_city
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: location_country
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: title
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: experience_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+                    unique: false
               - column:
                   name: birthday
                   type: DATE
                   constraints:
                     nullable: true
+                    unique: false
+              - column:
+                  name: about
+                  type: CLOB
+                  constraints:
+                    nullable: false
+                    unique: false
+        - createTable:
+            tableName: user_skills
+            columns:
+              - column:
+                  name: user_uuid
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: skill_key
+                  type: VARCHAR(25)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: skill_value
+                  type: VARCHAR(25)
+                  constraints:
+                    nullable: false
                     unique: false
         - createTable:
             tableName: user_preferences
@@ -127,14 +213,14 @@ databaseChangeLog:
                     nullable: true
                     unique: false
         - createTable:
-            tableName: invite
+            tableName: invitation
             columns:
               - column:
                   name: uuid
                   type: UUID
                   constraints:
                     primaryKey: true
-                    primaryKeyName: invite_pkey
+                    primaryKeyName: invitation_pkey
                     nullable: false
                     unique: true
               - column:
@@ -216,6 +302,24 @@ databaseChangeLog:
                     unique: false
 
         - addForeignKeyConstraint:
+            constraintName: user_user_details_uuid
+            baseTableName: user
+            baseColumnNames: details_uuid
+            referencedTableName: user_details
+            referencedColumnNames: uuid
+            onUpdate: CASCADE
+            onDelete: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: user_skills_user_details_uuid
+            baseTableName: user_skills
+            baseColumnNames: user_uuid
+            referencedTableName: user_details
+            referencedColumnNames: uuid
+            onUpdate: CASCADE
+            onDelete: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
             constraintName: user_preferences_user_uuid
             baseTableName: user_preferences
             baseColumnNames: user_uuid
@@ -225,8 +329,8 @@ databaseChangeLog:
             onDelete: CASCADE
             validate: true
         - addForeignKeyConstraint:
-            constraintName: invite_user_uuid
-            baseTableName: invite
+            constraintName: invitation_user_uuid
+            baseTableName: invitation
             baseColumnNames: user_uuid
             referencedTableName: user
             referencedColumnNames: uuid

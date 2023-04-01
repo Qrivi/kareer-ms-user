@@ -17,7 +17,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 
 @Entity
-@Table(name = "invite")
+@Table(name = "invitation")
 class Invitation(
 
     @Id
