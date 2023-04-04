@@ -17,13 +17,14 @@ WORKDIR /kareer
 # Update, upgrade and install jq for health check
 RUN apt-get update && apt-get upgrade -y && apt-get install -y jq
 
-# Create a user with limited permissions
-RUN groupadd -r kareer && useradd -g kareer kareer
-USER kareer:kareer
-
 # Get all our stuff together
 COPY --from=build /opt/build/libs/*.jar ./kareer-ms-user.jar
 
+# Create a user with limited permissions
+RUN groupadd -r kareer && useradd -g kareer kareer
+RUN chown -R kareer:kareer /kareer
+RUN chmod 755 /kareer
+USER kareer:kareer
 
 # Add some info to the image
 EXPOSE 8006
