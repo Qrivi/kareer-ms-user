@@ -107,7 +107,7 @@ class UserController(
         logger.info("Handling GET /users/v1 [getUsers] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
-        // TODO Add filter on status
+        // TODO Add filter on status (only relevant once we add functionality to block/deactivate users)
 
         if (page < 1 || size < 1) {
             throw InvalidPageOrSizeException()
@@ -121,8 +121,8 @@ class UserController(
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
+            roles = role.trimOrNullIfBlank()?.split(",")?.map { it.trim().toRole() },
             organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid,
-            role = role.trimOrNullIfBlank()?.toRole(),
         )
 
         return ResponseEntity

@@ -81,15 +81,15 @@ class UserService(
         pageRequest: PageRequest,
         keywords: String?,
         organizationUuid: UUID?,
-        role: Role?,
+        roles: List<Role>?,
     ) = when {
-        keywords != null && organizationUuid != null && role != null -> userRepository.findAllByDetailsOrganizationUuidAndRoleAndKeywordsContainsIgnoreCase(organizationUuid, role, keywords, pageRequest)
+        keywords != null && organizationUuid != null && roles != null -> userRepository.findAllByDetailsOrganizationUuidAndRoleInAndKeywordsContainsIgnoreCase(organizationUuid, roles, keywords, pageRequest)
         keywords != null && organizationUuid != null -> userRepository.findAllByDetailsOrganizationUuidAndKeywordsContainsIgnoreCase(organizationUuid, keywords, pageRequest)
-        keywords != null && role != null -> userRepository.findAllByRoleAndKeywordsContainsIgnoreCase(role, keywords, pageRequest)
-        organizationUuid != null && role != null -> userRepository.findAllByDetailsOrganizationUuidAndRole(organizationUuid, role, pageRequest)
+        keywords != null && roles != null -> userRepository.findAllByRoleInAndKeywordsContainsIgnoreCase(roles, keywords, pageRequest)
+        organizationUuid != null && roles != null -> userRepository.findAllByDetailsOrganizationUuidAndRoleIn(organizationUuid, roles, pageRequest)
         organizationUuid != null -> userRepository.findAllByDetailsOrganizationUuid(organizationUuid, pageRequest)
         keywords != null -> userRepository.findAllByKeywordsContainsIgnoreCase(keywords, pageRequest)
-        role != null -> userRepository.findAllByRole(role, pageRequest)
+        roles != null -> userRepository.findAllByRoleIn(roles, pageRequest)
         else -> userRepository.findAll(pageRequest)
     }
 
