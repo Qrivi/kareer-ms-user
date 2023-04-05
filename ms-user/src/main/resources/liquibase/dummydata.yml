@@ -18,7 +18,7 @@ databaseChangeLog:
                   value: "2011-01-01"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112201"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -57,7 +57,7 @@ databaseChangeLog:
                   value: "2012-02-02"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112202"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -96,7 +96,7 @@ databaseChangeLog:
                   value: "2013-03-03"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112203"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -135,7 +135,7 @@ databaseChangeLog:
                   value: "2014-04-04"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112204"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -210,7 +210,7 @@ databaseChangeLog:
                   value: "2016-06-06"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112206"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -285,7 +285,7 @@ databaseChangeLog:
                   value: "2018-08-08"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112208"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -324,7 +324,7 @@ databaseChangeLog:
                   value: "2019-09-09"
               - column:
                   name: phone
-                  value: "+32494112233"
+                  value: "+32494112209"
               - column:
                   name: location_address
                   value: "Rue de la Loi 1"
@@ -427,7 +427,7 @@ databaseChangeLog:
                   value: "0000000000000000000000b1"
               - column:
                   name: keywords
-                  value: "an van den eynde an an@kommaboard.be +32494332211 komma board"
+                  value: "an van den eynde an an@kommaboard.be +32494112201 komma board"
         - insert:
             tableName: user
             columns:
@@ -469,7 +469,7 @@ databaseChangeLog:
                   value: "0000000000000000000000b2"
               - column:
                   name: keywords
-                  value: "leen van den eynde leen leen@kommaboard.be komma board"
+                  value: "leen van den eynde leen leen@kommaboard.be +32494112202 komma board"
         - insert:
             tableName: user
             columns:
@@ -511,7 +511,7 @@ databaseChangeLog:
                   value: "0000000000000000000000a3"
               - column:
                   name: keywords
-                  value: "damian verhaegen damian damian@kommaboard.be +32494332222 komma board"
+                  value: "damian verhaegen damian damian@kommaboard.be +32494112203 komma board"
         - insert:
             tableName: user
             columns:
@@ -556,7 +556,7 @@ databaseChangeLog:
                   value: "0000000000000000000000b4"
               - column:
                   name: keywords
-                  value: "peter vercauteren peter peter@kommaboard.be +32494332233 komma board"
+                  value: "peter vercauteren peter peter@kommaboard.be +32494112204 komma board"
         - insert:
             tableName: user
             columns:
@@ -640,7 +640,7 @@ databaseChangeLog:
                   value: "0000000000000000000000a6"
               - column:
                   name: keywords
-                  value: "lina asly lina lina@kommaboard.be +32494332244 komma board"
+                  value: "jimmy da silva jimmy jimmy@kommaboard.be +32494112206 komma board"
         - insert:
             tableName: user
             columns:
@@ -685,7 +685,7 @@ databaseChangeLog:
                   value: "0000000000000000000000b7"
               - column:
                   name: keywords
-                  value: "hannelore selderslaghs hannelore hannelore@kommaboard.be +32494332255 komma board"
+                  value: "hannelore selderslaghs hannelore hannelore@kommaboard.be komma board"
         - insert:
             tableName: user
             columns:
@@ -727,7 +727,7 @@ databaseChangeLog:
                   value: "0000000000000000000000b8"
               - column:
                   name: keywords
-                  value: "stephanie hotton stephanie stephanie@kommaboard.be komma board"
+                  value: "stéphanie hotton stéphanie stephanie@kommaboard.be +32494112208 komma board"
         - insert:
             tableName: user
             columns:
@@ -769,7 +769,7 @@ databaseChangeLog:
                   value: "0000000000000000000000a9"
               - column:
                   name: keywords
-                  value: "christopher mungra christopher christopher@kommaboard.be +32494332266 komma board"
+                  value: "christopher mungra christopher christopher@kommaboard.be +32494112209 komma board"
 
         - insert:
             tableName: user_skills
