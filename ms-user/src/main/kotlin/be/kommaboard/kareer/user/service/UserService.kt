@@ -18,7 +18,7 @@ import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
-import be.kommaboard.kareer.user.repository.InviteRepository
+import be.kommaboard.kareer.user.repository.InvitationRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
 import be.kommaboard.kareer.user.repository.entity.Invitation
@@ -26,7 +26,8 @@ import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.repository.entity.UserDetails
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
-import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
 import be.kommaboard.kareer.user.service.exception.TicketDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketExpiredException
@@ -51,7 +52,7 @@ import java.util.UUID
 class UserService(
     private val clock: Clock,
     private val kareerConfig: KareerConfig,
-    private val inviteRepository: InviteRepository,
+    private val invitationRepository: InvitationRepository,
     private val ticketRepository: TicketRepository,
     private val userRepository: UserRepository,
     private val mailingQueueService: MailingQueueService,
@@ -75,7 +76,7 @@ class UserService(
 
     fun getAllUsers(): List<User> = userRepository.findAll()
 
-    fun getAllInvites(): List<Invitation> = inviteRepository.findAll()
+    fun getAllInvitations(): List<Invitation> = invitationRepository.findAll()
 
     fun getPagedUsers(
         pageRequest: PageRequest,
@@ -93,13 +94,13 @@ class UserService(
         else -> userRepository.findAll(pageRequest)
     }
 
-    fun getPagedInvites(
+    fun getPagedInvitations(
         pageRequest: PageRequest,
         organizationUuid: UUID,
         status: Invitation.Status?,
     ) = when {
-        status != null -> inviteRepository.findAllByOrganizationUuidAndStatus(organizationUuid, status, pageRequest)
-        else -> inviteRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
+        status != null -> invitationRepository.findAllByOrganizationUuidAndStatus(organizationUuid, status, pageRequest)
+        else -> invitationRepository.findAllByOrganizationUuid(organizationUuid, pageRequest)
     }
 
     fun getUserByUuid(
@@ -112,10 +113,10 @@ class UserService(
     ) = userRepository.findBySlug(slug)
         ?: throw UserDoesNotExistException()
 
-    fun getInviteByUuid(
+    fun getInvitationByUuid(
         uuid: UUID,
-    ) = inviteRepository.findByUuid(uuid)
-        ?: throw InviteDoesNotExistException()
+    ) = invitationRepository.findByUuid(uuid)
+        ?: throw InvitationDoesNotExistException()
 
     fun getTicketByUuid(
         uuid: UUID,
@@ -233,12 +234,12 @@ class UserService(
         return user
     }
 
-    fun createInvite(
+    fun createInvitation(
         dto: CreateInvitationDTO,
         manager: User,
         organization: OrganizationDTO,
     ): Invitation {
-        val invitation = inviteRepository.saveAndFlush(
+        val invitation = invitationRepository.saveAndFlush(
             Invitation(
                 inviter = manager,
                 creationDate = ZonedDateTime.now(clock),
@@ -257,8 +258,8 @@ class UserService(
             ),
             inviterName = manager.fullName(),
             organizationName = organization.name,
-            inviteLink = kareerConfig.registerUrl!!
-                .replace("{inviteUuid}", invitation.uuid.toString())
+            registrationLink = kareerConfig.registerUrl!!
+                .replace("{invitationUuid}", invitation.uuid.toString())
                 .replace("{inviteeEmail}", invitation.inviteeEmail),
         )
         mailingQueueService.sendToQueue(mailDTO)
@@ -350,13 +351,13 @@ class UserService(
         },
     )
 
-    fun updateInviteStatus(
+    fun updateInvitationStatus(
         invitation: Invitation,
         status: Invitation.Status,
     ): Invitation {
         invitation.status = status
 
-        return inviteRepository.save(invitation)
+        return invitationRepository.save(invitation)
     }
 
     fun appendUserDetailsSkills(
@@ -367,17 +368,22 @@ class UserService(
             throw InvalidCredentialsException()
         }
 
-        return userRepository.save(
-            user.apply {
-                this.details.apply {
-                    dto.skills?.forEach {
-                        if (it.isNotBlank()) {
-                            this!!.skills[it.trim().lowercase().replace("\\W".toRegex(), "")] = it.trim()
-                        }
+        val updatedUser = user.apply {
+            this.details.apply {
+                dto.skills?.forEach {
+                    if (it.isNotBlank()) {
+                        this!!.skills[it.trim().lowercase().replace("\\W".toRegex(), "")] = it.trim()
                     }
                 }
-            },
-        )
+            }
+        }
+
+        // Magic number, but unfortunately no efficient way to sync this with @ItemSize constraint in lib-user
+        if (updatedUser.details!!.skills.size > 15) {
+            throw SkillLimitException(15)
+        }
+
+        return userRepository.save(updatedUser)
     }
 
     fun removeUserDetailsSkills(
@@ -388,17 +394,22 @@ class UserService(
             throw InvalidCredentialsException()
         }
 
-        return userRepository.save(
-            user.apply {
-                this.details.apply {
-                    dto.skills?.forEach {
-                        if (it.isNotBlank()) {
-                            this!!.skills.remove(it.trim().lowercase().replace("\\W".toRegex(), ""))
-                        }
+        val updatedUser = user.apply {
+            this.details.apply {
+                dto.skills?.forEach {
+                    if (it.isNotBlank()) {
+                        this!!.skills.remove(it.trim().lowercase().replace("\\W".toRegex(), ""))
                     }
                 }
-            },
-        )
+            }
+        }
+
+        // Magic number, but unfortunately no efficient way to sync this with @Size constraint in lib-user
+        if (updatedUser.details!!.skills.isEmpty()) {
+            throw SkillLimitException(15)
+        }
+
+        return userRepository.save(updatedUser)
     }
 
     fun confirmEmail(

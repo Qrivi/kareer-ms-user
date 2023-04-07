@@ -33,7 +33,7 @@ data class CreateUserDetailsDTO(
     val title: String?,
 
     @get:NotNull(message = "{CreateUserDetailsDTO.skills.NotNull}")
-    @get:Size(message = "{CreateUserDetailsDTO.skills.Size}", min = 1)
+    @get:Size(message = "{CreateUserDetailsDTO.skills.Size}", min = 1, max = 15)
     @get:ItemSize(message = "{CreateUserDetailsDTO.skills.ItemSize}", min = 1, max = 25)
     val skills: List<String>?,
 

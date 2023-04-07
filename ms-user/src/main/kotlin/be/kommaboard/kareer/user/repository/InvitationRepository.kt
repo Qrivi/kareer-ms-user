@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface InviteRepository : JpaRepository<Invitation, UUID> {
+interface InvitationRepository : JpaRepository<Invitation, UUID> {
 
     @Query("SELECT i FROM Invitation i JOIN i.inviter u WHERE u.details.organizationUuid = :organizationUuid")
     fun findAllByOrganizationUuid(organizationUuid: UUID, pageable: Pageable): Page<Invitation>

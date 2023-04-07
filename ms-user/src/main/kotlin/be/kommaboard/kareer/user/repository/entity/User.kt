@@ -3,6 +3,7 @@ package be.kommaboard.kareer.user.repository.entity
 import be.kommaboard.kareer.authorization.Role
 import be.kommaboard.kareer.authorization.Status
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -62,7 +63,7 @@ class User(
     @Column(name = "slug")
     var slug: String?,
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(name = "details_uuid")
     val details: UserDetails?,
 

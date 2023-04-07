@@ -1,6 +1,6 @@
 // ms-user
 group = "be.kommaboard.kareer"
-version = "0.0.3"
+version = "0.0.4"
 
 extra["springBootVersion"] = "3.0.3"
 extra["springCloudVersion"] = "2022.0.1"
@@ -37,7 +37,7 @@ dependencies {
     implementation("be.kommaboard.kareer:lib-authorization:0.0.3")
     implementation("be.kommaboard.kareer:lib-common:0.0.3")
     implementation("be.kommaboard.kareer:lib-user:$version")
-    implementation("be.kommaboard.kareer:lib-mailing:0.0.2")
+    implementation("be.kommaboard.kareer:lib-mailing:0.0.3")
     implementation("be.kommaboard.kareer:lib-organization:0.0.1")
     implementation("be.kommaboard.kareer:lib-storage:0.0.1")
     // Kotlin (required by Spring Web)
