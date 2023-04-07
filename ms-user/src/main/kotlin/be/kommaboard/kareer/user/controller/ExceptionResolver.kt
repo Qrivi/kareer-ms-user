@@ -3,7 +3,7 @@ package be.kommaboard.kareer.user.controller
 import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.CommonMessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
-import be.kommaboard.kareer.user.service.exception.CredentialsIncorrectException
+import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.InvitationInvalidException
 import be.kommaboard.kareer.user.service.exception.InvitationStatusInvalidException
@@ -25,10 +25,10 @@ class ExceptionResolver(
 ) {
 
     @ExceptionHandler
-    fun resolve(e: CredentialsIncorrectException) = ResponseEntity
+    fun resolve(e: IncorrectCredentialsException) = ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
-        .body(ErrorsDTO(commonMessageService["exception.CredentialsIncorrect"]))
+        .body(ErrorsDTO(commonMessageService["exception.IncorrectCredentials"]))
 
     @ExceptionHandler
     fun resolve(e: InvitationDoesNotExistException) = ResponseEntity
