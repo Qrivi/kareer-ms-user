@@ -4,9 +4,9 @@ import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.CommonMessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
-import be.kommaboard.kareer.user.service.exception.InvalidInviteException
-import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
-import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.InvalidInvitationException
+import be.kommaboard.kareer.user.service.exception.InvalidInvitationStatusException
+import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
@@ -27,22 +27,22 @@ class ExceptionResolver(
         .body(ErrorsDTO(commonMessageService["exception.IncorrectCredentials"]))
 
     @ExceptionHandler
-    fun resolve(e: InvalidInviteException) = ResponseEntity
+    fun resolve(e: InvalidInvitationException) = ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
-        .body(ErrorsDTO(commonMessageService["exception.InvalidInvite"]))
+        .body(ErrorsDTO(commonMessageService["exception.InvalidInvitation"]))
 
     @ExceptionHandler
-    fun resolve(e: InvalidInviteStatusException) = ResponseEntity
+    fun resolve(e: InvalidInvitationStatusException) = ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
-        .body(ErrorsDTO(commonMessageService["exception.InvalidInviteStatus", e.value]))
+        .body(ErrorsDTO(commonMessageService["exception.InvalidInvitationStatus", e.value]))
 
     @ExceptionHandler
-    fun resolve(e: InviteDoesNotExistException) = ResponseEntity
+    fun resolve(e: InvitationDoesNotExistException) = ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .headers(HttpHeadersBuilder().contentLanguage().build())
-        .body(ErrorsDTO(commonMessageService["exception.InviteDoesNotExist"]))
+        .body(ErrorsDTO(commonMessageService["exception.InvitationDoesNotExist"]))
 
     @ExceptionHandler
     fun resolve(e: SkillLimitException) = ResponseEntity

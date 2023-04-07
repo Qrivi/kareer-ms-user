@@ -28,7 +28,7 @@ import be.kommaboard.kareer.user.proxy.StorageProxy
 import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
-import be.kommaboard.kareer.user.service.exception.InvalidInviteException
+import be.kommaboard.kareer.user.service.exception.InvalidInvitationException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -189,12 +189,12 @@ class UserController(
             throw RequestValidationException(validation)
         }
 
-        // Get the invite details if we were passed an invitation UUID
-        val invitation = userService.getInviteByUuid(dto.invitationUuid!!.toUuid())
+        // Get the invitation details if we were passed an invitation UUID
+        val invitation = userService.getInvitationByUuid(dto.invitationUuid!!.toUuid())
 
-        // Only PENDING invites can be used to create a new user
+        // Only PENDING invitations can be used to create a new user
         if (invitation.status != Invitation.Status.PENDING) {
-            throw InvalidInviteException()
+            throw InvalidInvitationException()
         }
 
         // Assuming this won't throw a FeignException because the inviter should always belong to an existing organization
@@ -212,7 +212,7 @@ class UserController(
         )
 
         // Prevent an invitation from being used multiple times
-        userService.updateInviteStatus(invitation, Invitation.Status.ACCEPTED)
+        userService.updateInvitationStatus(invitation, Invitation.Status.ACCEPTED)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

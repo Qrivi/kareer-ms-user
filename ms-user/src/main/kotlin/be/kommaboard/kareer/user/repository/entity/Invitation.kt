@@ -1,7 +1,7 @@
 package be.kommaboard.kareer.user.repository.entity
 
 import be.kommaboard.kareer.user.lib.dto.response.InvitationDTO
-import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
+import be.kommaboard.kareer.user.service.exception.InvalidInvitationStatusException
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -71,5 +71,5 @@ class Invitation(
 fun String.toInvitationStatus(): Invitation.Status = try {
     Invitation.Status.valueOf(this.trim().uppercase())
 } catch (e: IllegalArgumentException) {
-    throw InvalidInviteStatusException(this.trim())
+    throw InvalidInvitationStatusException(this.trim())
 }
