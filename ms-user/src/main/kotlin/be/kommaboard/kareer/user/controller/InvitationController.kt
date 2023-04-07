@@ -20,7 +20,7 @@ import be.kommaboard.kareer.user.proxy.OrganizationProxy
 import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.toInvitationStatus
 import be.kommaboard.kareer.user.service.UserService
-import be.kommaboard.kareer.user.service.exception.InvalidInvitationStatusException
+import be.kommaboard.kareer.user.service.exception.InvitationStatusInvalidException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -195,7 +195,7 @@ class InvitationController(
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER)
 
         val invitation = userService.getInvitationByUuid(uuid.toUuid())
-        val status = dto.status?.toInvitationStatus() ?: throw InvalidInvitationStatusException(dto.status ?: "")
+        val status = dto.status?.toInvitationStatus() ?: throw InvitationStatusInvalidException(dto.status ?: "")
 
         // Extra requirements if performed as a manager
         if (consumerRole.isRole(Role.MANAGER)) {
@@ -208,7 +208,7 @@ class InvitationController(
 
             // Managers can not accept or decline invitations (only the invitee can), but can retract invitations or undo retraction
             if (status != Invitation.Status.PENDING && status != Invitation.Status.RETRACTED) {
-                throw InvalidInvitationStatusException(status.name.lowercase())
+                throw InvitationStatusInvalidException(status.name.lowercase())
             }
         }
 

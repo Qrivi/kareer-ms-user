@@ -28,7 +28,7 @@ import be.kommaboard.kareer.user.proxy.StorageProxy
 import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.service.UserService
-import be.kommaboard.kareer.user.service.exception.InvalidInvitationException
+import be.kommaboard.kareer.user.service.exception.InvitationInvalidException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -114,7 +114,7 @@ class UserController(
         }
 
         if (sort.contains("password")) {
-            // Disable sorting on password
+            // If a smartass tries to sort on the password, the same exception is thrown as if the field doesn't exist
             throw PropertyReferenceException("password", TypeInformation.of(User::class.java), listOf())
         }
 
@@ -194,7 +194,7 @@ class UserController(
 
         // Only PENDING invitations can be used to create a new user
         if (invitation.status != Invitation.Status.PENDING) {
-            throw InvalidInvitationException()
+            throw InvitationInvalidException()
         }
 
         // Assuming this won't throw a FeignException because the inviter should always belong to an existing organization

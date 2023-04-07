@@ -25,7 +25,7 @@ import be.kommaboard.kareer.user.repository.entity.Invitation
 import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.repository.entity.UserDetails
-import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
+import be.kommaboard.kareer.user.service.exception.CredentialsIncorrectException
 import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
@@ -127,8 +127,8 @@ class UserService(
         uuid: UUID,
         password: String,
     ): User {
-        val user = userRepository.findByUuid(uuid) ?: throw IncorrectCredentialsException()
-        if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
+        val user = userRepository.findByUuid(uuid) ?: throw CredentialsIncorrectException()
+        if (!BCrypt.checkpw(password, user.password)) throw CredentialsIncorrectException()
         return user
     }
 
@@ -136,8 +136,8 @@ class UserService(
         email: String,
         password: String,
     ): User {
-        val user = userRepository.findByEmailIgnoreCase(email) ?: throw IncorrectCredentialsException()
-        if (!BCrypt.checkpw(password, user.password)) throw IncorrectCredentialsException()
+        val user = userRepository.findByEmailIgnoreCase(email) ?: throw CredentialsIncorrectException()
+        if (!BCrypt.checkpw(password, user.password)) throw CredentialsIncorrectException()
         return user
     }
 
