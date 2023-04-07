@@ -7,6 +7,7 @@ import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InvalidInviteException
 import be.kommaboard.kareer.user.service.exception.InvalidInviteStatusException
 import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.UserAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.UserDoesNotExistException
 import org.springframework.http.HttpStatus
@@ -42,6 +43,12 @@ class ExceptionResolver(
         .status(HttpStatus.NOT_FOUND)
         .headers(HttpHeadersBuilder().contentLanguage().build())
         .body(ErrorsDTO(commonMessageService["exception.InviteDoesNotExist"]))
+
+    @ExceptionHandler
+    fun resolve(e: SkillLimitException) = ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(commonMessageService["exception.SkillLimitException", e.limit]))
 
     @ExceptionHandler
     fun resolve(e: UserAlreadyExistsException) = ResponseEntity

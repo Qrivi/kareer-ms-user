@@ -27,6 +27,7 @@ import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.repository.entity.UserDetails
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InviteDoesNotExistException
+import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
 import be.kommaboard.kareer.user.service.exception.TicketDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.TicketExpiredException
@@ -367,17 +368,22 @@ class UserService(
             throw InvalidCredentialsException()
         }
 
-        return userRepository.save(
-            user.apply {
-                this.details.apply {
-                    dto.skills?.forEach {
-                        if (it.isNotBlank()) {
-                            this!!.skills[it.trim().lowercase().replace("\\W".toRegex(), "")] = it.trim()
-                        }
+        val updatedUser = user.apply {
+            this.details.apply {
+                dto.skills?.forEach {
+                    if (it.isNotBlank()) {
+                        this!!.skills[it.trim().lowercase().replace("\\W".toRegex(), "")] = it.trim()
                     }
                 }
-            },
-        )
+            }
+        }
+
+        // Magic number, but unfortunately no efficient way to sync this with @ItemSize constraint in lib-user
+        if (updatedUser.details!!.skills.size > 15) {
+            throw SkillLimitException(15)
+        }
+
+        return userRepository.save(updatedUser)
     }
 
     fun removeUserDetailsSkills(
@@ -388,17 +394,22 @@ class UserService(
             throw InvalidCredentialsException()
         }
 
-        return userRepository.save(
-            user.apply {
-                this.details.apply {
-                    dto.skills?.forEach {
-                        if (it.isNotBlank()) {
-                            this!!.skills.remove(it.trim().lowercase().replace("\\W".toRegex(), ""))
-                        }
+        val updatedUser = user.apply {
+            this.details.apply {
+                dto.skills?.forEach {
+                    if (it.isNotBlank()) {
+                        this!!.skills.remove(it.trim().lowercase().replace("\\W".toRegex(), ""))
                     }
                 }
-            },
-        )
+            }
+        }
+
+        // Magic number, but unfortunately no efficient way to sync this with @Size constraint in lib-user
+        if (updatedUser.details!!.skills.isEmpty()) {
+            throw SkillLimitException(15)
+        }
+
+        return userRepository.save(updatedUser)
     }
 
     fun confirmEmail(
