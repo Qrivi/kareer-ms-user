@@ -37,7 +37,7 @@ LABEL org.opencontainers.image.description="Kareer microservice for user managem
 # Delayed run (to startup failures and log spam because of dependencies still starting up)
 ENTRYPOINT [ "/bin/bash", \
   "-c", \
-  "echo Startup in 15s…; sleep 15; java -XX:InitialRAMPercentage=60 -XX:MaxRAMPercentage=90 -XX:+HeapDumpOnOutOfMemoryError -jar kareer-ms-user.jar" ]
+  "echo Startup in 15s…; sleep 15; java -XX:InitialRAMPercentage=40 -XX:MaxRAMPercentage=60 -XX:+HeapDumpOnOutOfMemoryError -jar kareer-ms-user.jar" ]
 
 # Health check
 HEALTHCHECK --start-period=30s --interval=30s --timeout=10s --retries=3 \
