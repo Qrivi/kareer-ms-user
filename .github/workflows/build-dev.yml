@@ -1,4 +1,4 @@
-name: Image creation
+name: Build DEV image
 
 on:
   workflow_dispatch:

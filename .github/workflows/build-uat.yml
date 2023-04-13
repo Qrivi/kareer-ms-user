@@ -1,0 +1,82 @@
+name: Build UAT image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ stable ]
+
+env:
+  REGISTRY: ghcr.io
+  REGISTRY_USER: kommaboard
+  REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  uat-latest:
+    name: uat-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Checkout codebase
+        id: checkout-codebase
+        uses: actions/checkout@v3.3.0
+        with:
+          ref: ${{ github.ref }}
+      - name: Log in to registry
+        id: login-to-registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
+      - name: Extract version
+        id: extract-version
+        run: echo "version=$(cat ./ms-user/build.gradle.kts | grep ^version | awk -F'"' '{print $2}')" >> $GITHUB_OUTPUT
+      - name: Extract metadata
+        id: extract-metadata
+        uses: docker/metadata-action@v4.3.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.REGISTRY_USER }}/kareer-ms-user
+          flavor: |
+            latest=auto
+            prefix=uat-,onlatest=true
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.extract-version.outputs.version }}
+      - name: Build and push image
+        id: build-and-push-image
+        uses: docker/build-push-action@v4.0.0
+        with:
+          context: ./ms-user
+          push: true
+          tags: ${{ steps.extract-metadata.outputs.tags }}
+          labels: ${{ steps.extract-metadata.outputs.labels }}
+      - name: Inform the team
+        id: inform-team
+        run: |
+          META_TAGS="$(echo ${{ join(fromJSON(steps.extract-metadata.outputs.json).tags) }} | sed 's/${{ env.REGISTRY }}\/${{ env.REGISTRY_USER }}\/kareer-ms-user:/\`/g' | sed 's/,/\`, /g')\`"
+          SLACK_CONTENT="{
+            \"blocks\": [
+              {
+                \"type\": \"section\",
+                \"text\": {
+                  \"type\": \"mrkdwn\",
+                  \"text\": \"CI/CD pushed new image tags to <https://github.com/kommaboard/kareer-ms-user/pkgs/container/kareer-ms-user|GitHub Packages>! :whale:\"
+                }
+              },
+              {
+                \"type\": \"section\",
+                \"fields\": [
+                  {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Image*\n\`kommaboard\/kareer-ms-user\`\"
+                  },
+                  {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Tags*\n$META_TAGS\"
+                  }
+                ]
+              }
+            ]
+          }"
+          curl -X POST -H "Content-type: application/json" --data "$SLACK_CONTENT" $SLACK_WEBHOOK_URL
