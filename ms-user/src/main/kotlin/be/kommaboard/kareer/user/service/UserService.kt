@@ -253,6 +253,8 @@ class UserService(
         val mailDTO = UserInvitationMailDTO(
             meta = MailMeta(
                 language = LocaleContextHolder.getLocale().language,
+                headerImage = organization.logoUrl ?: "https://kareer-dev.kommaboard.be/static/favicon.svg",
+                headerText = organization.name,
                 recipientEmail = invitation.inviteeEmail,
                 recipientName = invitation.inviteeFirstName,
             ),
