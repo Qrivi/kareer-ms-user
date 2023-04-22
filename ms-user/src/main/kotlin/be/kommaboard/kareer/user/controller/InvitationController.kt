@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/users/v1/invitations")
+@RequestMapping("/invitations/v1")
 class InvitationController(
     private val kareerConfig: KareerConfig,
     private val userService: UserService,
