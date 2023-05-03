@@ -7,16 +7,16 @@ import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [NotSimpleValidator::class])
-annotation class NotSimple(
-    val message: String = "constraint.NotSimple.message",
+@Constraint(validatedBy = [NotSimplePasswordValidator::class])
+annotation class NotSimplePassword(
+    val message: String = "constraint.NotSimplePassword.message",
     val groups: Array<KClass<out Any>> = [],
     val payload: Array<KClass<out Any>> = [],
 )
 
-class NotSimpleValidator : ConstraintValidator<NotSimple, String> {
+class NotSimplePasswordValidator : ConstraintValidator<NotSimplePassword, String> {
 
-    override fun initialize(constraintAnnotation: NotSimple) {}
+    override fun initialize(constraintAnnotation: NotSimplePassword) {}
 
     // Regex checks for 1 uppercase, 1 lowercase and 1 number
     override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {

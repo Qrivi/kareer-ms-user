@@ -1,7 +1,7 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.NotCommon
-import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import be.kommaboard.kareer.user.lib.constraint.NotCommonPassword
+import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -15,8 +15,8 @@ data class CreateAdminDTO(
 
     @get:NotBlank(message = "{CreateAdminDTO.password.NotBlank}")
     @get:Size(message = "{CreateAdminDTO.password.Size}", min = 8)
-    @get:NotCommon(message = "{CreateAdminDTO.password.NotCommon}")
-    @get:NotSimple(message = "{CreateAdminDTO.password.NotSimple}")
+    @get:NotCommonPassword(message = "{CreateAdminDTO.password.NotCommonPassword}")
+    @get:NotSimplePassword(message = "{CreateAdminDTO.password.NotSimplePassword}")
     val password: String?,
 
     @get:NotBlank(message = "{CreateAdminDTO.lastName.NotBlank}")

@@ -1,7 +1,8 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.NotCommon
-import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import be.kommaboard.kareer.user.lib.constraint.NotBlacklistedSlug
+import be.kommaboard.kareer.user.lib.constraint.NotCommonPassword
+import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -22,8 +23,8 @@ data class CreateUserDTO(
 
     @get:NotBlank(message = "{CreateUserDTO.password.NotBlank}")
     @get:Size(message = "{CreateUserDTO.password.Size}", min = 8)
-    @get:NotCommon(message = "{CreateUserDTO.password.NotCommon}")
-    @get:NotSimple(message = "{CreateUserDTO.password.NotSimple}")
+    @get:NotCommonPassword(message = "{CreateUserDTO.password.NotCommonPassword}")
+    @get:NotSimplePassword(message = "{CreateUserDTO.password.NotSimplePassword}")
     val password: String?,
 
     @get:NotBlank(message = "{CreateUserDTO.lastName.NotBlank}")
@@ -39,6 +40,7 @@ data class CreateUserDTO(
 
     @get:Size(message = "{CreateUserDTO.slug.Size}", max = 50)
     @get:Pattern(message = "{CreateUserDTO.slug.Pattern}", regexp = "^[\\w.]+\$")
+    @get:NotBlacklistedSlug(message = "{CreateUserDTO.slug.NotBlacklistedSlug}")
     val slug: String?,
 
     @get:Valid

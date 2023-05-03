@@ -7,16 +7,16 @@ import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [NotCommonValidator::class])
-annotation class NotCommon(
-    val message: String = "constraint.NotCommon.message",
+@Constraint(validatedBy = [NotCommonPasswordValidator::class])
+annotation class NotCommonPassword(
+    val message: String = "constraint.NotCommonPassword.message",
     val groups: Array<KClass<out Any>> = [],
     val payload: Array<KClass<out Any>> = [],
 )
 
-class NotCommonValidator : ConstraintValidator<NotCommon, String> {
+class NotCommonPasswordValidator : ConstraintValidator<NotCommonPassword, String> {
 
-    override fun initialize(constraintAnnotation: NotCommon) {}
+    override fun initialize(constraintAnnotation: NotCommonPassword) {}
 
     override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {
         return if (value == null) {

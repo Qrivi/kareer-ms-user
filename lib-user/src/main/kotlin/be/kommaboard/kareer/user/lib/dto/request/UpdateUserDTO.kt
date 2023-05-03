@@ -1,7 +1,7 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.NotCommon
-import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import be.kommaboard.kareer.user.lib.constraint.NotCommonPassword
+import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -20,8 +20,8 @@ data class UpdateUserDTO(
 
     @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.password.NotBlank}")
     @get:Size(message = "{UpdateUserDTO.password.size}", min = 8)
-    @get:NotCommon(message = "{UpdateUserDTO.password.NotCommon}")
-    @get:NotSimple(message = "{UpdateUserDTO.password.NotSimple}")
+    @get:NotCommonPassword(message = "{UpdateUserDTO.password.NotCommonPassword}")
+    @get:NotSimplePassword(message = "{UpdateUserDTO.password.NotSimplePassword}")
     val password: String?,
 
     @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDTO.lastName.NotBlank}")
