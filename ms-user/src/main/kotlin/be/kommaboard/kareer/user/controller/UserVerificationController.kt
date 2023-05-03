@@ -27,11 +27,10 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.Clock
 
 @RestController
-@RequestMapping("/users/v1/verification")
-class VerificationController(
+@RequestMapping("/userverification/v1")
+class UserVerificationController(
     private val kareerConfig: KareerConfig,
     private val userService: UserService,
-    private val clock: Clock,
 ) {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 

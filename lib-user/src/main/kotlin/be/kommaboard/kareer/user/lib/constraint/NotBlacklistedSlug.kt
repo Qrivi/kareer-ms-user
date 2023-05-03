@@ -23,9 +23,8 @@ class NotBlacklistedSlugValidator : ConstraintValidator<NotBlacklistedSlug, Stri
             true
         } else {
             setOf(
-                // Slugs we should not allow because e.g. they might be offensive or because they can collide with existing endpoint paths
-                "invitations",
-                "verification",
+                // Slugs we should not allow because e.g. they might be offensive
+                "poop",
             ).none { it.equals(value, ignoreCase = true) }
         }
     }
