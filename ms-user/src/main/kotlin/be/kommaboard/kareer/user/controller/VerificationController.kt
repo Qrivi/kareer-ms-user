@@ -37,14 +37,14 @@ class VerificationController(
 
     @Operation(hidden = true)
     @PostMapping
-    fun verifyUserCredentials(
+    fun verifyCredentials(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @Valid @RequestBody
         dto: VerifyCredentialsDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
-        logger.info("Handling POST /users/v1/verification [verifyUserCredentials] for {}", consumerId)
+        logger.info("Handling POST /users/v1/verification [verifyCredentials] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (validation.hasErrors()) {
