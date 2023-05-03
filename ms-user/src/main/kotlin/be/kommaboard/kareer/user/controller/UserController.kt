@@ -20,7 +20,6 @@ import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
-import be.kommaboard.kareer.user.lib.dto.request.VerifyCredentialsDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyPasswordDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
@@ -114,15 +113,15 @@ class UserController(
         }
 
         if (sort.contains("password")) {
-            // If a smartass tries to sort on the password, the same exception is thrown as if the field doesn't exist
+            // If a smartass tries to sort on the password, the same exception as if the field doesn't exist is thrown
             throw PropertyReferenceException("password", TypeInformation.of(User::class.java), listOf())
         }
 
         val usersPage = userService.getPagedUsers(
             pageRequest = PageRequest.of(page - 1, size, sort.toSort()),
             keywords = keywords.trimOrNullIfBlank(),
-            roles = role.trimOrNullIfBlank()?.split(",")?.map { it.trim().toRole() },
             organizationUuid = if (consumerRole.isRole(Role.ADMIN)) organizationUuid.trimOrNullIfBlank()?.toUuid() else userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid,
+            roles = role.trimOrNullIfBlank()?.split(",")?.map { it.trim().toRole() },
         )
 
         return ResponseEntity
@@ -338,33 +337,6 @@ class UserController(
             .body(user.toDTO())
     }
 
-    @Operation(hidden = true)
-    @PostMapping("/verify")
-    fun verifyUserCredentials(
-        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
-        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
-        @Valid @RequestBody
-        dto: VerifyCredentialsDTO,
-        validation: BindingResult,
-    ): ResponseEntity<UserDTO> {
-        logger.info("Handling POST /users/v1/verify [verifyUserCredentials] for {}", consumerId)
-        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
-
-        if (validation.hasErrors()) {
-            throw RequestValidationException(validation)
-        }
-
-        val user = userService.getUserByEmailAndPassword(
-            email = dto.email!!,
-            password = dto.password!!,
-        )
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(user.toDTO())
-    }
-
     // endregion
     // region UserDetails skills
 
@@ -433,7 +405,7 @@ class UserController(
         )
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
             .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
     }

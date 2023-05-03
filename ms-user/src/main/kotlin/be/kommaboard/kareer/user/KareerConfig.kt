@@ -1,7 +1,7 @@
 package be.kommaboard.kareer.user
 
-import be.kommaboard.kareer.user.lib.constraint.NotCommon
-import be.kommaboard.kareer.user.lib.constraint.NotSimple
+import be.kommaboard.kareer.user.lib.constraint.NotCommonPassword
+import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -40,8 +40,8 @@ data class KareerConfig(
      * Default admin password
      */
     @get:NotBlank(message = "admin-password cannot be blank.")
-    @get:NotSimple(message = "admin-password cannot be too simple.")
-    @get:NotCommon(message = "admin-password cannot be too common.")
+    @get:NotSimplePassword(message = "admin-password cannot be too simple.")
+    @get:NotCommonPassword(message = "admin-password cannot be too common.")
     @get:Size(message = "admin-password must be 8 characters or more.", min = 8)
     var adminPassword: String? = null,
 

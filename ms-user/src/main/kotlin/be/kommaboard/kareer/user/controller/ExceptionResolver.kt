@@ -6,6 +6,7 @@ import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
 import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.InvitationInvalidException
+import be.kommaboard.kareer.user.service.exception.InvitationMismatchException
 import be.kommaboard.kareer.user.service.exception.InvitationStatusInvalidException
 import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
@@ -41,6 +42,12 @@ class ExceptionResolver(
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
         .body(ErrorsDTO(commonMessageService["exception.InvitationInvalid"]))
+
+    @ExceptionHandler
+    fun resolve(e: InvitationMismatchException) = ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(commonMessageService["exception.InvitationMismatch"]))
 
     @ExceptionHandler
     fun resolve(e: InvitationStatusInvalidException) = ResponseEntity

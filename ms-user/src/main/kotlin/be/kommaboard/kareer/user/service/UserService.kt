@@ -74,6 +74,10 @@ class UserService(
         }
     }
 
+    fun userEmailInUse(
+        email: String,
+    ) = userRepository.existsByEmailIgnoreCase(email)
+
     fun getAllUsers(): List<User> = userRepository.findAll()
 
     fun getAllInvitations(): List<Invitation> = invitationRepository.findAll()
