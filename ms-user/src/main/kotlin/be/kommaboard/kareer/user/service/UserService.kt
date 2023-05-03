@@ -42,6 +42,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.bcrypt.BCrypt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -266,7 +268,7 @@ class UserService(
             organizationName = organization.name,
             registrationLink = kareerConfig.registerUrl!!
                 .replace("{invitationUuid}", invitation.uuid.toString())
-                .replace("{inviteeEmail}", invitation.inviteeEmail),
+                .replace("{inviteeEmail}", URLEncoder.encode(invitation.inviteeEmail, StandardCharsets.UTF_8)),
         )
         mailingQueueService.sendToQueue(mailDTO)
 
