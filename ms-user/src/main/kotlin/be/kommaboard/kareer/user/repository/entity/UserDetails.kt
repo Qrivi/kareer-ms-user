@@ -71,7 +71,7 @@ class UserDetails(
     var birthday: LocalDate?,
 
     @Column(name = "about")
-    var about: String,
+    var about: String?,
 ) {
 
     fun toDTO() = UserDetailsDTO(

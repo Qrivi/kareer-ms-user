@@ -42,7 +42,7 @@ class UserVerificationController(
         dto: VerifyCredentialsDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
-        logger.info("Handling POST /users/v1/verification [verifyCredentials] for {}", consumerId)
+        logger.info("Handling POST /userverification/v1 [verifyCredentials] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (validation.hasErrors()) {
@@ -67,7 +67,7 @@ class UserVerificationController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @RequestBody dto: VerifyInvitationDTO,
     ): ResponseEntity<InvitationDTO> {
-        logger.info("Handling POST /users/v1/verification/invitation [verifyInvitation] for {}", consumerId)
+        logger.info("Handling POST /userverification/v1/invitation [verifyInvitation] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (dto.invitationUuid == null || dto.email == null) {
@@ -93,7 +93,7 @@ class UserVerificationController(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
         @RequestBody dto: VerifyInvitationDTO,
     ): ResponseEntity<Unit> {
-        logger.info("Handling POST /users/v1/verification/registration [verifyRegistration] for {}", consumerId)
+        logger.info("Handling POST /userverification/v1/registration [verifyRegistration] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole)
 
         if (dto.invitationUuid == null || dto.email == null) {

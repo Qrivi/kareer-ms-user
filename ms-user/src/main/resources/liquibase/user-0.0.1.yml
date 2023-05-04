@@ -174,7 +174,7 @@ databaseChangeLog:
                   name: about
                   type: CLOB
                   constraints:
-                    nullable: false
+                    nullable: true
                     unique: false
         - createTable:
             tableName: user_skills

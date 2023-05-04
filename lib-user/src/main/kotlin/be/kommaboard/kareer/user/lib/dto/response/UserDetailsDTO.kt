@@ -16,5 +16,5 @@ data class UserDetailsDTO(
     val skills: List<String>,
     val experienceDate: LocalDate,
     val birthday: LocalDate?,
-    val about: String,
+    val about: String?,
 )

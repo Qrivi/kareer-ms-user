@@ -214,7 +214,7 @@ class UserService(
                     experienceDate = dto.details?.experienceDate ?: localNow,
                     birthday = dto.details?.birthday,
                     startDate = localNow,
-                    about = dto.details?.about!!,
+                    about = dto.details?.about,
                 ),
                 avatarReference = null,
                 bannerReference = null,
