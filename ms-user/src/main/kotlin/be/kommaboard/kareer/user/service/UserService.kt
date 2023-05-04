@@ -203,18 +203,18 @@ class UserService(
                 slug = dto.slug,
                 details = UserDetails(
                     organizationUuid = organization.uuid,
-                    phone = dto.details!!.phone,
-                    locationAddress = dto.details!!.locationAddress.trimOrNullIfBlank(),
-                    locationAddress2 = dto.details!!.locationAddress2.trimOrNullIfBlank(),
-                    locationCode = dto.details!!.locationCode.trimOrNullIfBlank(),
-                    locationCity = dto.details!!.locationCity.trimOrNullIfBlank(),
-                    locationCountry = dto.details!!.locationCountry.trimOrNullIfBlank(),
-                    title = dto.details!!.title.trimOrNullIfBlank() ?: "${organization.name} Employee",
-                    skills = skillsMap(dto.details!!.skills!!),
-                    experienceDate = dto.details!!.experienceDate ?: localNow,
-                    birthday = dto.details!!.birthday,
+                    phone = dto.details?.phone,
+                    locationAddress = dto.details?.locationAddress.trimOrNullIfBlank(),
+                    locationAddress2 = dto.details?.locationAddress2.trimOrNullIfBlank(),
+                    locationCode = dto.details?.locationCode.trimOrNullIfBlank(),
+                    locationCity = dto.details?.locationCity.trimOrNullIfBlank(),
+                    locationCountry = dto.details?.locationCountry.trimOrNullIfBlank(),
+                    title = dto.details?.title.trimOrNullIfBlank() ?: "${organization.name} Employee",
+                    skills = skillsMap(dto.details?.skills),
+                    experienceDate = dto.details?.experienceDate ?: localNow,
+                    birthday = dto.details?.birthday,
                     startDate = localNow,
-                    about = dto.details!!.about!!,
+                    about = dto.details?.about!!,
                 ),
                 avatarReference = null,
                 bannerReference = null,
@@ -412,11 +412,6 @@ class UserService(
             }
         }
 
-        // Magic number, but unfortunately no efficient way to sync this with @Size constraint in lib-user
-        if (updatedUser.details!!.skills.isEmpty()) {
-            throw SkillLimitException(15)
-        }
-
         return userRepository.save(updatedUser)
     }
 
@@ -448,5 +443,5 @@ class UserService(
         return user
     }
 
-    private fun skillsMap(skills: List<String>) = skills.filterNot { it.isBlank() }.associate { it.trim().lowercase().replace("\\W".toRegex(), "") to it.trim() }.toMutableMap()
+    private fun skillsMap(skills: List<String>?) = skills?.filterNot { it.isBlank() }?.associate { it.trim().lowercase().replace("\\W".toRegex(), "") to it.trim() }?.toMutableMap() ?: mutableMapOf()
 }

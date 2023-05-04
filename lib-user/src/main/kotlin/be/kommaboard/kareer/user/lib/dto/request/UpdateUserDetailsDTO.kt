@@ -35,7 +35,7 @@ data class UpdateUserDetailsDTO(
     @get:Size(message = "{UpdateUserDetailsDTO.title.Size}", max = 100)
     val title: String?,
 
-    @get:Size(message = "{UpdateUserDetailsDTO.skills.Size}", min = 1, max = 15)
+    @get:Size(message = "{UpdateUserDetailsDTO.skills.Size}", max = 15)
     @get:ItemSize(message = "{UpdateUserDetailsDTO.skills.ItemSize}", min = 1, max = 25)
     val skills: List<String>?,
 

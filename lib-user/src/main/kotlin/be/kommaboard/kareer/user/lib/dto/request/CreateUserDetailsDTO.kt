@@ -1,8 +1,6 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
 import be.kommaboard.kareer.user.lib.constraint.ItemSize
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -28,12 +26,10 @@ data class CreateUserDetailsDTO(
     @get:Size(message = "{CreateUserDetailsDTO.locationCountry.Size}", max = 100)
     val locationCountry: String?,
 
-    @get:NotBlank(message = "{CreateUserDetailsDTO.title.NotBlank}")
     @get:Size(message = "{CreateUserDetailsDTO.title.Size}", max = 100)
     val title: String?,
 
-    @get:NotNull(message = "{CreateUserDetailsDTO.skills.NotNull}")
-    @get:Size(message = "{CreateUserDetailsDTO.skills.Size}", min = 1, max = 15)
+    @get:Size(message = "{CreateUserDetailsDTO.skills.Size}", max = 15)
     @get:ItemSize(message = "{CreateUserDetailsDTO.skills.ItemSize}", min = 1, max = 25)
     val skills: List<String>?,
 

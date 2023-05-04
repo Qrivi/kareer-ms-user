@@ -6,7 +6,6 @@ import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
@@ -44,6 +43,5 @@ data class CreateUserDTO(
     val slug: String?,
 
     @get:Valid
-    @get:NotNull(message = "{CreateUserDTO.details.NotNull}")
     val details: CreateUserDetailsDTO?,
 )
