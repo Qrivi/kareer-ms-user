@@ -163,8 +163,6 @@ class InvitationController(
             throw RequestValidationException(validation)
         }
 
-        // TODO Add a check to avoid creation of multiple invitations to the same e-mail address?
-
         val invitation = userService.createInvitation(
             dto = dto,
             manager = manager,

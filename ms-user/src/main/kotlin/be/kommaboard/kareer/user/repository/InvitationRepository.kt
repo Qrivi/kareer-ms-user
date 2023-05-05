@@ -18,4 +18,6 @@ interface InvitationRepository : JpaRepository<Invitation, UUID> {
     fun findAllByOrganizationUuidAndStatus(organizationUuid: UUID, status: Invitation.Status, pageable: Pageable): Page<Invitation>
 
     fun findByUuid(uuid: UUID): Invitation?
+
+    fun existsByInviteeEmailIgnoreCase(email: String): Boolean
 }

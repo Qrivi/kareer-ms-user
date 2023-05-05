@@ -4,6 +4,7 @@ import be.kommaboard.kareer.common.dto.ErrorsDTO
 import be.kommaboard.kareer.common.service.CommonMessageService
 import be.kommaboard.kareer.common.util.HttpHeadersBuilder
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
+import be.kommaboard.kareer.user.service.exception.InvitationAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.InvitationInvalidException
 import be.kommaboard.kareer.user.service.exception.InvitationMismatchException
@@ -30,6 +31,12 @@ class ExceptionResolver(
         .status(HttpStatus.BAD_REQUEST)
         .headers(HttpHeadersBuilder().contentLanguage().build())
         .body(ErrorsDTO(commonMessageService["exception.IncorrectCredentials"]))
+
+    @ExceptionHandler
+    fun resolve(e: InvitationAlreadyExistsException) = ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .headers(HttpHeadersBuilder().contentLanguage().build())
+        .body(ErrorsDTO(commonMessageService["exception.InvitationAlreadyExists", e.email]))
 
     @ExceptionHandler
     fun resolve(e: InvitationDoesNotExistException) = ResponseEntity

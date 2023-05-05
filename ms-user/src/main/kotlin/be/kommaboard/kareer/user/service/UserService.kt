@@ -26,6 +26,7 @@ import be.kommaboard.kareer.user.repository.entity.Ticket
 import be.kommaboard.kareer.user.repository.entity.User
 import be.kommaboard.kareer.user.repository.entity.UserDetails
 import be.kommaboard.kareer.user.service.exception.IncorrectCredentialsException
+import be.kommaboard.kareer.user.service.exception.InvitationAlreadyExistsException
 import be.kommaboard.kareer.user.service.exception.InvitationDoesNotExistException
 import be.kommaboard.kareer.user.service.exception.SkillLimitException
 import be.kommaboard.kareer.user.service.exception.TicketAlreadyUsedException
@@ -245,11 +246,16 @@ class UserService(
         manager: User,
         organization: OrganizationDTO,
     ): Invitation {
+        val formattedEmail = dto.email!!.trim().lowercase()
+        if (invitationRepository.existsByInviteeEmailIgnoreCase(formattedEmail)) {
+            throw InvitationAlreadyExistsException(formattedEmail)
+        }
+
         val invitation = invitationRepository.saveAndFlush(
             Invitation(
                 inviter = manager,
                 creationDate = ZonedDateTime.now(clock),
-                inviteeEmail = dto.email!!.trim().lowercase(),
+                inviteeEmail = formattedEmail,
                 inviteeLastName = dto.lastName!!.trim(),
                 inviteeFirstName = dto.firstName!!.trim(),
                 status = Invitation.Status.PENDING,
