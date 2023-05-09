@@ -12,26 +12,26 @@ data class UpdateUserDetailsDTO(
     @get:Pattern(message = "{UpdateUserDetailsDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
     val phone: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDetailsDTO.locationAddress.NotBlank}")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.locationAddress.NotBlank}", regexp = "^(?!\\s*$).+")
     @get:Size(message = "{UpdateUserDetailsDTO.locationAddress.Size}", max = 100)
     val locationAddress: String?,
 
     @get:Size(message = "{UpdateUserDetailsDTO.locationAddress2.Size}", max = 100)
     val locationAddress2: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDetailsDTO.locationCode.NotBlank}")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.locationCode.NotBlank}", regexp = "^(?!\\s*$).+")
     @get:Size(message = "{UpdateUserDetailsDTO.locationCode.Size}", max = 100)
     val locationCode: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDetailsDTO.locationCity.NotBlank}")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.locationCity.NotBlank}", regexp = "^(?!\\s*$).+")
     @get:Size(message = "{UpdateUserDetailsDTO.locationCity.Size}", max = 100)
     val locationCity: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDetailsDTO.locationCountry.NotBlank}")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.locationCountry.NotBlank}", regexp = "^(?!\\s*$).+")
     @get:Size(message = "{UpdateUserDetailsDTO.locationCountry.Size}", max = 100)
     val locationCountry: String?,
 
-    @get:Pattern(regexp = "^(?!\\s*$).+", message = "{UpdateUserDetailsDTO.title.NotBlank}")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.title.NotBlank}", regexp = "^(?!\\s*$).+")
     @get:Size(message = "{UpdateUserDetailsDTO.title.Size}", max = 100)
     val title: String?,
 
