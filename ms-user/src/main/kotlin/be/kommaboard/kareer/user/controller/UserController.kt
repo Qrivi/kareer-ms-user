@@ -300,11 +300,11 @@ class UserController(
     }
 
     @Operation(
-        summary = "Update a user's password",
-        description = "Updates a user's password. You can only update your own password.",
+        summary = "Set a new user password",
+        description = "Set a new user password. You can only update your own password.",
         responses = [ApiResponse(responseCode = "200")],
     )
-    @PatchMapping("/{uuid}/password")
+    @PostMapping("/{uuid}/password")
     fun updateUserPassword(
         @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
         @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
@@ -314,7 +314,7 @@ class UserController(
         dto: UpdateUserPasswordDTO,
         validation: BindingResult,
     ): ResponseEntity<UserDTO> {
-        logger.info("Handling PATCH /users/v1/{uuid}/password [updateUserPassword] for {}", consumerId)
+        logger.info("Handling POST /users/v1/{uuid}/password [updateUserPassword] for {}", consumerId)
         authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
 
         // Get the user details, for later
