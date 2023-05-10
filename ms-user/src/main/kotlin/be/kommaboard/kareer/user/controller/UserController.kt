@@ -20,6 +20,7 @@ import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateUserPasswordDTO
 import be.kommaboard.kareer.user.lib.dto.request.VerifyPasswordDTO
 import be.kommaboard.kareer.user.lib.dto.response.UserDTO
 import be.kommaboard.kareer.user.proxy.OrganizationProxy
@@ -163,10 +164,7 @@ class UserController(
             .body(if (skipStorage) user.toDTO() else user.toRichDTO())
     }
 
-    fun createAdmin(): ResponseEntity<UserDTO> {
-        // TODO implement 👽
-        throw NotImplementedError()
-    }
+    // TODO Do we want a create admin endpoint?
 
     @Operation(
         summary = "Create a new user",
@@ -221,7 +219,7 @@ class UserController(
 
     @Operation(
         summary = "Update a user",
-        description = "Updates an user's details. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        description = "Updates a user's details. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
     @PatchMapping("/{uuid}")
@@ -266,7 +264,7 @@ class UserController(
 
     @Operation(
         summary = "Update a user's details",
-        description = "Updates an user's details. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        description = "Updates a user's details. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
     @PatchMapping("/{uuid}/details")
@@ -291,6 +289,43 @@ class UserController(
         }
 
         val updatedUser = userService.updateUserDetails(
+            user = user,
+            dto = dto,
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .headers(HttpHeadersBuilder().contentLanguage().build())
+            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+    }
+
+    @Operation(
+        summary = "Set a new user password",
+        description = "Set a new user password. You can only update your own password.",
+        responses = [ApiResponse(responseCode = "200")],
+    )
+    @PostMapping("/{uuid}/password")
+    fun updateUserPassword(
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ROLE) consumerRole: String,
+        @RequestHeader(InternalHttpHeaders.CONSUMER_ID) consumerId: String,
+        @PathVariable uuid: String,
+        @RequestParam(defaultValue = "false") skipStorage: Boolean,
+        @Valid @RequestBody
+        dto: UpdateUserPasswordDTO,
+        validation: BindingResult,
+    ): ResponseEntity<UserDTO> {
+        logger.info("Handling POST /users/v1/{uuid}/password [updateUserPassword] for {}", consumerId)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+
+        // Get the user details, for later
+        val user = getUserIfPermitted(uuid, consumerId, consumerRole)
+
+        // Make sure the request body is valid
+        if (validation.hasErrors()) {
+            throw RequestValidationException(validation)
+        }
+
+        val updatedUser = userService.updateUserPassword(
             user = user,
             dto = dto,
         )
@@ -493,7 +528,7 @@ class UserController(
 
     @Operation(
         summary = "Replace a user's banner",
-        description = "Replaces an user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
+        description = "Replaces a user's banner. The `ADMIN` role can edit all users, `MANAGER` role can edit users belonging to their organization, and `USER` role can only edit their own details.",
         responses = [ApiResponse(responseCode = "200")],
     )
     @PutMapping("/{uuid}/banner", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

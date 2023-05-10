@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size
 import java.time.LocalDate
 
 data class CreateUserDetailsDTO(
+
     @get:Size(message = "{CreateUserDetailsDTO.phone.Size}", max = 20)
     @get:Pattern(message = "{CreateUserDetailsDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
     val phone: String?,
