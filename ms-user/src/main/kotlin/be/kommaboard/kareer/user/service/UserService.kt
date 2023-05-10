@@ -18,6 +18,7 @@ import be.kommaboard.kareer.user.lib.dto.request.CreateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.EditUserDetailsSkillsDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDTO
 import be.kommaboard.kareer.user.lib.dto.request.UpdateUserDetailsDTO
+import be.kommaboard.kareer.user.lib.dto.request.UpdateUserPasswordDTO
 import be.kommaboard.kareer.user.repository.InvitationRepository
 import be.kommaboard.kareer.user.repository.TicketRepository
 import be.kommaboard.kareer.user.repository.UserRepository
@@ -302,7 +303,6 @@ class UserService(
                 dto.role?.let { this.role = it.toRole() }
                 dto.slug?.let { this.slug = formattedSlug }
                 formattedEmail?.let { this.email = it }
-                dto.password?.let { this.password = password.hashedWithSalt(kareerConfig.salt!!) }
                 dto.lastName?.let { this.lastName = it.trim() }
                 dto.firstName?.let { this.firstName = it.trim() }
                 dto.nickname?.let { this.nickname = it.trimOrNullIfBlank() }
@@ -334,6 +334,19 @@ class UserService(
                     dto.birthday?.let { this.birthday = it }
                     dto.about?.let { this.about = it }
                 }
+            },
+        )
+    }
+
+    fun updateUserPassword(
+        user: User,
+        dto: UpdateUserPasswordDTO,
+    ): User {
+        if (!BCrypt.checkpw(dto.currentPassword, user.password)) throw IncorrectCredentialsException()
+
+        return userRepository.save(
+            user.apply {
+                this.password = dto.newPassword!!.hashedWithSalt(kareerConfig.salt!!)
             },
         )
     }

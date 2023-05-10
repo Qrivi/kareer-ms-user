@@ -1,7 +1,5 @@
 package be.kommaboard.kareer.user.lib.dto.request
 
-import be.kommaboard.kareer.user.lib.constraint.NotCommonPassword
-import be.kommaboard.kareer.user.lib.constraint.NotSimplePassword
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
