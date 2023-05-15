@@ -30,7 +30,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Founder & Manager"
@@ -69,7 +69,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "HR Manager"
@@ -108,7 +108,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Project Matcher"
@@ -147,7 +147,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Frontend Connaisseur"
@@ -183,7 +183,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "11X Developer"
@@ -222,7 +222,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "React Rookie"
@@ -258,7 +258,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Financial Controller"
@@ -297,7 +297,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Senorita Accountant"
@@ -336,7 +336,7 @@ databaseChangeLog:
                   value: "Bruxelles"
               - column:
                   name: location_country
-                  value: "Belgium"
+                  value: "BE"
               - column:
                   name: title
                   value: "Business Controller"

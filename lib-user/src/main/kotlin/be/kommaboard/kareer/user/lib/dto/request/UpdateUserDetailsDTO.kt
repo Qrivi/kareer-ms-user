@@ -28,7 +28,7 @@ data class UpdateUserDetailsDTO(
     val locationCity: String?,
 
     @get:Pattern(message = "{UpdateUserDetailsDTO.locationCountry.NotBlank}", regexp = "^(?!\\s*$).+")
-    @get:Size(message = "{UpdateUserDetailsDTO.locationCountry.Size}", max = 100)
+    @get:Size(message = "{UpdateUserDetailsDTO.locationCountry.Size}", max = 2)
     val locationCountry: String?,
 
     @get:Pattern(message = "{UpdateUserDetailsDTO.title.NotBlank}", regexp = "^(?!\\s*$).+")
