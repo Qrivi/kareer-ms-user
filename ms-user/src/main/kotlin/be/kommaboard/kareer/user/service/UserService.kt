@@ -210,7 +210,7 @@ class UserService(
                     locationAddress2 = dto.details?.locationAddress2.trimOrNullIfBlank(),
                     locationCode = dto.details?.locationCode.trimOrNullIfBlank(),
                     locationCity = dto.details?.locationCity.trimOrNullIfBlank(),
-                    locationCountry = dto.details?.locationCountry.trimOrNullIfBlank(),
+                    locationCountry = dto.details?.locationCountry.trimOrNullIfBlank()?.uppercase(),
                     title = dto.details?.title.trimOrNullIfBlank() ?: "${organization.name} Employee",
                     skills = skillsMap(dto.details?.skills),
                     experienceDate = dto.details?.experienceDate ?: localNow,
@@ -327,7 +327,7 @@ class UserService(
                     dto.locationAddress2?.let { this.locationAddress2 = it.trimOrNullIfBlank() }
                     dto.locationCode?.let { this.locationCode = it.trimOrNullIfBlank() }
                     dto.locationCity?.let { this.locationCity = it.trimOrNullIfBlank() }
-                    dto.locationCountry?.let { this.locationCountry = it.trimOrNullIfBlank() }
+                    dto.locationCountry?.let { this.locationCountry = it.trimOrNullIfBlank()?.uppercase() }
                     dto.title?.let { this.title = it }
                     dto.skills?.let { this.skills = skillsMap(it) }
                     dto.experienceDate?.let { this.experienceDate = it }

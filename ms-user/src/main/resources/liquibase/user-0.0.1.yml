@@ -148,7 +148,7 @@ databaseChangeLog:
                     unique: false
               - column:
                   name: location_country
-                  type: VARCHAR(100)
+                  type: VARCHAR(2)
                   constraints:
                     nullable: true
                     unique: false

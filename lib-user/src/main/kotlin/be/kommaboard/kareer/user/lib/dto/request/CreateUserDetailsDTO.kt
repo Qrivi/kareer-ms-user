@@ -24,7 +24,7 @@ data class CreateUserDetailsDTO(
     @get:Size(message = "{CreateUserDetailsDTO.locationCity.Size}", max = 100)
     val locationCity: String?,
 
-    @get:Size(message = "{CreateUserDetailsDTO.locationCountry.Size}", max = 100)
+    @get:Size(message = "{CreateUserDetailsDTO.locationCountry.Size}", max = 2)
     val locationCountry: String?,
 
     @get:Size(message = "{CreateUserDetailsDTO.title.Size}", max = 100)
