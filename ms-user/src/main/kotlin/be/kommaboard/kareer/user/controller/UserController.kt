@@ -149,12 +149,13 @@ class UserController(
         @RequestParam(defaultValue = "false") skipStorage: Boolean,
     ): ResponseEntity<UserDTO> {
         logger.info("Handling GET /users/v1/{uuid} [getUser] for {}", consumerId)
-        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.ADMIN, Role.MANAGER, Role.USER)
+        authorizationCheck(consumerId, kareerConfig.consumerId, consumerRole, Role.MANAGER, Role.USER)
 
-        val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserBySlug(uuidOrSlug)
+        val organizationUuid = userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid
+        val user = if (uuidOrSlug.contains("-")) userService.getUserByUuid(uuidOrSlug.toUuid()) else userService.getUserByOrganizationUuidAndSlug(organizationUuid, uuidOrSlug)
 
-        // If the consumer is a regular user or manager, they can only retrieve user data of users belonging to their organization
-        if (consumerRole.isRole(Role.MANAGER, Role.USER) && userService.getUserByUuid(consumerId.toUuid()).details!!.organizationUuid != user.details!!.organizationUuid) {
+        // You can only retrieve data of users belonging to your own organization
+        if (organizationUuid != user.details!!.organizationUuid) {
             throw InvalidCredentialsException()
         }
 
