@@ -1,6 +1,6 @@
 // lib-user
 group = "be.kommaboard.kareer"
-version = "0.0.7"
+version = "1.0.2"
 
 extra["springBootVersion"] = "3.0.3"
 

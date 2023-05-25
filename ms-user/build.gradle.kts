@@ -1,6 +1,6 @@
 // ms-user
 group = "be.kommaboard.kareer"
-version = "0.0.7"
+version = "1.0.2"
 
 extra["springBootVersion"] = "3.0.3"
 extra["springCloudVersion"] = "2022.0.1"
@@ -34,12 +34,12 @@ dependencyManagement {
 
 dependencies {
     // Kareer Libraries
-    implementation("be.kommaboard.kareer:lib-authorization:0.0.4")
-    implementation("be.kommaboard.kareer:lib-common:0.0.4")
+    implementation("be.kommaboard.kareer:lib-authorization:1.0.2")
+    implementation("be.kommaboard.kareer:lib-common:1.0.2")
     implementation("be.kommaboard.kareer:lib-user:$version")
-    implementation("be.kommaboard.kareer:lib-mailing:0.0.4")
-    implementation("be.kommaboard.kareer:lib-organization:0.0.2")
-    implementation("be.kommaboard.kareer:lib-storage:0.0.2")
+    implementation("be.kommaboard.kareer:lib-mailing:1.0.2")
+    implementation("be.kommaboard.kareer:lib-organization:1.0.2")
+    implementation("be.kommaboard.kareer:lib-storage:1.0.2")
     // Kotlin (required by Spring Web)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

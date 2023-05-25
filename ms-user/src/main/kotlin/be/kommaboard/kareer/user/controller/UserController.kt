@@ -133,7 +133,7 @@ class UserController(
                     .link(request, usersPage)
                     .build(),
             )
-            .body(ListDTO(usersPage.content.map { if (skipStorage) it.toDTO() else it.toRichDTO() }, usersPage))
+            .body(ListDTO(usersPage.content.map { it.toRichDTO(skipStorage) }, usersPage))
     }
 
     @Operation(
@@ -162,7 +162,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (skipStorage) user.toDTO() else user.toRichDTO())
+            .body(user.toRichDTO(skipStorage))
     }
 
     // TODO Do we want a create admin endpoint?
@@ -260,7 +260,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+            .body(updatedUser.toRichDTO(skipStorage))
     }
 
     @Operation(
@@ -297,7 +297,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+            .body(updatedUser.toRichDTO(skipStorage))
     }
 
     @Operation(
@@ -334,7 +334,7 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .headers(HttpHeadersBuilder().contentLanguage().build())
-            .body(if (skipStorage) updatedUser.toDTO() else updatedUser.toRichDTO())
+            .body(updatedUser.toRichDTO(skipStorage))
     }
 
     @Operation(
@@ -466,7 +466,7 @@ class UserController(
 
         val user = getUserIfPermitted(uuid, consumerId, consumerRole)
 
-        // TODO Add file type/size checks
+        // TODO Add file type/size checks?
 
         // Upload new avatar and get its reference
         val fileReference = storageProxy.createFileReference(
@@ -660,7 +660,11 @@ class UserController(
         return user
     }
 
-    private fun User.toRichDTO(): UserDTO {
+    private fun User.toRichDTO(skipStorage: Boolean = false): UserDTO {
+        if (skipStorage) {
+            return this.toDTO()
+        }
+
         val avatarUrl = this.avatarReference?.let { id ->
             storageProxy.getFileReference(
                 consumerRole = Role.SYSTEM.name,
