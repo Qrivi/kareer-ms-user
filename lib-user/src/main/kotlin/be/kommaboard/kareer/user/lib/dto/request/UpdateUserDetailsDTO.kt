@@ -9,7 +9,7 @@ import java.time.LocalDate
 data class UpdateUserDetailsDTO(
 
     @get:Size(message = "{UpdateUserDetailsDTO.phone.Size}", max = 20)
-    @get:Pattern(message = "{UpdateUserDetailsDTO.phone.Pattern}", regexp = "^(00|\\+)\\d+\$")
+    @get:Pattern(message = "{UpdateUserDetailsDTO.phone.Pattern}", regexp = "^\\+\\d+\$")
     val phone: String?,
 
     @get:Pattern(message = "{UpdateUserDetailsDTO.locationAddress.NotBlank}", regexp = "^(?!\\s*$).+")

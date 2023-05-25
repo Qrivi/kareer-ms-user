@@ -27,7 +27,7 @@ interface UserRepository : JpaRepository<User, UUID> {
 
     fun findByUuid(uuid: UUID): User?
 
-    fun findBySlug(slug: String): User?
+    fun findByDetailsOrganizationUuidAndSlugIgnoreCase(organizationUuid: UUID, slug: String): User?
 
     fun findByEmailIgnoreCase(email: String): User?
 

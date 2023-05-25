@@ -116,9 +116,10 @@ class UserService(
     ) = userRepository.findByUuid(uuid)
         ?: throw UserDoesNotExistException()
 
-    fun getUserBySlug(
+    fun getUserByOrganizationUuidAndSlug(
+        organizationUuid: UUID,
         slug: String,
-    ) = userRepository.findBySlug(slug)
+    ) = userRepository.findByDetailsOrganizationUuidAndSlugIgnoreCase(organizationUuid, slug)
         ?: throw UserDoesNotExistException()
 
     fun getInvitationByUuid(
